@@ -10,6 +10,7 @@ import {
   FilePlus, // For Document Management (admin)
   CheckSquare, // For Approvals (admin)
   ShieldQuestion, // For Smart Document Suggestion (if it has its own page)
+  Settings, // Import Settings icon
 } from "lucide-react";
 
 export const navConfig: Record<UserRole, NavItem[]> = {
@@ -118,10 +119,9 @@ export const navConfig: Record<UserRole, NavItem[]> = {
 };
 
 export const commonNavItems: NavItem[] = [
-  // Example:
-  // {
-  //   title: "Settings",
-  //   href: "/settings",
-  //   icon: SettingsIcon, // Replace with actual icon
-  // },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings, // Use the imported Settings icon
+  },
 ];

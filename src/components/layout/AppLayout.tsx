@@ -57,7 +57,7 @@ export default function AppLayout({ children, user: propsUser, pageTitle, locale
       <SidebarInset>
         <Header user={currentUser} pageTitle={pageTitle} currentLocale={locale} />
         <main className="flex-1 overflow-auto">
-          {children}
+ {children}
         </main>
       </SidebarInset>
     </SidebarProvider>
