@@ -1,7 +1,7 @@
 import type React from 'react';
 import type { User } from '@/types';
 import Header from './Header';
-import SidebarNav from './SidebarNav';
+import { AppSidebar } from './SidebarNav';
 import {
   SidebarProvider,
   Sidebar,
@@ -44,7 +44,7 @@ export default function AppLayout({ children, user: propsUser, pageTitle, locale
           </Link>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarNav />
+ <AppSidebar />
         </SidebarContent>
         <SidebarFooter>
           {/* Logout button text will be translated in SidebarNav or here if made client component part */}
