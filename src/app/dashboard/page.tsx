@@ -1,3 +1,4 @@
+
 import AppLayout from '@/components/layout/AppLayout';
 import WelcomeHeader from '@/components/dashboard/WelcomeHeader';
 import RequestsSummary from '@/components/dashboard/RequestsSummary';
@@ -7,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import type { User } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldAlert } from 'lucide-react';
+import SeedButton from '@/components/dashboard/SeedButton'; // Added import
 
 
 // Mock user data for the dashboard page.
@@ -41,6 +43,11 @@ export default async function DashboardPage() {
         <WelcomeHeader userName={user.name} />
         
         <Separator />
+        
+        {/* TEMPORARY SEED BUTTON - REMOVE AFTER USE */}
+        <SeedButton />
+        <Separator className="my-6 border-destructive border-dashed" />
+        {/* END TEMPORARY SEED BUTTON */}
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map(stat => (
