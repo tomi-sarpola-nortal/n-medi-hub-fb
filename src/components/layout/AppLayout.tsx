@@ -16,10 +16,12 @@ import Link from 'next/link';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  user?: User; // Make user optional for initial setup
+  user?: User;
+  pageTitle: string; // Now required and expected to be pre-translated
+  locale: string; // To pass down if needed, or components can use useRouter
 }
 
-export default function AppLayout({ children, user: propsUser }: AppLayoutProps) {
+export default function AppLayout({ children, user: propsUser, pageTitle, locale }: AppLayoutProps) {
   // Mock user for now, will be replaced by actual auth logic
   const currentUser: User = propsUser || {
     id: 'user1',
@@ -45,14 +47,15 @@ export default function AppLayout({ children, user: propsUser }: AppLayoutProps)
           <SidebarNav />
         </SidebarContent>
         <SidebarFooter>
+          {/* Logout button text will be translated in SidebarNav or here if made client component part */}
           <Button variant="ghost" className="w-full justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
             <LogOut className="h-4 w-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Logout</span>
+            <span className="group-data-[collapsible=icon]:hidden">Logout</span> {/* This will be handled by SidebarNav */}
           </Button>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <Header user={currentUser} pageTitle="Dashboard" />
+        <Header user={currentUser} pageTitle={pageTitle} currentLocale={locale} />
         <main className="flex-1 overflow-auto">
           {children}
         </main>

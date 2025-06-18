@@ -1,3 +1,4 @@
+'use client';
 
 import type { User } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,33 +12,44 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Bell, UserCircle, LogOut, Settings } from 'lucide-react'; // Removed Search as it's commented out
+import { Bell, UserCircle, LogOut, Settings } from 'lucide-react';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useRouter } from 'next/navigation'; // For locale
 
 interface HeaderProps {
   user: User;
-  pageTitle?: string; // Made optional as some pages might set title differently
+  pageTitle: string; 
+  currentLocale?: string;
 }
 
-export default function Header({ user, pageTitle }: HeaderProps) {
+// A simple way to get translations on the client for this specific component
+const getClientTranslations = (locale: string) => {
+  try {
+    if (locale === 'de') {
+      return require('../../../locales/de.json');
+    }
+    return require('../../../locales/en.json');
+  } catch (e) {
+    return require('../../../locales/en.json'); // Fallback
+  }
+};
+
+
+export default function Header({ user, pageTitle, currentLocale }: HeaderProps) {
+  const router = useRouter();
+  const locale = currentLocale || router.locale || 'en';
+  const t = getClientTranslations(locale);
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger className="sm:hidden" />
-      
-      {/* Search was previously here, commented out */}
-      {/* <div className="relative ml-auto flex-1 md:grow-0">
-         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search..."
-          className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-        />
-      </div> */}
       
       {pageTitle && (
          <h1 className="flex-1 text-xl font-semibold font-headline whitespace-nowrap hidden md:block">{pageTitle}</h1>
       )}
       
-      <div className="ml-auto flex items-center gap-2"> {/* Ensures buttons are grouped to the right */}
+      <div className="ml-auto flex items-center gap-4"> {/* Ensured LanguageSwitcher is part of this group */}
+        <LanguageSwitcher initialLocale={locale} />
         <Button variant="outline" size="icon" className="h-8 w-8">
           <Bell className="h-4 w-4" />
           <span className="sr-only">Toggle notifications</span>
@@ -53,20 +65,20 @@ export default function Header({ user, pageTitle }: HeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t.header_my_account || "My Account"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+              <span>{t.header_settings || "Settings"}</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <UserCircle className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>{t.header_profile || "Profile"}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
+              <span>{t.header_logout || "Logout"}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

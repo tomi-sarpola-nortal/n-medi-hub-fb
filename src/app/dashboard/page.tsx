@@ -1,4 +1,3 @@
-
 import AppLayout from '@/components/layout/AppLayout';
 import WelcomeHeader from '@/components/dashboard/WelcomeHeader';
 import RequestsSummary from '@/components/dashboard/RequestsSummary';
@@ -8,39 +7,43 @@ import { Separator } from '@/components/ui/separator';
 import type { User } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldAlert } from 'lucide-react';
-import SeedButton from '@/components/dashboard/SeedButton'; // Added import
-
+import SeedButton from '@/components/dashboard/SeedButton';
+import { getTranslations } from '@/lib/translations'; // For server-side translations
 
 // Mock user data for the dashboard page.
-// In a real application, this would come from an authentication context or API.
 const getCurrentUser = async (): Promise<User> => {
-  // Simulate fetching user data
   return {
     id: 'user123',
     name: 'Dr. Sabine Müller',
     email: 'sabine.mueller@example.com',
     role: 'dentist',
-    region: 'Bayern', // Example region, can be dynamic
+    region: 'Bayern',
     avatarUrl: `https://placehold.co/100x100.png?text=SM`,
     dentistId: 'ZA-2025-0842',
   };
 };
 
-export default async function DashboardPage() {
-  const user = await getCurrentUser();
+interface DashboardPageProps {
+  params: { locale: string };
+}
 
-  // Placeholder stats - replace with real data later
+export default async function DashboardPage({ params }: DashboardPageProps) {
+  const user = await getCurrentUser();
+  const t = getTranslations(params.locale);
+
+  const welcomeMessage = t.welcome_back.replace('{userName}', user.name);
+  const pageTitle = t.dashboard_page_title || "Dashboard";
+
   const stats = [
     { title: "Active Cases", value: "12", change: "+5 this month", icon: ShieldAlert},
     { title: "Education Points", value: "150", change: "Target: 200", icon: ShieldAlert},
     { title: "Upcoming Events", value: "3", change: "View Calendar", icon: ShieldAlert},
   ];
 
-
   return (
-    <AppLayout user={user}>
+    <AppLayout user={user} pageTitle={pageTitle} locale={params.locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8">
-        <WelcomeHeader userName={user.name} />
+        <WelcomeHeader translatedWelcomeMessage={welcomeMessage} />
         
         <Separator />
         
