@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,7 +21,7 @@ body {
     --secondary-foreground: 0 0% 20%; /* #333333 Charcoal */
     --muted: 0 0% 90%; /* Lighter grey */
     --muted-foreground: 0 0% 40%; /* Mid-grey */
-    --accent: 183 50% 82%; /* #BEE5E8 Teal */
+    --accent: 183 50% 92%; /* Lighter Teal for general accents, can be same as sidebar-accent */
     --accent-foreground: 0 0% 20%; /* #333333 Charcoal */
     --destructive: 5 78% 50%; /* #E33A2B Red */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF White */
@@ -36,13 +37,18 @@ body {
 
     /* Sidebar specific colors */
     --sidebar-background: 0 0% 100%; /* White */
-    --sidebar-foreground: 0 0% 20%; /* Charcoal */
-    --sidebar-primary: 183 50% 82%; /* Teal */
+    --sidebar-foreground: 0 0% 25%; /* Slightly darker charcoal for better contrast on white */
+    --sidebar-primary: 183 50% 82%; /* Teal - used for active item border */
     --sidebar-primary-foreground: 0 0% 20%; /* Charcoal */
-    --sidebar-accent: 183 50% 92%; /* Lighter Teal for hover */
-    --sidebar-accent-foreground: 0 0% 20%; /* Charcoal */
-    --sidebar-border: 0 0% 90%; /* Light grey */
-    --sidebar-ring: 183 50% 70%; /* Slightly darker Teal */
+    --sidebar-accent: 183 50% 92%; /* Lighter Teal for hover/active backgrounds */
+    --sidebar-accent-foreground: 0 0% 20%; /* Charcoal for text on accent backgrounds */
+    --sidebar-border: 0 0% 90%; /* Light grey for sidebar internal borders */
+    --sidebar-ring: 183 50% 70%; /* Slightly darker Teal for focus rings within sidebar */
+    
+    /* User info section in sidebar - can be distinct or use existing vars */
+    --sidebar-user-info-background: 0 0% 94%; /* Slightly off-white, like a subtle card within sidebar */
+    --sidebar-user-info-foreground: 0 0% 20%; 
+    --sidebar-user-info-hover-background: 0 0% 88%; /* Slightly darker hover for user info trigger */
   }
 
   .dark {
@@ -73,14 +79,18 @@ body {
     --chart-5: 340 75% 55%;
 
     /* Dark Sidebar specific colors - can be adjusted */
-    --sidebar-background: 0 0% 10%; /* Darker Background */
-    --sidebar-foreground: 0 0% 95%; /* Lighter Foreground */
-    --sidebar-primary: 183 50% 60%; /* Darker Teal */
-    --sidebar-primary-foreground: 0 0% 98%; /* White */
-    --sidebar-accent: 0 0% 15%; /* Darker Accent */
-    --sidebar-accent-foreground: 0 0% 95%; /* Lighter Foreground */
-    --sidebar-border: 0 0% 15%; /* Darker Border */
-    --sidebar-ring: 183 50% 60%; /* Darker Teal */
+    --sidebar-background: 0 0% 10%; 
+    --sidebar-foreground: 0 0% 95%; 
+    --sidebar-primary: 183 50% 60%; 
+    --sidebar-primary-foreground: 0 0% 98%; 
+    --sidebar-accent: 0 0% 15%; 
+    --sidebar-accent-foreground: 0 0% 95%; 
+    --sidebar-border: 0 0% 20%; 
+    --sidebar-ring: 183 50% 60%;
+
+    --sidebar-user-info-background: 0 0% 12%; 
+    --sidebar-user-info-foreground: 0 0% 95%;
+    --sidebar-user-info-hover-background: 0 0% 18%;
   }
 }
 
@@ -92,3 +102,19 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom class for collapsed sidebar language switcher */
+.collapsed-language-switcher-item {
+    @apply p-2 flex items-center justify-center;
+}
+.collapsed-language-switcher-item .lucide-globe {
+    @apply hidden; /* Hide globe icon if SelectTrigger shows it or if you want custom layout */
+}
+.collapsed-language-switcher-item .select-trigger-class { /* Add a specific class to SelectTrigger if needed */
+    @apply w-auto p-0 border-none bg-transparent; /* Example styling for collapsed */
+}
+.collapsed-language-switcher-item .select-trigger-class span {
+    @apply text-xs; /* Make text smaller */
+}
+
+

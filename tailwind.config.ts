@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -56,14 +57,18 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
+          DEFAULT: 'hsl(var(--sidebar-background))', // Matches --sidebar-background from globals.css
           foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
+          'item-active-background': 'hsl(var(--sidebar-accent))', // Use --sidebar-accent for active item bg
+          'item-active-foreground': 'hsl(var(--sidebar-accent-foreground))', // Use --sidebar-accent-foreground for active item text
+          'item-active-border': 'hsl(var(--sidebar-primary))', // Use --sidebar-primary for active item border
+          'item-hover-background': 'hsl(var(--sidebar-accent))', // Use --sidebar-accent for hover item bg
+          'item-hover-foreground': 'hsl(var(--sidebar-accent-foreground))', // Use --sidebar-accent-foreground for hover item text
+          'user-info-background': 'hsl(var(--muted))', // A slightly different background for the user info section
+          'user-info-foreground': 'hsl(var(--muted-foreground))',
+          'user-info-hover-background': 'hsl(var(--accent))',
         },
       },
       borderRadius: {
@@ -97,3 +102,4 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+

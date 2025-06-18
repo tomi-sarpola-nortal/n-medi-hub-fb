@@ -1,65 +1,43 @@
+
 import type React from 'react';
-import type { User } from '@/types';
+import type { User } from '@/types'; // User might still be used if SidebarNav needs it directly passed
 import Header from './Header';
-import { AppSidebar } from './SidebarNav';
+import { AppSidebar } from './SidebarNav'; // Corrected import name
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
+  // SidebarHeader, // No longer directly used here, SidebarNav handles its own header
+  // SidebarContent, // No longer directly used here
+  // SidebarFooter, // No longer directly used here
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { ShieldCheck, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+// import { ShieldCheck, LogOut } from 'lucide-react'; // Moved to SidebarNav or not needed
+// import { Button } from '@/components/ui/button'; // Moved to SidebarNav
+// import Link from 'next/link'; // Moved to SidebarNav
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  user?: User;
-  pageTitle: string; // Now required and expected to be pre-translated
-  locale: string; // To pass down if needed, or components can use useRouter
+  user?: User; // This prop might become optional or removed if Header/SidebarNav fetch user via context
+  pageTitle: string; 
+  locale: string; 
 }
 
 export default function AppLayout({ children, user: propsUser, pageTitle, locale }: AppLayoutProps) {
-  // Mock user for now, will be replaced by actual auth logic
-  const currentUser: User = propsUser || {
-    id: 'user1',
-    name: 'Dr. Sabine Müller',
-    email: 'sabine.mueller@example.com',
-    role: 'dentist',
-    region: 'Bayern',
-    avatarUrl: `https://placehold.co/100x100.png?text=SM`,
-  };
+  // Mock user or user from props/context - SidebarNav now uses useAuth() context
+  // const currentUser: User | undefined = propsUser; // Or fetched from context if Header/SidebarNav don't take prop
 
   return (
     <SidebarProvider defaultOpen>
-      <Sidebar variant="sidebar" collapsible="icon">
-        <SidebarHeader className="p-0">
-          <Link href="/dashboard" className="flex h-16 items-center justify-center border-b border-sidebar-border px-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-t-lg">
-            <ShieldCheck className="h-7 w-7 text-primary" />
-            <h1 className="ml-2 text-lg font-bold font-headline group-data-[collapsible=icon]:hidden">
-              ZahnKammer
-            </h1>
-          </Link>
-        </SidebarHeader>
-        <SidebarContent>
- <AppSidebar />
-        </SidebarContent>
-        <SidebarFooter>
-          {/* Logout button text will be translated in SidebarNav or here if made client component part */}
-          <Button variant="ghost" className="w-full justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
-            <LogOut className="h-4 w-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Logout</span> {/* This will be handled by SidebarNav */}
-          </Button>
-        </SidebarFooter>
-      </Sidebar>
+      {/* AppSidebar now fetches its own user data via useAuth context */}
+      <AppSidebar /> 
       <SidebarInset>
-        <Header user={currentUser} pageTitle={pageTitle} currentLocale={locale} />
+        {/* Header no longer needs user prop for avatar/dropdown */}
+        <Header pageTitle={pageTitle} currentLocale={locale} /> 
         <main className="flex-1 overflow-auto">
- {children}
+          {children}
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+

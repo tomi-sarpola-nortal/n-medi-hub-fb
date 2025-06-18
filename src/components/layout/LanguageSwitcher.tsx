@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -11,9 +12,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { Globe } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { cn } from '@/lib/utils'; // Import cn
 
-// A simple way to get translations on the client for this specific component
-// In a larger app, you might use a context or a dedicated i18n client library
 const getClientTranslations = (locale: string) => {
   try {
     if (locale === 'de') {
@@ -21,7 +21,7 @@ const getClientTranslations = (locale: string) => {
     }
     return require('../../../locales/en.json');
   } catch (e) {
-    return require('../../../locales/en.json'); // Fallback
+    return require('../../../locales/en.json'); 
   }
 };
 
@@ -33,14 +33,12 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentLocale = initialLocale || router.locale || 'en';
+  // Ensure currentLocale falls back to 'en' if router.locale is undefined during initial render
+  const currentLocale = initialLocale || router.locale || 'en'; 
   
   const t = getClientTranslations(currentLocale);
 
   const handleChange = (newLocale: string) => {
-    // Rebuild the path with the new locale, keeping the original pathname without locale prefix
-    // For example, if current path is /en/dashboard, newPathname becomes /dashboard
-    // Then router.push will prepend the newLocale
     const currentPathWithoutLocale = pathname.startsWith(`/${currentLocale}`)
       ? pathname.substring(`/${currentLocale}`.length) || '/'
       : pathname;
@@ -50,13 +48,18 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   };
 
   return (
-    <div className={className ? className : "flex items-center space-x-2"} {...props}>
-      <Globe className="h-5 w-5 text-muted-foreground" />
-      <Label htmlFor="language-select" className="sr-only text-sm font-medium">
+    // Use cn to merge classes, allowing 'className' prop to override or extend
+    <div className={cn("flex items-center space-x-2", className)} {...props}>
+      <Globe className="h-5 w-5 text-muted-foreground group-data-[state=collapsed]:hidden" />
+      <Label htmlFor="language-select" className="sr-only text-sm font-medium group-data-[state=collapsed]:hidden">
         {t.language_switcher_label || "Language"}
       </Label>
       <Select value={currentLocale} onValueChange={handleChange}>
-        <SelectTrigger id="language-select" className="w-[100px] h-9 text-xs">
+        <SelectTrigger 
+          id="language-select" 
+          className="w-full min-w-[100px] h-9 text-xs group-data-[state=collapsed]:hidden" // Ensure it takes full width in its container
+          aria-label={t.language_switcher_label || "Language"}
+        >
           <SelectValue placeholder={t.language_switcher_label || "Language"} />
         </SelectTrigger>
         <SelectContent>
@@ -67,3 +70,4 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
     </div>
   );
 }
+
