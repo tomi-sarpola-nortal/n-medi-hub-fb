@@ -1,3 +1,4 @@
+
 import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 // Uncomment if you plan to use Firebase Authentication or Storage
@@ -13,34 +14,27 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Validate critical Firebase configuration
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  const errorMessage = "CRITICAL: Firebase configuration is incomplete. 'apiKey' or 'projectId' is missing. Please ensure NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID are correctly set in your .env file. Firestore cannot be initialized, and the application may not function correctly.";
+  console.error(errorMessage);
+  // Throwing an error here will stop the application from proceeding with an invalid Firebase setup,
+  // making the root cause of issues like seeding errors more apparent.
+  throw new Error(errorMessage);
+}
+
 // Initialize Firebase
 let app;
 if (!getApps().length) {
-  if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.warn("Firebase config is missing. Please ensure all NEXT_PUBLIC_FIREBASE_ environment variables are set.");
-    // Potentially throw an error or handle this state appropriately for your app
-    // For now, we'll proceed, but Firestore/Auth/Storage will not work.
-    app = {} as any; // Avoid crashing during initialization if config is missing
-  } else {
-     app = initializeApp(firebaseConfig);
-  }
+  app = initializeApp(firebaseConfig);
 } else {
   app = getApp();
 }
 
-let db;
-// let auth;
-// let storage;
-
-if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-  db = getFirestore(app);
-  // auth = getAuth(app);
-  // storage = getStorage(app);
-} else {
-  // Mock or disable Firestore if config is not available
-  db = {} as any; // Avoid crashing if db is used without proper init
-  console.warn("Firestore could not be initialized due to missing Firebase config.");
-}
-
+const db = getFirestore(app);
+// Uncomment and initialize if you plan to use Firebase Authentication or Storage
+// const auth = getAuth(app);
+// const storage = getStorage(app);
 
 export { db /*, auth, storage */ };
+
