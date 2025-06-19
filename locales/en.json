@@ -1,3 +1,4 @@
+
 {
   "welcome_back": "Welcome back, {userName}!",
   "dashboard_page_title": "Dashboard",
@@ -33,5 +34,24 @@
   "fortbildungshistorie_pagination_showing": "Showing {start} to {end} of {total} trainings",
   "fortbildungshistorie_pagination_back": "Back",
   "fortbildungshistorie_pagination_next": "Next",
-  "fortbildungshistorie_footer_note": "The points displayed are based on the interface with the training platform. Your complete documentation can be found in the official ÖZÄK training account."
+  "fortbildungshistorie_footer_note": "The points displayed are based on the interface with the training platform. Your complete documentation can be found in the official ÖZÄK training account.",
+  "login_logo_text_main": "AUSTRIAN DENTAL CHAMBER",
+  "login_logo_text_portal": "Portal",
+  "login_form_title": "Login to Portal",
+  "login_label_email": "Email or Dentist ID",
+  "login_placeholder_email": "john.doe@example.com",
+  "login_label_password": "Password",
+  "login_button_text": "LOGIN",
+  "login_forgot_password_link": "Forgot password?",
+  "login_support_text_prefix": "Problems with login?",
+  "login_support_link": "Contact our support",
+  "login_register_title": "Not yet registered with the Austrian Dental Chamber?",
+  "login_register_description": "If you are new to practicing in Austria and do not yet have an entry with the Austrian Dental Chamber, you can apply for an entry here.",
+  "login_register_button_text": "APPLY FOR CHAMBER REGISTRATION",
+  "login_footer_copyright": "© 2025 Austrian Dental Chamber. All rights reserved.",
+  "login_footer_privacy": "Privacy Policy",
+  "login_footer_imprint": "Imprint",
+  "login_footer_contact": "Contact",
+  "login_error_title": "Login Failed",
+  "login_error_description": "The email or password you entered is incorrect. Please try again."
 }
