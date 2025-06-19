@@ -16,6 +16,7 @@ import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { auth } from '@/lib/firebaseConfig';
 import { fetchSignInMethodsForEmail } from 'firebase/auth';
+import { updateRegistrationData } from '@/lib/registrationStore'; // Import the store function
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -35,10 +36,6 @@ const FormSchema = z.object({
 });
 type EmailFormInputs = z.infer<typeof FormSchema>;
 
-// In a real multi-step form, this state would be managed by a context or a parent component
-let registrationDataStore: { email?: string } = {};
-
-
 export default function RegisterStep1Page() {
   const router = useRouter();
   const pathname = usePathname();
@@ -52,7 +49,7 @@ export default function RegisterStep1Page() {
   const form = useForm<EmailFormInputs>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: registrationDataStore.email || '',
+      email: '',
     },
   });
 
@@ -67,11 +64,11 @@ export default function RegisterStep1Page() {
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
-        setIsLoading(false); // Ensure loading indicator is turned off
-        return; // Explicitly stop if email exists
+        setIsLoading(false);
+        return; 
       } else {
         // Email is available
-        registrationDataStore.email = data.email; 
+        updateRegistrationData({ email: data.email }); // Save email to store
         toast({
           title: t.register_email_valid_title || "Email Verified",
           description: t.register_email_valid_description || "Email address is valid and available. Proceeding to the next step.",

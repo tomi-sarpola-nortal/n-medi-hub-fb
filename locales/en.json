@@ -68,5 +68,17 @@
   "register_email_valid_title": "Email Verified",
   "register_email_valid_description": "Email address is valid and available. Proceeding to the next step.",
   "register_email_check_error_title": "Verification Error",
-  "register_email_check_error_description": "Could not verify email address. Please try again."
+  "register_email_check_error_description": "Could not verify email address. Please try again.",
+  "register_back_button": "Back",
+  "register_step1_part2_card_title": "Set Password",
+  "register_step1_part2_card_description": "Please choose a secure password for your access to the member portal.",
+  "register_step1_part2_label_password": "Password",
+  "register_step1_part2_label_confirm_password": "Repeat Password",
+  "register_step1_part2_criteria_length": "At least 8 characters",
+  "register_step1_part2_criteria_uppercase": "At least one uppercase letter",
+  "register_step1_part2_criteria_lowercase": "At least one lowercase letter",
+  "register_step1_part2_criteria_number": "At least one number",
+  "register_step1_part2_button_save_password": "SAVE PASSWORD",
+  "register_step1_part2_password_saved_title": "Password Saved",
+  "register_step1_part2_password_saved_desc": "Password has been temporarily saved. Proceed to the next step."
 }

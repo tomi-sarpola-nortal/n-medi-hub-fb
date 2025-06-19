@@ -68,5 +68,17 @@
   "register_email_valid_title": "E-Mail bestätigt",
   "register_email_valid_description": "E-Mail-Adresse ist gültig und verfügbar. Weiter zum nächsten Schritt.",
   "register_email_check_error_title": "Überprüfungsfehler",
-  "register_email_check_error_description": "Die E-Mail-Adresse konnte nicht überprüft werden. Bitte versuchen Sie es erneut."
+  "register_email_check_error_description": "Die E-Mail-Adresse konnte nicht überprüft werden. Bitte versuchen Sie es erneut.",
+  "register_back_button": "Zurück",
+  "register_step1_part2_card_title": "Passwort festlegen",
+  "register_step1_part2_card_description": "Bitte wählen Sie ein sicheres Passwort für Ihren Zugang zum Mitgliederportal.",
+  "register_step1_part2_label_password": "Passwort",
+  "register_step1_part2_label_confirm_password": "Passwort wiederholen",
+  "register_step1_part2_criteria_length": "Mindestens 8 Zeichen",
+  "register_step1_part2_criteria_uppercase": "Mindestens ein Großbuchstabe",
+  "register_step1_part2_criteria_lowercase": "Mindestens ein Kleinbuchstabe",
+  "register_step1_part2_criteria_number": "Mindestens eine Zahl",
+  "register_step1_part2_button_save_password": "PASSWORT SPEICHERN",
+  "register_step1_part2_password_saved_title": "Passwort gespeichert",
+  "register_step1_part2_password_saved_desc": "Das Passwort wurde temporär gespeichert. Fahren Sie mit dem nächsten Schritt fort."
 }
