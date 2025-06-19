@@ -61,17 +61,14 @@ export default function RegisterStep1Page() {
     try {
       const methods = await fetchSignInMethodsForEmail(auth, data.email);
       
-      // DEBUG ALERT: Show the email and methods length
-      alert(`Email: ${data.email}\nNumber of sign-in methods found: ${methods.length}`);
-
       if (methods.length > 0) {
         toast({
           title: t.register_email_exists_title || "Email Already Registered",
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
-        setIsLoading(false); 
-        return; 
+        setIsLoading(false); // Ensure loading indicator is turned off
+        return; // Explicitly stop if email exists
       } else {
         // Email is available
         registrationDataStore.email = data.email; 
