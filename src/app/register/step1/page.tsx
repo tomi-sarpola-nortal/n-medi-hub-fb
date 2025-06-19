@@ -66,6 +66,7 @@ export default function RegisterStep1Page() {
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
+        return; // Explicitly stop further execution if email exists
       } else {
         // Email is available
         registrationDataStore.email = data.email; // Store email for next step
