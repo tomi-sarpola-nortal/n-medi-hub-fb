@@ -60,8 +60,9 @@ export default function RegisterStep1Page() {
     setIsLoading(true);
     try {
       const methods = await fetchSignInMethodsForEmail(auth, data.email);
-      console.log('Firebase sign-in methods found:', methods); // DEBUG LOG
-      console.log('methods.length:', methods.length); // DEBUG LOG
+      
+      // DEBUG ALERT: Show the email and methods length
+      alert(`Email: ${data.email}\nNumber of sign-in methods found: ${methods.length}`);
 
       if (methods.length > 0) {
         toast({
@@ -69,7 +70,7 @@ export default function RegisterStep1Page() {
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
-        setIsLoading(false); // Make sure to set loading to false here
+        setIsLoading(false); 
         return; 
       } else {
         // Email is available
@@ -137,4 +138,3 @@ export default function RegisterStep1Page() {
     </AuthLayout>
   );
 }
-
