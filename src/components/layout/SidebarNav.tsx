@@ -88,10 +88,10 @@ export function AppSidebar() {
   if (!user) return null;
 
   const userNavItems = navConfig[user.role] || [];
-  const allNavItems = [...userNavItems, ...commonNavItems.filter(item => !item.roles || item.roles.includes(user.role))];
+  const allNavItems = [...userNavItems, ...commonNavItems.filter(item => !item.roles || item.roles.includes(user.role))]; // Removed filtering by roles here, assuming roles are handled by navConfig
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-3">
         <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
           <Landmark className="h-7 w-7 flex-shrink-0 text-primary" />
@@ -101,15 +101,15 @@ export function AppSidebar() {
             </span>
           )}
         </Link>
-        {state === "expanded" && (
-            <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden md:flex ml-auto h-7 w-7 text-sidebar-foreground hover:bg-sidebar-item-hover-background">
-                <ChevronLeftSquare />
-            </Button>
-        )}
+        {/* Toggle button commented out to keep sidebar fully visible by default */}
+        {/* <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden md:flex ml-auto h-7 w-7 text-sidebar-foreground hover:bg-sidebar-item-hover-background">
+            <ChevronLeftSquare />
+        </Button> */}
       </SidebarHeader>
 
       {/* User Profile Section with Dropdown */}
-      {state === "expanded" && (
+      {/* Always show user profile section when sidebar is not collapsed */}
+      {/* {state === "expanded" && ( */}
         <div className="p-3 mx-2 my-1 rounded-md bg-sidebar-user-info-background text-sidebar-user-info-foreground">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -145,40 +145,7 @@ export function AppSidebar() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      )}
-      {/* Icon only avatar when collapsed */}
-       {state === "collapsed" && (
-         <div className="p-3 mx-auto my-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Avatar className="h-9 w-9 cursor-pointer">
-                  <AvatarImage src={user.profileImage || `https://avatar.vercel.sh/${user.email}.png?size=40`} alt={user.name || "User"} data-ai-hint="avatar person" />
-                  <AvatarFallback>
-                    <UserCircle className="h-9 w-9 text-muted-foreground" />
-                  </AvatarFallback>
-                </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="center" className="w-56">
-              <DropdownMenuLabel>{t.header_my_account || "My Account"}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-               <DropdownMenuItem onSelect={() => router.push('/profile')}>
-                <UserCircle className="mr-2 h-4 w-4" />
-                <span>{t.header_profile || "Profile"}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => router.push('/settings')}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>{t.header_settings || "Settings"}</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={logout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>{t.header_logout || "Logout"}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-         </div>
-       )}
-
+      {/* )} */}
 
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
@@ -200,23 +167,23 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
+      {/* Language switcher in footer, always visible */}
       <SidebarFooter className="p-2 border-t border-sidebar-border mt-auto">
-         {state === "expanded" && <LanguageSwitcher initialLocale={locale} className="p-1" />}
-         {state === "collapsed" && (
-            <div className="flex justify-center py-2">
-                {/* Placeholder for collapsed language switcher icon if needed, or remove this block */}
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-sidebar-foreground">
-                            <Globe className="h-5 w-5" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="center">
-                        <LanguageSwitcher initialLocale={locale} className="p-2 flex flex-col gap-2"/>
-                    </DropdownMenuContent>
-                 </DropdownMenu>
-            </div>
-         )}
+         <LanguageSwitcher initialLocale={locale} className="p-1" />
+         {/* Collapsed language switcher removed as sidebar is always expanded */}
+         {/* {state === "collapsed" && (
+            // <div className="flex justify-center py-2">
+            //      <DropdownMenu>
+            //         <DropdownMenuTrigger asChild>
+            //             <Button variant="ghost" size="icon" className="h-8 w-8 text-sidebar-foreground">
+            //                 <Globe className="h-5 w-5" />
+            //             </Button>
+            //         </DropdownMenuTrigger>
+            //         <DropdownMenuContent side="right" align="center">
+            //             <LanguageSwitcher initialLocale={locale} className="p-2 flex flex-col gap-2"/>
+            //         </DropdownMenuContent>
+            //      </DropdownMenu>
+            // </div> */}
       </SidebarFooter>
     </Sidebar>
   );

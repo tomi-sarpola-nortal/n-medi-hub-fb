@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,8 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { Landmark, Loader2, PlusCircle } from 'lucide-react';
-import Image from 'next/image';
+import { Loader2, PlusCircle } from 'lucide-react';
+import AuthLayout from '@/components/auth/AuthLayout'; // Import AuthLayout
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -37,8 +37,9 @@ type LoginFormInputs = z.infer<typeof FormSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentLocale = searchParams.get('locale') || router.locale || 'en';
+  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
   const t = getClientTranslations(currentLocale);
 
   const { login } = useAuth();
@@ -69,25 +70,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 font-body">
-      <header className="mb-10 text-center">
-        <Link href="/" className="inline-block">
-          <div className="flex items-center justify-center space-x-2">
-            {/* Placeholder for Z graphic, using Landmark icon */}
-            <Landmark className="h-12 w-12 text-destructive" data-ai-hint="logo company" />
-            <div>
-              <h1 className="text-2xl font-bold font-headline text-charcoal">
-                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
-              </h1>
-              <p className="text-xl font-headline text-primary">
-                {t.login_logo_text_portal || "Portal"}
-              </p>
-            </div>
-          </div>
-        </Link>
-      </header>
-
-      <main className="w-full max-w-md space-y-8">
+    <AuthLayout
+      pageTitle={t.login_page_main_title || "Portal Login"} // Assuming a general title for auth pages
+      // pageSubtitle could be added if needed for login
+    >
+      <div className="w-full max-w-md space-y-8"> {/* This div ensures content is centered within AuthLayout's main area */}
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">{t.login_form_title || "Anmeldung ins Portal"}</CardTitle>
@@ -154,7 +141,8 @@ export default function LoginPage() {
                   {t.login_register_description || "Wenn Sie neu in Österreich tätig sind und noch keinen Eintrag bei der Österreichischen Zahnärztekammer haben, können Sie sich hier für einen Eintrag anmelden."}
                 </p>
                 <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
-                  <Link href="/register">
+                  {/* Updated Link to point to the new registration flow */}
+                  <Link href="/register/step1"> 
                     {t.login_register_button_text || "EINTRAG IN DIE KAMMER BEANTRAGEN"}
                   </Link>
                 </Button>
@@ -162,22 +150,7 @@ export default function LoginPage() {
             </div>
           </CardContent>
         </Card>
-      </main>
-
-      <footer className="mt-12 py-8 text-center text-xs text-muted-foreground w-full">
-         <div className="inline-flex items-center justify-center space-x-1 mb-2">
-            <Landmark className="h-5 w-5 text-destructive" />
-            <span className="font-bold font-headline text-sm text-charcoal">
-                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
-            </span>
-        </div>
-        <p className="mb-2">{t.login_footer_copyright || "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten."}</p>
-        <div className="space-x-4">
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_privacy || "Datenschutz"}</Link>
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_imprint || "Impressum"}</Link>
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_contact || "Kontakt"}</Link>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </AuthLayout>
   );
 }

@@ -1,0 +1,97 @@
+
+"use client";
+
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Landmark, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+// Helper for client-side translations (consistent with login page)
+const getClientTranslations = (locale: string) => {
+  try {
+    if (locale === 'de') {
+      return require('../../../locales/de.json');
+    }
+    return require('../../../locales/en.json');
+  } catch (e) {
+    console.warn("Translation file not found for AuthLayout, falling back to en");
+    return require('../../../locales/en.json'); // Fallback
+  }
+};
+
+interface AuthLayoutProps {
+  children: React.ReactNode;
+  pageTitle: string;
+  pageSubtitle?: string;
+  showBackButton?: boolean;
+  backButtonHref?: string;
+  backButtonTextKey?: string; // e.g., "register_back_to_login"
+}
+
+export default function AuthLayout({
+  children,
+  pageTitle,
+  pageSubtitle,
+  showBackButton = false,
+  backButtonHref = "/login",
+  backButtonTextKey = "register_back_to_login",
+}: AuthLayoutProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
+  const t = getClientTranslations(currentLocale);
+
+  const translatedBackButtonText = t[backButtonTextKey] || "Back";
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background text-foreground font-body">
+      <header className="py-6 px-4 sm:px-8 border-b border-border">
+        <div className="container mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <Landmark className="h-10 w-10 text-destructive" data-ai-hint="logo company" />
+            <div>
+              <h1 className="text-xl font-bold font-headline text-charcoal">
+                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
+              </h1>
+              <p className="text-lg font-headline text-primary">
+                {t.login_logo_text_portal || "Portal"}
+              </p>
+            </div>
+          </Link>
+          {showBackButton && (
+            <Button variant="outline" onClick={() => router.push(backButtonHref)} className="text-sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {translatedBackButtonText}
+            </Button>
+          )}
+        </div>
+      </header>
+
+      <main className="flex-grow flex flex-col items-center justify-center p-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold font-headline text-foreground">{pageTitle}</h2>
+          {pageSubtitle && (
+            <p className="text-md text-muted-foreground mt-2">{pageSubtitle}</p>
+          )}
+        </div>
+        {children}
+      </main>
+
+      <footer className="py-8 text-center text-xs text-muted-foreground border-t border-border">
+         <div className="inline-flex items-center justify-center space-x-1 mb-2">
+            <Landmark className="h-5 w-5 text-destructive" />
+            <span className="font-bold font-headline text-sm text-charcoal">
+                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
+            </span>
+        </div>
+        <p className="mb-2">{t.login_footer_copyright || "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten."}</p>
+        <div className="space-x-4">
+          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_privacy || "Datenschutz"}</Link>
+          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_imprint || "Impressum"}</Link>
+          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_contact || "Kontakt"}</Link>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -53,5 +53,20 @@
   "login_footer_imprint": "Impressum",
   "login_footer_contact": "Kontakt",
   "login_error_title": "Anmeldung fehlgeschlagen",
-  "login_error_description": "Die eingegebene E-Mail-Adresse oder das Passwort ist ungültig. Bitte versuchen Sie es erneut."
+  "login_error_description": "Die eingegebene E-Mail-Adresse oder das Passwort ist ungültig. Bitte versuchen Sie es erneut.",
+  "login_page_main_title": "Portal Anmeldung",
+  "register_page_main_title": "Eintrag in die Österreichische Zahnärztekammer",
+  "register_step1_subtitle": "Bitte erstellen Sie zunächst ein Konto, um mit der Eintragung fortzufahren.",
+  "register_back_to_login": "Zurück zur Anmeldung",
+  "register_step1_card_title": "Konto erstellen",
+  "register_step1_card_description": "Bitte geben Sie eine gültige E-Mail-Adresse an, um Ihr Konto zu sichern und wichtige Mitteilungen zu erhalten.",
+  "register_label_email": "E-Mail-Adresse",
+  "register_placeholder_email": "beispiel@email.com",
+  "register_step1_button_confirm_email": "E-MAIL-ADRESSE BESTÄTIGEN",
+  "register_email_exists_title": "E-Mail bereits registriert",
+  "register_email_exists_description": "Diese E-Mail-Adresse wird bereits verwendet. Bitte verwenden Sie eine andere E-Mail-Adresse oder versuchen Sie sich anzumelden.",
+  "register_email_valid_title": "E-Mail bestätigt",
+  "register_email_valid_description": "E-Mail-Adresse ist gültig und verfügbar. Weiter zum nächsten Schritt.",
+  "register_email_check_error_title": "Überprüfungsfehler",
+  "register_email_check_error_description": "Die E-Mail-Adresse konnte nicht überprüft werden. Bitte versuchen Sie es erneut."
 }

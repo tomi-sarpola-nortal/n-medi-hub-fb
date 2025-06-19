@@ -53,5 +53,20 @@
   "login_footer_imprint": "Imprint",
   "login_footer_contact": "Contact",
   "login_error_title": "Login Failed",
-  "login_error_description": "The email or password you entered is incorrect. Please try again."
+  "login_error_description": "The email or password you entered is incorrect. Please try again.",
+  "login_page_main_title": "Portal Login",
+  "register_page_main_title": "Registration with the Austrian Dental Chamber",
+  "register_step1_subtitle": "Please create an account first to continue with the registration.",
+  "register_back_to_login": "Back to Login",
+  "register_step1_card_title": "Create Account",
+  "register_step1_card_description": "Please provide a valid email address to secure your account and receive important communications.",
+  "register_label_email": "Email Address",
+  "register_placeholder_email": "example@email.com",
+  "register_step1_button_confirm_email": "CONFIRM EMAIL ADDRESS",
+  "register_email_exists_title": "Email Already Registered",
+  "register_email_exists_description": "This email address is already in use. Please use a different email or try logging in.",
+  "register_email_valid_title": "Email Verified",
+  "register_email_valid_description": "Email address is valid and available. Proceeding to the next step.",
+  "register_email_check_error_title": "Verification Error",
+  "register_email_check_error_description": "Could not verify email address. Please try again."
 }
