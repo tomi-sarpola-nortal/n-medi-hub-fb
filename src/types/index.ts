@@ -7,26 +7,23 @@ export type UserRole = 'dentist' | 'lk_member' | 'ozak_employee'; // Extended Us
 // This is the primary User type, used in auth context and for user data.
 // It combines properties that might have been in separate User and Person types.
 export interface User {
-  id: string; // Corresponds to Firestore document ID
+  id: string; // Corresponds to Firestore document ID (which will be Firebase Auth UID)
   name: string;
-  email: string; // Should be unique
-  hashedPassword?: string; // IMPORTANT: Store only hashed passwords. Firebase Auth is preferred.
+  email: string; // Should be unique (from Firebase Auth)
+  // hashedPassword is removed as Firebase Auth handles it
   role: UserRole;
   region: string; 
   dentistId?: string; // Unique for dentists, assigned by LK
   profileImage?: string; // Renamed from avatarUrl for consistency
   
-  // Status to manage workflow (relevant for dentists, could be optional for other roles)
   status?: 'pending_approval' | 'active' | 'inactive' | 'rejected';
   
   otpEnabled?: boolean; 
-  otpSecret?: string; // Encrypted or securely stored. Firebase Auth MFA is recommended.
+  otpSecret?: string; // For 2FA, if implemented beyond Firebase Auth's MFA
   
-  // Additional fields that might be relevant from the original Person type
-  approved?: boolean; // Can be derived from status or be a separate flag
-  educationPoints?: number; // Example, could be fetched from external system
+  approved?: boolean; 
+  educationPoints?: number; 
 
-  // Timestamps (optional here, as they are primarily Firestore concerns)
   createdAt?: Timestamp; 
   updatedAt?: Timestamp; 
 }
@@ -38,15 +35,13 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   label?: string;
-  roles?: UserRole[]; // Which roles can see this item
+  roles?: UserRole[]; 
   disabled?: boolean;
   external?: boolean;
-  items?: NavItem[]; // For sub-navigation
+  items?: NavItem[]; 
 }
 
 
-// Note: SuggestDocumentsOutput from AI flow will be the primary type for suggested documents.
-// This is a basic placeholder if needed elsewhere.
 export interface SuggestedDocument {
   title: string;
   description: string;
@@ -54,18 +49,17 @@ export interface SuggestedDocument {
 }
 
 
-// The 'Person' type might be deprecated or merged into 'User' 
-// if 'User' becomes the canonical representation from Firestore.
-// For now, keeping it separate for clarity on Firestore structure if it differs.
+// Firestore document structure for a person.
+// The document ID for 'persons' collection should be the Firebase Auth UID.
 export interface Person {
-  id: string; 
+  id: string; // This will be the Firebase Auth UID
   name: string;
   email: string; 
-  hashedPassword?: string; 
+  // hashedPassword is removed
   role: UserRole; 
   region: string;
   dentistId?: string; 
-  avatarUrl?: string; // Note: User uses profileImage
+  avatarUrl?: string; // Consider renaming to profileImage for consistency with User type
   status: 'pending_approval' | 'active' | 'inactive' | 'rejected';
   otpEnabled: boolean; 
   otpSecret?: string; 
@@ -73,3 +67,24 @@ export interface Person {
   updatedAt: Timestamp; 
 }
 
+// Data needed to create a new person document in Firestore, after Firebase Auth user is created.
+// This is the data beyond what Firebase Auth stores.
+export type PersonCreationData = Omit<Person, 'id' | 'email' | 'createdAt' | 'updatedAt'>;
+
+// Data structure for the registration form state
+export interface RegistrationFormData {
+  email: string;
+  password?: string; // Password will be handled by Auth
+  name: string;
+  role: UserRole;
+  region: string;
+  dentistId?: string;
+  avatarUrl?: string;
+  status: 'pending_approval' | 'active' | 'inactive' | 'rejected'; // Default to pending_approval
+  otpEnabled: boolean; // Default to false
+  // Add other fields from your 6-step registration process here
+  // For example:
+  // addressLine1?: string;
+  // phoneNumber?: string;
+  // qualifications?: string[];
+}
