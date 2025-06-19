@@ -1,3 +1,4 @@
+
 import type { NavItem, UserRole } from "@/lib/types";
 import {
   LayoutDashboard,
@@ -40,11 +41,11 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       href: "/education-points",
       icon: Award,
     },
-    {
-      title: "Smart Suggestions",
-      href: "/smart-suggestions",
-      icon: ShieldQuestion,
-    }
+    // {
+    //   title: "Smart Suggestions",
+    //   href: "/smart-suggestions",
+    //   icon: ShieldQuestion,
+    // }
   ],
   lk_member: [
     {
@@ -77,11 +78,11 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       href: "/lk/approvals",
       icon: CheckSquare,
     },
-    {
-      title: "Smart Suggestions",
-      href: "/smart-suggestions",
-      icon: ShieldQuestion,
-    }
+    // {
+    //   title: "Smart Suggestions",
+    //   href: "/smart-suggestions",
+    //   icon: ShieldQuestion,
+    // }
   ],
   ozak_employee: [
     {
@@ -110,11 +111,11 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       href: "/ozak/admin",
       icon: Users, // Placeholder
     },
-    {
-      title: "Smart Suggestions",
-      href: "/smart-suggestions",
-      icon: ShieldQuestion,
-    }
+    // {
+    //   title: "Smart Suggestions",
+    //   href: "/smart-suggestions",
+    //   icon: ShieldQuestion,
+    // }
   ],
 };
 

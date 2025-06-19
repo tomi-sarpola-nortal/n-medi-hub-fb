@@ -1,8 +1,9 @@
+
 import AppLayout from '@/components/layout/AppLayout';
 import WelcomeHeader from '@/components/dashboard/WelcomeHeader';
 import RequestsSummary from '@/components/dashboard/RequestsSummary';
 import RecentActions from '@/components/dashboard/RecentActions';
-import SmartSuggestions from '@/components/dashboard/SmartSuggestions';
+// import SmartSuggestions from '@/components/dashboard/SmartSuggestions';
 import { Separator } from '@/components/ui/separator';
 import type { User } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,7 +70,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           <RecentActions />
         </div>
         
-        <SmartSuggestions userRole={user.role} userRegion={user.region} />
+        {/* <SmartSuggestions userRole={user.role} userRegion={user.region} /> */}
 
       </div>
     </AppLayout>
