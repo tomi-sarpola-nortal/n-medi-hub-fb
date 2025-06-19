@@ -83,7 +83,7 @@ export async function getPersonById(id: string): Promise<Person | null> {
  */
 export async function updatePerson(
   id: string,
-  updates: Partial<Omit<Person, 'id' | 'createdAt'>>
+  updates: Partial<PersonCreationData> // Updated to use PersonCreationData for updates
 ): Promise<void> {
   const docRef = doc(db, PERSONS_COLLECTION, id);
   await updateDoc(docRef, {
@@ -112,6 +112,7 @@ export async function findPersonByEmail(email: string): Promise<Person | null> {
   if (querySnapshot.empty) {
     return null;
   }
+  // Assuming email is unique, so take the first document.
   return snapshotToPerson(querySnapshot.docs[0]);
 }
 
@@ -126,6 +127,7 @@ export async function findPersonByDentistId(dentistId: string): Promise<Person |
   if (querySnapshot.empty) {
     return null;
   }
+  // Assuming dentistId is unique, take the first document.
   return snapshotToPerson(querySnapshot.docs[0]);
 }
 

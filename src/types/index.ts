@@ -69,7 +69,8 @@ export interface Person {
 
 // Data needed to create a new person document in Firestore, after Firebase Auth user is created.
 // This is the data beyond what Firebase Auth stores.
-export type PersonCreationData = Omit<Person, 'id' | 'email' | 'createdAt' | 'updatedAt'>;
+// It also includes 'email' as we decided to store it in Firestore as well for querying.
+export type PersonCreationData = Omit<Person, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Data structure for the registration form state
 export interface RegistrationFormData {
@@ -79,9 +80,9 @@ export interface RegistrationFormData {
   role: UserRole;
   region: string;
   dentistId?: string;
-  avatarUrl?: string;
-  status: 'pending_approval' | 'active' | 'inactive' | 'rejected'; // Default to pending_approval
-  otpEnabled: boolean; // Default to false
+  avatarUrl?: string; // Will be used for initial profile setup
+  status?: 'pending_approval' | 'active' | 'inactive' | 'rejected'; // Default to pending_approval
+  otpEnabled?: boolean; // Default to false
   // Add other fields from your 6-step registration process here
   // For example:
   // addressLine1?: string;
