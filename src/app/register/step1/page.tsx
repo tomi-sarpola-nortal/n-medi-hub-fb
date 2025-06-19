@@ -60,22 +60,25 @@ export default function RegisterStep1Page() {
     setIsLoading(true);
     try {
       const methods = await fetchSignInMethodsForEmail(auth, data.email);
+      console.log('Firebase sign-in methods found:', methods); // DEBUG LOG
+      console.log('methods.length:', methods.length); // DEBUG LOG
+
       if (methods.length > 0) {
         toast({
           title: t.register_email_exists_title || "Email Already Registered",
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
-        return; // Explicitly stop further execution if email exists
+        setIsLoading(false); // Make sure to set loading to false here
+        return; 
       } else {
         // Email is available
-        registrationDataStore.email = data.email; // Store email for next step
+        registrationDataStore.email = data.email; 
         toast({
           title: t.register_email_valid_title || "Email Verified",
           description: t.register_email_valid_description || "Email address is valid and available. Proceeding to the next step.",
         });
-        // Navigate to the next step of registration
-        router.push(`/register/step1-part2`); // Placeholder for the next step
+        router.push(`/register/step1-part2`); 
       }
     } catch (error: any) {
       console.error("Email check error:", error);
@@ -134,3 +137,4 @@ export default function RegisterStep1Page() {
     </AuthLayout>
   );
 }
+
