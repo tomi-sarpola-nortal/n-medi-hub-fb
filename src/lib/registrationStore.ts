@@ -4,7 +4,6 @@
 import type { UserRole } from "./types";
 
 // Define the structure for specializations and professional titles
-// This could be expanded or fetched from a config/API later
 export const DENTAL_SPECIALIZATIONS = [
   { id: 'implantologie', labelKey: 'register_step4_spec_implantologie' },
   { id: 'parodontologie', labelKey: 'register_step4_spec_parodontologie' },
@@ -14,7 +13,7 @@ export const DENTAL_SPECIALIZATIONS = [
   { id: 'endodontie', labelKey: 'register_step4_spec_endodontie' },
   { id: 'kinderzahnheilkunde', labelKey: 'register_step4_spec_kinderzahnheilkunde' },
   { id: 'oralchirurgie', labelKey: 'register_step4_spec_oralchirurgie' },
-] as const; // Use "as const" for better type inference for ids
+] as const; 
 
 export type SpecializationId = typeof DENTAL_SPECIALIZATIONS[number]['id'];
 
@@ -27,13 +26,22 @@ export const PROFESSIONAL_TITLES = [
 ] as const;
 export type ProfessionalTitleId = typeof PROFESSIONAL_TITLES[number]['id'];
 
+export const HEALTH_INSURANCE_CONTRACTS = [
+    { id: 'ogk', labelKey: 'register_step5_contract_ogk' },
+    { id: 'svs', labelKey: 'register_step5_contract_svs' },
+    { id: 'bvaeb', labelKey: 'register_step5_contract_bvaeb' },
+    { id: 'kfa', labelKey: 'register_step5_contract_kfa' },
+] as const;
+export type HealthInsuranceContractId = typeof HEALTH_INSURANCE_CONTRACTS[number]['id'];
+
 
 interface RegistrationData {
   // Step 1
   email?: string;
+  // Step 2
   password?: string;
 
-  // Step 2: Personal Data
+  // Step 3: Personal Data
   title?: string;
   firstName?: string;
   lastName?: string;
@@ -48,17 +56,14 @@ interface RegistrationData {
   idDocument?: File | null;
   idDocumentName?: string;
 
-  // Step 3: Placeholder (to be defined later)
-  // ...
-
   // Step 4: Professional Qualifications
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
-  languages?: string; // Comma-separated or similar for now
-  graduationDate?: string; // e.g., "MM/YYYY" or "DD/MM/YYYY" as text
+  languages?: string; 
+  graduationDate?: string; 
   university?: string;
   approbationNumber?: string;
-  approbationDate?: string; // e.g., "MM/YYYY" or "DD/MM/YYYY" as text
+  approbationDate?: string; 
   diplomaFile?: File | null;
   diplomaFileName?: string;
   approbationCertificateFile?: File | null;
@@ -66,9 +71,17 @@ interface RegistrationData {
   specialistRecognitionFile?: File | null;
   specialistRecognitionFileName?: string;
 
+  // Step 5: Practice Information
+  practiceName?: string;
+  practiceStreetAddress?: string;
+  practicePostalCode?: string;
+  practiceCity?: string;
+  practicePhoneNumber?: string;
+  practiceFaxNumber?: string;
+  practiceEmail?: string;
+  practiceWebsite?: string;
+  healthInsuranceContracts?: HealthInsuranceContractId[];
 
-  // Step 5: Contact Preferences (placeholder for future)
-  // ...
 
   // Step 6: Review & Confirm (placeholder for future)
   // ...
@@ -91,9 +104,10 @@ export function getRegistrationData(): RegistrationData {
 export function clearRegistrationData() {
     // Clear Step 1
     (registrationDataStore as any).email = undefined;
+    // Clear Step 2
     (registrationDataStore as any).password = undefined;
 
-    // Clear Step 2
+    // Clear Step 3
     (registrationDataStore as any).title = undefined;
     (registrationDataStore as any).firstName = undefined;
     (registrationDataStore as any).lastName = undefined;
@@ -123,6 +137,19 @@ export function clearRegistrationData() {
     (registrationDataStore as any).specialistRecognitionFile = undefined;
     (registrationDataStore as any).specialistRecognitionFileName = undefined;
 
+    // Clear Step 5
+    (registrationDataStore as any).practiceName = undefined;
+    (registrationDataStore as any).practiceStreetAddress = undefined;
+    (registrationDataStore as any).practicePostalCode = undefined;
+    (registrationDataStore as any).practiceCity = undefined;
+    (registrationDataStore as any).practicePhoneNumber = undefined;
+    (registrationDataStore as any).practiceFaxNumber = undefined;
+    (registrationDataStore as any).practiceEmail = undefined;
+    (registrationDataStore as any).practiceWebsite = undefined;
+    (registrationDataStore as any).healthInsuranceContracts = undefined;
+
+
     // Clear other fields as they are added
     console.log("Registration data cleared.");
 }
+

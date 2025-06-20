@@ -148,5 +148,26 @@
   "register_step4_prof_title_fachzahnarzt_kfo": "Specialist Dentist for Orthodontics",
   "register_step4_prof_title_fachzahnarzt_oralchirurgie": "Specialist Dentist for Oral Surgery",
   "register_step4_prof_title_assistenzzahnarzt": "Assistant Dentist",
-  "register_step4_prof_title_student_zahnmedizin": "Dental Student"
+  "register_step4_prof_title_student_zahnmedizin": "Dental Student",
+  "register_step5_subtitle": "Please provide your practice information.",
+  "register_step5_card_title": "Practice Information",
+  "register_step5_label_practiceName": "Name of Practice/Clinic",
+  "register_step5_label_practiceStreetAddress": "Street and House Number",
+  "register_step5_label_practicePostalCode": "Postal Code",
+  "register_step5_label_practiceCity": "City",
+  "register_step5_label_practicePhoneNumber": "Practice Phone Number",
+  "register_step5_label_practiceFaxNumber": "Practice Fax Number",
+  "register_step5_label_practiceEmail": "Practice Email",
+  "register_step5_placeholder_practiceEmail": "practice@example.com",
+  "register_step5_label_practiceWebsite": "Practice Website",
+  "register_step5_placeholder_practiceWebsite": "https://example.com",
+  "register_step5_label_healthInsuranceContracts": "Health Insurance Contracts",
+  "register_step5_contract_ogk": "ÖGK (Austrian Health Insurance Fund)",
+  "register_step5_contract_svs": "SVS (Social Insurance for the Self-Employed)",
+  "register_step5_contract_bvaeb": "BVAEB (Insurance Institution for Public Employees, Railways and Mining)",
+  "register_step5_contract_kfa": "KFA (Health Insurance Fund for Municipal Employees)",
+  "register_step5_button_continue_to_review": "CONTINUE TO REVIEW",
+  "register_step5_data_saved_title": "Practice Information Saved",
+  "register_step5_data_saved_desc": "Your practice information has been temporarily saved. Proceed to the next step."
 }
+
