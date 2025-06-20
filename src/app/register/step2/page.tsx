@@ -1,25 +1,20 @@
 
-"use client";
+"use client"; // This is the content from the old step1-part2, now becoming step2
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useForm, type SubmitHandler, Controller } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, CalendarIcon, UploadCloud, FileText as FileIcon } from 'lucide-react'; // Added FileIcon
+import { Loader2, XCircle, CheckCircle2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { getRegistrationData, updateRegistrationData } from '@/lib/registrationStore';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -29,41 +24,36 @@ const getClientTranslations = (locale: string) => {
     }
     return require('../../../../locales/en.json');
   } catch (e) {
-    console.warn("Translation file not found for register/step2, falling back to en");
-    return require('../../../../locales/en.json');
+    console.warn("Translation file not found for register/step2 (password), falling back to en");
+    return require('../../../../locales/en.json'); // Fallback
   }
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+const passwordValidation = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\S]{8,}$/
+);
 
 const FormSchema = z.object({
-  title: z.string().optional(),
-  firstName: z.string().min(1, { message: "First name is required." }),
-  lastName: z.string().min(1, { message: "Last name is required." }),
-  dateOfBirth: z.date({ required_error: "Date of birth is required." }),
-  placeOfBirth: z.string().min(1, { message: "Place of birth is required." }),
-  nationality: z.string().min(1, { message: "Nationality is required." }),
-  streetAddress: z.string().min(1, { message: "Street and house number are required." }),
-  postalCode: z.string().min(1, { message: "Postal code is required." }),
-  city: z.string().min(1, { message: "City is required." }),
-  stateOrProvince: z.string().min(1, { message: "State/Province is required." }),
-  phoneNumber: z.string().optional(),
-  email: z.string().email(), // Should be pre-filled and read-only
-  idDocument: z
-    .custom<FileList>()
-    .refine((files) => files && files.length === 1, "ID document is required.")
-    .refine((files) => files && files?.[0]?.size <= MAX_FILE_SIZE, `File size should be less than 10MB.`)
-    .refine(
-      (files) => files && ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
-      "Only .pdf, .jpg, .jpeg, .png formats are supported."
-    )
-    .transform(files => files?.[0] || null), // Get the first file or null
+  password: z.string().min(8, { message: "Password must be at least 8 characters." })
+    .regex(passwordValidation, {
+      message: "Password must include uppercase, lowercase, and a number.",
+    }),
+  confirmPassword: z.string().min(8, { message: "Please confirm your password." }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"], 
 });
 
-type PersonalDataFormInputs = z.infer<typeof FormSchema>;
+type PasswordFormInputs = z.infer<typeof FormSchema>;
 
-export default function RegisterStep2Page() {
+interface PasswordCriteria {
+  minLength: boolean;
+  uppercase: boolean;
+  lowercase: boolean;
+  number: boolean;
+}
+
+export default function RegisterStep2PasswordPage() { // Renamed component for clarity
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -72,91 +62,58 @@ export default function RegisterStep2Page() {
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [storedEmail, setStoredEmail] = useState<string>('');
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [passwordCriteria, setPasswordCriteria] = useState<PasswordCriteria>({
+    minLength: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+  });
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email || !storedData.password) { // Also check for password conceptually
+    if (!storedData.email) {
       toast({
-        title: t.register_step2_missing_data_title || "Missing Information",
-        description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
+        title: "Error",
+        description: "Email not found. Please start registration from Step 1.",
         variant: "destructive",
       });
-      router.replace('/register/step1');
+      router.replace('/register/step1'); 
     } else {
-      setStoredEmail(storedData.email);
-      // Pre-fill form if data already exists in store (e.g., user went back and forth)
-      form.reset({
-        email: storedData.email,
-        title: storedData.title || '',
-        firstName: storedData.firstName || '',
-        lastName: storedData.lastName || '',
-        dateOfBirth: storedData.dateOfBirth,
-        placeOfBirth: storedData.placeOfBirth || '',
-        nationality: storedData.nationality || '',
-        streetAddress: storedData.streetAddress || '',
-        postalCode: storedData.postalCode || '',
-        city: storedData.city || '',
-        stateOrProvince: storedData.stateOrProvince || '',
-        phoneNumber: storedData.phoneNumber || '',
-        // idDocument is handled by Controller and native file input state
-      });
-      if (storedData.idDocumentName) {
-        setSelectedFileName(storedData.idDocumentName);
-      }
+      setEmail(storedData.email);
     }
-  }, [router, toast, t]); // Removed form from dependencies as it's stable
+  }, [router, toast]);
 
-  const form = useForm<PersonalDataFormInputs>({
+  const form = useForm<PasswordFormInputs>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: storedEmail, // Will be updated by useEffect
-      title: '',
-      firstName: '',
-      lastName: '',
-      dateOfBirth: undefined,
-      placeOfBirth: '',
-      nationality: '',
-      streetAddress: '',
-      postalCode: '',
-      city: '',
-      stateOrProvince: '',
-      phoneNumber: '',
-      idDocument: undefined,
+      password: '',
+      confirmPassword: '',
     },
+    mode: 'onTouched', 
   });
 
-  const onSubmit: SubmitHandler<PersonalDataFormInputs> = async (data) => {
-    setIsLoading(true);
-    const fileToStore = data.idDocument as File | null;
+  const handlePasswordChange = (password: string) => {
+    setPasswordCriteria({
+      minLength: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+    });
+  };
 
-    updateRegistrationData({
-      ...data,
-      idDocument: fileToStore, // Store the File object
-      idDocumentName: fileToStore?.name, // Store the file name
-    });
+  const onSubmit: SubmitHandler<PasswordFormInputs> = async (data) => {
+    setIsLoading(true);
+    updateRegistrationData({ password: data.password });
     toast({
-      title: t.register_step2_data_saved_title || "Personal Data Saved",
-      description: t.register_step2_data_saved_desc || "Your personal information has been temporarily saved.",
+      title: t.register_step1_part2_password_saved_title || "Password Saved",
+      description: t.register_step1_part2_password_saved_desc || "Password has been temporarily saved. Proceed to the next step.",
     });
-    router.push('/register/step3'); // Navigate to the next step
+    router.push('/register/step3'); // Navigate to the new Step 3 (Personal Data)
     setIsLoading(false);
   };
-  
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      form.setValue('idDocument', files, { shouldValidate: true });
-      setSelectedFileName(files[0].name);
-    } else {
-      form.setValue('idDocument', undefined, { shouldValidate: true });
-      setSelectedFileName(null);
-    }
-  };
 
-
-  if (!storedEmail && !isLoading) { // Ensure email is loaded before rendering form
+  if (!email && !isLoading) {
     return (
         <AuthLayout pageTitle="Loading..." pageSubtitle="Verifying registration step...">
             <div className="flex justify-center items-center h-32">
@@ -166,225 +123,78 @@ export default function RegisterStep2Page() {
     );
   }
 
+  const criteriaList = [
+    { key: 'minLength', text: t.register_step1_part2_criteria_length || "At least 8 characters", met: passwordCriteria.minLength },
+    { key: 'uppercase', text: t.register_step1_part2_criteria_uppercase || "At least one uppercase letter", met: passwordCriteria.uppercase },
+    { key: 'lowercase', text: t.register_step1_part2_criteria_lowercase || "At least one lowercase letter", met: passwordCriteria.lowercase },
+    { key: 'number', text: t.register_step1_part2_criteria_number || "At least one number", met: passwordCriteria.number },
+  ];
+
   return (
     <AuthLayout
-      pageTitle={t.register_page_main_title || "Registration"}
-      pageSubtitle={t.register_step2_subtitle || "Please fill in your personal details."}
+      pageTitle={t.register_page_main_title || "Registration with the Austrian Dental Chamber"}
+      pageSubtitle={t.register_step1_subtitle || "Please create an account first to continue with the registration."} // Subtitle for account creation part 2
       showBackButton={true}
-      backButtonHref="/register/step1-part2"
+      backButtonHref="/register/step1" // Back to Step 1 (Email)
       backButtonTextKey="register_back_button"
     >
-      <div className="w-full max-w-2xl"> {/* Increased max-width for more fields */}
-        <RegistrationStepper currentStep={2} totalSteps={6} />
+      <div className="w-full max-w-xl">
+        <RegistrationStepper currentStep={2} totalSteps={6} /> {/* Now Step 2 */}
         <Card className="shadow-xl w-full">
           <CardHeader className="text-left">
-            <CardTitle className="font-headline text-2xl">{t.register_step2_card_title || "Personal Data"}</CardTitle>
-            <CardDescription>{t.register_step2_card_description || "Please provide your personal information."}</CardDescription>
+            <CardTitle className="font-headline text-2xl">{t.register_step1_part2_card_title || "Set Password"}</CardTitle>
+            <CardDescription>{t.register_step1_part2_card_description || "Please choose a secure password for your access to the member portal."}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Titel */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div className="md:col-span-1">
-                    <Label htmlFor="title">{t.register_step2_label_title || "Title"}</Label>
-                    <Controller
-                        name="title"
-                        control={form.control}
-                        render={({ field }) => (
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <SelectTrigger id="title">
-                                    <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Dr.">{t.title_dr || "Dr."}</SelectItem>
-                                    <SelectItem value="Prof.">{t.title_prof || "Prof."}</SelectItem>
-                                    <SelectItem value="Mag.">{t.title_mag || "Mag."}</SelectItem>
-                                    <SelectItem value="none">{t.title_none || "None"}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        )}
-                    />
-                </div>
-                {/* Vorname */}
-                <div className="md:col-span-2">
-                    <Label htmlFor="firstName">{t.register_step2_label_firstName || "First Name"}*</Label>
-                    <Input id="firstName" {...form.register('firstName')} />
-                    {form.formState.errors.firstName && <p className="text-xs text-destructive mt-1">{form.formState.errors.firstName.message}</p>}
-                </div>
-              </div>
-
-              {/* Nachname */}
               <div>
-                <Label htmlFor="lastName">{t.register_step2_label_lastName || "Last Name"}*</Label>
-                <Input id="lastName" {...form.register('lastName')} />
-                {form.formState.errors.lastName && <p className="text-xs text-destructive mt-1">{form.formState.errors.lastName.message}</p>}
-              </div>
-
-              {/* Geburtsdatum und Geburtsort */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="dateOfBirth">{t.register_step2_label_dateOfBirth || "Date of Birth"}*</Label>
-                  <Controller
-                    name="dateOfBirth"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    )}
-                  />
-                  {form.formState.errors.dateOfBirth && <p className="text-xs text-destructive mt-1">{form.formState.errors.dateOfBirth.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="placeOfBirth">{t.register_step2_label_placeOfBirth || "Place of Birth"}*</Label>
-                  <Input id="placeOfBirth" {...form.register('placeOfBirth')} />
-                  {form.formState.errors.placeOfBirth && <p className="text-xs text-destructive mt-1">{form.formState.errors.placeOfBirth.message}</p>}
-                </div>
-              </div>
-
-              {/* Staatsbürgerschaft */}
-              <div>
-                <Label htmlFor="nationality">{t.register_step2_label_nationality || "Nationality"}*</Label>
-                 <Controller
-                    name="nationality"
-                    control={form.control}
-                    render={({ field }) => (
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger id="nationality">
-                                <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="AT">{t.nationality_at || "Austria"}</SelectItem>
-                                <SelectItem value="DE">{t.nationality_de || "Germany"}</SelectItem>
-                                <SelectItem value="CH">{t.nationality_ch || "Switzerland"}</SelectItem>
-                                <SelectItem value="other">{t.nationality_other || "Other"}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    )}
+                <Label htmlFor="password">{t.register_step1_part2_label_password || "Password"}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...form.register('password')}
+                  onChange={(e) => {
+                    form.handleChange(e); 
+                    handlePasswordChange(e.target.value);
+                  }}
+                  className={form.formState.errors.password ? "border-destructive" : ""}
                 />
-                {form.formState.errors.nationality && <p className="text-xs text-destructive mt-1">{form.formState.errors.nationality.message}</p>}
-              </div>
-
-              {/* Straße und Hausnummer */}
-              <div>
-                <Label htmlFor="streetAddress">{t.register_step2_label_streetAddress || "Street and House Number"}*</Label>
-                <Input id="streetAddress" {...form.register('streetAddress')} />
-                {form.formState.errors.streetAddress && <p className="text-xs text-destructive mt-1">{form.formState.errors.streetAddress.message}</p>}
-              </div>
-
-              {/* Postleitzahl und Wohnort */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="postalCode">{t.register_step2_label_postalCode || "Postal Code"}*</Label>
-                  <Input id="postalCode" {...form.register('postalCode')} />
-                  {form.formState.errors.postalCode && <p className="text-xs text-destructive mt-1">{form.formState.errors.postalCode.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="city">{t.register_step2_label_city || "City"}*</Label>
-                  <Input id="city" {...form.register('city')} />
-                  {form.formState.errors.city && <p className="text-xs text-destructive mt-1">{form.formState.errors.city.message}</p>}
-                </div>
-              </div>
-
-              {/* Bundesland */}
-              <div>
-                <Label htmlFor="stateOrProvince">{t.register_step2_label_stateOrProvince || "State/Province"}*</Label>
-                 <Controller
-                    name="stateOrProvince"
-                    control={form.control}
-                    render={({ field }) => (
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger id="stateOrProvince">
-                                <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Wien">{t.state_wien || "Vienna"}</SelectItem>
-                                <SelectItem value="NÖ">{t.state_noe || "Lower Austria"}</SelectItem>
-                                <SelectItem value="OÖ">{t.state_ooe || "Upper Austria"}</SelectItem>
-                                <SelectItem value="Bayern">{t.state_bayern || "Bavaria"}</SelectItem>
-                                <SelectItem value="Baden-Württemberg">{t.state_bw || "Baden-Württemberg"}</SelectItem>
-                                {/* Add more states as needed */}
-                            </SelectContent>
-                        </Select>
-                    )}
-                />
-                {form.formState.errors.stateOrProvince && <p className="text-xs text-destructive mt-1">{form.formState.errors.stateOrProvince.message}</p>}
-              </div>
-
-              {/* Telefonnummer */}
-              <div>
-                <Label htmlFor="phoneNumber">{t.register_step2_label_phoneNumber || "Phone Number"}</Label>
-                <Input id="phoneNumber" type="tel" {...form.register('phoneNumber')} />
-                {form.formState.errors.phoneNumber && <p className="text-xs text-destructive mt-1">{form.formState.errors.phoneNumber.message}</p>}
-              </div>
-
-              {/* E-Mail-Adresse (read-only) */}
-              <div>
-                <Label htmlFor="email">{t.register_label_email || "Email Address"}*</Label>
-                <Input id="email" type="email" value={storedEmail} readOnly disabled className="bg-muted/50" />
-              </div>
-              
-              {/* Personalausweis oder Reisepass */}
-              <div>
-                <Label htmlFor="idDocument">{t.register_step2_label_idDocument || "ID Card or Passport"}*</Label>
-                <div className="flex items-center space-x-2 mt-1">
-                    <label
-                        htmlFor="idDocument-file"
-                        className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
-                    >
-                        <UploadCloud className="mr-2 h-4 w-4" />
-                        {selectedFileName ? (
-                            <span className="truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
-                                {selectedFileName}
-                            </span>
-                        ) : (
-                            t.register_step2_button_selectFile || "Select File"
-                        )}
-                    </label>
-                    <Input
-                        id="idDocument-file"
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={(e) => {
-                            handleFileChange(e);
-                            // form.register('idDocument').onChange(e); // Propagate to react-hook-form
-                        }}
-                    />
-                </div>
-                {selectedFileName && (
-                     <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <FileIcon className="h-4 w-4 mr-1 text-primary" />
-                        <span>{t.register_step2_selected_file || "Selected:"} {selectedFileName}</span>
-                    </div>
+                {form.formState.errors.password && (
+                  <p className="text-xs text-destructive mt-1">{form.formState.errors.password.message}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">{t.register_step2_file_formats || "Accepted formats: PDF, JPG, PNG (max. 10MB)"}</p>
-                {form.formState.errors.idDocument && <p className="text-xs text-destructive mt-1">{form.formState.errors.idDocument.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="confirmPassword">{t.register_step1_part2_label_confirm_password || "Repeat Password"}</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  {...form.register('confirmPassword')}
+                  className={form.formState.errors.confirmPassword ? "border-destructive" : ""}
+                />
+                {form.formState.errors.confirmPassword && (
+                  <p className="text-xs text-destructive mt-1">{form.formState.errors.confirmPassword.message}</p>
+                )}
               </div>
 
+              <div className="p-4 bg-muted/50 rounded-md space-y-2">
+                {criteriaList.map(criterion => (
+                  <div key={criterion.key} className="flex items-center text-sm">
+                    {criterion.met ? (
+                      <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 mr-2 text-destructive" />
+                    )}
+                    <span>{criterion.text}</span>
+                  </div>
+                ))}
+              </div>
 
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : (t.register_button_continue || "CONTINUE")}
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  t.register_button_continue || "CONTINUE" // Changed button text to generic "CONTINUE"
+                )}
               </Button>
             </form>
           </CardContent>

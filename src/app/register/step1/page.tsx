@@ -16,7 +16,7 @@ import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { auth } from '@/lib/firebaseConfig';
 import { fetchSignInMethodsForEmail } from 'firebase/auth';
-import { updateRegistrationData } from '@/lib/registrationStore'; // Import the store function
+import { updateRegistrationData } from '@/lib/registrationStore'; 
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -73,7 +73,7 @@ export default function RegisterStep1Page() {
           title: t.register_email_valid_title || "Email Verified",
           description: t.register_email_valid_description || "Email address is valid and available. Proceeding to the next step.",
         });
-        router.push(`/register/step1-part2`); 
+        router.push(`/register/step2`); // Navigate to the new Step 2 (Password page)
       }
     } catch (error: any) {
       console.error("Email check error:", error);

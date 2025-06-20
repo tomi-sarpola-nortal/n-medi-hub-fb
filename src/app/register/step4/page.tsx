@@ -105,7 +105,7 @@ export default function RegisterStep4Page() {
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
         approbationDate: storedData.approbationDate || "",
-        diplomaFile: undefined, // Files are not typically pre-filled like this
+        diplomaFile: undefined, 
         approbationCertificateFile: undefined,
         specialistRecognitionFile: undefined,
       };
@@ -114,7 +114,8 @@ export default function RegisterStep4Page() {
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email || !storedData.password || !storedData.firstName) { // Check for essential data from previous steps
+    // Check for essential data from previous steps (e.g. step3 personal data)
+    if (!storedData.email || !storedData.password || !storedData.firstName ) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
         description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
@@ -122,11 +123,9 @@ export default function RegisterStep4Page() {
       });
       router.replace('/register/step1');
     } else {
-      // Pre-fill file names if they exist in the store (e.g., user went back and forth)
       if (storedData.diplomaFileName) setSelectedDiplomaFileName(storedData.diplomaFileName);
       if (storedData.approbationCertificateFileName) setSelectedApprobationCertificateFileName(storedData.approbationCertificateFileName);
       if (storedData.specialistRecognitionFileName) setSelectedSpecialistRecognitionFileName(storedData.specialistRecognitionFileName);
-       // Reset form with stored data when component mounts or storedData changes
       form.reset({
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
@@ -135,8 +134,6 @@ export default function RegisterStep4Page() {
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
         approbationDate: storedData.approbationDate || "",
-        // Do not reset FileList inputs with actual File objects
-        // Their state is managed by the native input and `selectedFileName` states
       });
     }
   }, [router, toast, t, form]);
@@ -152,7 +149,7 @@ export default function RegisterStep4Page() {
       form.setValue(fieldName, files as any, { shouldValidate: true });
       setFileNameState(files[0].name);
     } else {
-      form.setValue(fieldName, null as any, { shouldValidate: true }); // Use null if no file, or undefined
+      form.setValue(fieldName, null as any, { shouldValidate: true }); 
       setFileNameState(null);
     }
   };
@@ -178,7 +175,7 @@ export default function RegisterStep4Page() {
       title: t.register_step4_data_saved_title || "Professional Qualifications Saved",
       description: t.register_step4_data_saved_desc || "Your professional qualifications have been temporarily saved.",
     });
-    router.push('/register/step5'); // Navigate to the next step (placeholder)
+    router.push('/register/step5'); 
     setIsLoading(false);
   };
 
@@ -187,7 +184,7 @@ export default function RegisterStep4Page() {
       pageTitle={t.register_page_main_title || "Registration"}
       pageSubtitle={t.register_step4_subtitle || "Please provide your professional qualifications."}
       showBackButton={true}
-      backButtonHref="/register/step2" // Back to Personal Data for now
+      backButtonHref="/register/step3" // Back to new Step 3 (Personal Data)
       backButtonTextKey="register_back_button"
     >
       <div className="w-full max-w-2xl">
@@ -200,7 +197,6 @@ export default function RegisterStep4Page() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Aktuelle Berufsbezeichnung */}
                 <FormField
                   control={form.control}
                   name="currentProfessionalTitle"
@@ -226,7 +222,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Fachrichtungen/Schwerpunkte */}
                 <FormItem>
                   <FormLabel>{t.register_step4_label_specializations || "Specializations/Focus Areas"}*</FormLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
@@ -265,7 +260,6 @@ export default function RegisterStep4Page() {
                   <FormMessage>{form.formState.errors.specializations?.message}</FormMessage>
                 </FormItem>
                 
-                {/* Sprachen */}
                 <FormField
                   control={form.control}
                   name="languages"
@@ -280,7 +274,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Datum des Studienabschlusses */}
                 <FormField
                   control={form.control}
                   name="graduationDate"
@@ -295,7 +288,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Universität/Hochschule */}
                 <FormField
                   control={form.control}
                   name="university"
@@ -310,7 +302,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Approbationsnummer */}
                 <FormField
                   control={form.control}
                   name="approbationNumber"
@@ -325,7 +316,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Datum des Approbation */}
                 <FormField
                   control={form.control}
                   name="approbationDate"
@@ -340,11 +330,10 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Diplom / Zeugnis des Zahnmedizinstudiums */}
                 <FormField
                   control={form.control}
                   name="diplomaFile"
-                  render={({ field }) => ( // `field` is not directly used for native file input value
+                  render={({ field }) => ( 
                     <FormItem>
                       <FormLabel>{t.register_step4_label_diploma || "Diploma/Certificate of Dental Studies"}*</FormLabel>
                        <FormControl>
@@ -377,7 +366,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Approbationsurkunde */}
                  <FormField
                   control={form.control}
                   name="approbationCertificateFile"
@@ -414,7 +402,6 @@ export default function RegisterStep4Page() {
                   )}
                 />
 
-                {/* Fachzahnarztanerkennung */}
                 <FormField
                   control={form.control}
                   name="specialistRecognitionFile"
@@ -452,7 +439,7 @@ export default function RegisterStep4Page() {
                 />
                 
                 <div className="flex justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={() => router.push('/register/step2')} disabled={isLoading}>
+                  <Button type="button" variant="outline" onClick={() => router.push('/register/step3')} disabled={isLoading}>
                     {t.register_back_button || "Back"}
                   </Button>
                   <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base" disabled={isLoading}>
@@ -467,4 +454,3 @@ export default function RegisterStep4Page() {
     </AuthLayout>
   );
 }
-
