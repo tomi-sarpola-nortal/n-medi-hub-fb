@@ -184,5 +184,10 @@
   "register_step6_success_desc": "Ihr Antrag wurde erfolgreich zur Prüfung eingereicht. Sie werden per E-Mail kontaktiert.",
   "register_step6_submit_error_title": "Einreichung fehlgeschlagen",
   "register_step6_submit_error_desc": "Beim Einreichen Ihres Antrags ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Daten und versuchen Sie es erneut. Sollte das Problem weiterhin bestehen, kontaktieren Sie den Support.",
-  "register_review_not_provided": "Nicht angegeben"
+  "register_review_not_provided": "Nicht angegeben",
+  "register_success_page_title": "Registrierung Eingereicht",
+  "register_success_card_title": "Vielen Dank!",
+  "register_success_card_message_line1": "Ihr Antrag wurde erfolgreich an die Zahnärztekammer Salzburg übermittelt.",
+  "register_success_card_message_line2": "Nach der Prüfung erhalten Sie Ihre Zahnarzt-ID und weitere Informationen per E-Mail.",
+  "register_success_button_to_login": "ZUR ANMELDUNG"
 }
