@@ -34,6 +34,30 @@ export const HEALTH_INSURANCE_CONTRACTS = [
 ] as const;
 export type HealthInsuranceContractId = typeof HEALTH_INSURANCE_CONTRACTS[number]['id'];
 
+// For Step 3 (Personal Data) - to map select values to display text
+export const TITLES_MAP: Record<string, string> = {
+  "Dr.": "title_dr",
+  "Prof.": "title_prof",
+  "Mag.": "title_mag",
+  "none": "title_none"
+};
+
+export const NATIONALITIES_MAP: Record<string, string> = {
+  "AT": "nationality_at",
+  "DE": "nationality_de",
+  "CH": "nationality_ch",
+  "other": "nationality_other"
+};
+
+export const STATES_MAP: Record<string, string> = {
+  "Wien": "state_wien",
+  "NÖ": "state_noe",
+  "OÖ": "state_ooe",
+  "Bayern": "state_bayern",
+  "Baden-Württemberg": "state_bw"
+  // Add other states as needed
+};
+
 
 interface RegistrationData {
   // Step 1
@@ -82,12 +106,12 @@ interface RegistrationData {
   practiceWebsite?: string;
   healthInsuranceContracts?: HealthInsuranceContractId[];
 
+  // Step 6: Review & Confirm
+  agreedToTerms?: boolean;
 
-  // Step 6: Review & Confirm (placeholder for future)
-  // ...
 
-  // Overall registration details
-  role?: UserRole;
+  // Overall registration details - role is selected/assigned as part of the process or post-reg
+  role?: UserRole; // This might be set to 'dentist' by default for this flow
 }
 
 export const registrationDataStore: RegistrationData = {};
@@ -147,9 +171,25 @@ export function clearRegistrationData() {
     (registrationDataStore as any).practiceEmail = undefined;
     (registrationDataStore as any).practiceWebsite = undefined;
     (registrationDataStore as any).healthInsuranceContracts = undefined;
-
+    
+    // Clear Step 6
+    (registrationDataStore as any).agreedToTerms = undefined;
 
     // Clear other fields as they are added
     console.log("Registration data cleared.");
 }
 
+// Helper to get translation key for a value from a map
+export const getTranslationKey = (value: string | undefined, map: Record<string, string>): string | undefined => {
+  if (!value) return undefined;
+  return map[value] || value; // Fallback to value itself if not in map
+};
+
+// Helper to get translation key for an array of values
+export const getTranslationKeysForArray = (values: string[] | undefined, map: readonly {id: string, labelKey: string}[]): string[] => {
+  if (!values || values.length === 0) return [];
+  return values.map(val => {
+    const foundItem = map.find(item => item.id === val);
+    return foundItem ? foundItem.labelKey : val; // Fallback to value itself
+  });
+};

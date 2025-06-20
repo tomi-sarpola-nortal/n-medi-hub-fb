@@ -168,6 +168,21 @@
   "register_step5_contract_kfa": "KFA (Health Insurance Fund for Municipal Employees)",
   "register_step5_button_continue_to_review": "CONTINUE TO REVIEW",
   "register_step5_data_saved_title": "Practice Information Saved",
-  "register_step5_data_saved_desc": "Your practice information has been temporarily saved. Proceed to the next step."
+  "register_step5_data_saved_desc": "Your practice information has been temporarily saved. Proceed to the next step.",
+  "register_step6_subtitle": "Please review your data before submission.",
+  "register_step6_loading_subtitle": "Loading review data...",
+  "register_step6_card_title": "Review Your Data",
+  "register_step6_card_description": "Please verify your information carefully before submitting your application.",
+  "register_step6_info_message": "Your application will be reviewed by the Dental Chamber. You will receive an email with your Dentist ID upon successful review.",
+  "register_step6_terms_checkbox_label": "Agree to terms and conditions",
+  "register_step6_terms_checkbox_text_part1": "I confirm the accuracy of my details and agree to the processing of my data according to the ",
+  "register_step6_terms_checkbox_text_part2_link": "privacy policy",
+  "register_step6_terms_error_title": "Terms Not Agreed",
+  "register_step6_terms_error_desc": "You must agree to the terms and privacy policy to submit your application.",
+  "register_step6_button_submit": "SUBMIT APPLICATION",
+  "register_step6_success_title": "Registration Submitted",
+  "register_step6_success_desc": "Your application has been successfully submitted for review. You will be contacted via email.",
+  "register_step6_submit_error_title": "Submission Failed",
+  "register_step6_submit_error_desc": "An error occurred while submitting your application. Please review your data and try again. If the problem persists, contact support.",
+  "register_review_not_provided": "Not provided"
 }
-

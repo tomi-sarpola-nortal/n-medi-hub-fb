@@ -30,8 +30,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
   return {
     id: snapshot.id,
     name: data.name,
-    email: data.email, // email will be stored in Firestore document as well for querying/display
-    // hashedPassword removed
+    email: data.email,
     role: data.role,
     region: data.region,
     dentistId: data.dentistId,
@@ -39,6 +38,44 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     status: data.status,
     otpEnabled: data.otpEnabled,
     otpSecret: data.otpSecret,
+    
+    // Personal Data
+    title: data.title,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    dateOfBirth: data.dateOfBirth, // Stored as string 'YYYY-MM-DD'
+    placeOfBirth: data.placeOfBirth,
+    nationality: data.nationality,
+    streetAddress: data.streetAddress,
+    postalCode: data.postalCode,
+    city: data.city,
+    stateOrProvince: data.stateOrProvince,
+    phoneNumber: data.phoneNumber,
+    idDocumentName: data.idDocumentName,
+
+    // Professional Qualifications
+    currentProfessionalTitle: data.currentProfessionalTitle,
+    specializations: data.specializations,
+    languages: data.languages,
+    graduationDate: data.graduationDate,
+    university: data.university,
+    approbationNumber: data.approbationNumber,
+    approbationDate: data.approbationDate,
+    diplomaFileName: data.diplomaFileName,
+    approbationCertificateFileName: data.approbationCertificateFileName,
+    specialistRecognitionFileName: data.specialistRecognitionFileName,
+    
+    // Practice Information
+    practiceName: data.practiceName,
+    practiceStreetAddress: data.practiceStreetAddress,
+    practicePostalCode: data.practicePostalCode,
+    practiceCity: data.practiceCity,
+    practicePhoneNumber: data.practicePhoneNumber,
+    practiceFaxNumber: data.practiceFaxNumber,
+    practiceEmail: data.practiceEmail,
+    practiceWebsite: data.practiceWebsite,
+    healthInsuranceContracts: data.healthInsuranceContracts,
+
     createdAt: data.createdAt as Timestamp,
     updatedAt: data.updatedAt as Timestamp,
   };
@@ -48,15 +85,15 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
  * Creates a new person document in Firestore.
  * The document ID will be the Firebase Auth UID.
  * @param uid - The Firebase Auth User ID.
- * @param personData - The data for the new person, including email.
+ * @param personData - The data for the new person, including all registration steps data.
  */
 export async function createPerson(
   uid: string,
-  personData: PersonCreationData & { email: string } // Ensure email is part of the data
+  personData: PersonCreationData // This now includes all fields from Person minus id, createdAt, updatedAt
 ): Promise<void> {
   const personDocRef = doc(db, PERSONS_COLLECTION, uid);
   await setDoc(personDocRef, {
-    ...personData, // email is included here
+    ...personData, 
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -83,7 +120,7 @@ export async function getPersonById(id: string): Promise<Person | null> {
  */
 export async function updatePerson(
   id: string,
-  updates: Partial<PersonCreationData> // Updated to use PersonCreationData for updates
+  updates: Partial<PersonCreationData> 
 ): Promise<void> {
   const docRef = doc(db, PERSONS_COLLECTION, id);
   await updateDoc(docRef, {
@@ -140,3 +177,6 @@ export async function getAllPersons(): Promise<Person[]> {
   const querySnapshot = await getDocs(collection(db, PERSONS_COLLECTION));
   return querySnapshot.docs.map(snapshotToPerson);
 }
+
+// Ensure PersonCreationData in types/index.ts is updated to include all these fields too.
+// The createPerson function now expects a more comprehensive personData object.

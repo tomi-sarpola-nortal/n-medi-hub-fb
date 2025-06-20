@@ -168,5 +168,21 @@
   "register_step5_contract_kfa": "KFA (Krankenfürsorgeanstalt)",
   "register_step5_button_continue_to_review": "WEITER ZUR PRÜFUNG",
   "register_step5_data_saved_title": "Ordinationsinformationen gespeichert",
-  "register_step5_data_saved_desc": "Ihre Ordinationsinformationen wurden temporär gespeichert. Fahren Sie mit dem nächsten Schritt fort."
+  "register_step5_data_saved_desc": "Ihre Ordinationsinformationen wurden temporär gespeichert. Fahren Sie mit dem nächsten Schritt fort.",
+  "register_step6_subtitle": "Bitte überprüfen Sie Ihre Daten vor der Einreichung.",
+  "register_step6_loading_subtitle": "Lade Daten für die Überprüfung...",
+  "register_step6_card_title": "Prüfung Ihrer Daten",
+  "register_step6_card_description": "Bitte überprüfen Sie Ihre Angaben sorgfältig, bevor Sie Ihren Antrag einreichen.",
+  "register_step6_info_message": "Ihr Antrag wird von der Zahnärztekammer geprüft. Nach erfolgreicher Prüfung erhalten Sie eine E-Mail mit Ihrer Zahnarzt-ID.",
+  "register_step6_terms_checkbox_label": "Bedingungen zustimmen",
+  "register_step6_terms_checkbox_text_part1": "Ich bestätige die Richtigkeit meiner Angaben und stimme der Verarbeitung meiner Daten gemäß der ",
+  "register_step6_terms_checkbox_text_part2_link": "Datenschutzerklärung",
+  "register_step6_terms_error_title": "Bedingungen nicht zugestimmt",
+  "register_step6_terms_error_desc": "Sie müssen den Bedingungen und der Datenschutzerklärung zustimmen, um Ihren Antrag einzureichen.",
+  "register_step6_button_submit": "ANTRAG EINREICHEN",
+  "register_step6_success_title": "Registrierung eingereicht",
+  "register_step6_success_desc": "Ihr Antrag wurde erfolgreich zur Prüfung eingereicht. Sie werden per E-Mail kontaktiert.",
+  "register_step6_submit_error_title": "Einreichung fehlgeschlagen",
+  "register_step6_submit_error_desc": "Beim Einreichen Ihres Antrags ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Daten und versuchen Sie es erneut. Sollte das Problem weiterhin bestehen, kontaktieren Sie den Support.",
+  "register_review_not_provided": "Nicht angegeben"
 }
