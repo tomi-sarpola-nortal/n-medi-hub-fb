@@ -314,9 +314,6 @@ export default function RegisterStep6Page() {
                     </Label>
                 </div>
               </div>
-               {form.formState.errors.agreedToTerms && (
-                <p className="text-xs text-destructive">{form.formState.errors.agreedToTerms.message}</p>
-              )}
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between pt-6 space-y-2 sm:space-y-0 sm:space-x-2">
@@ -338,9 +335,3 @@ export default function RegisterStep6Page() {
     </AuthLayout>
   );
 }
-
-// Temporary form variable to satisfy the component structure, as we are not using react-hook-form here directly for submission.
-// This is a workaround since the component structure expects a form object from react-hook-form.
-const form = {
-  formState: { errors: {} as any } // Mocking errors object
-};
