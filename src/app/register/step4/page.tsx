@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useForm, type SubmitHandler, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -82,8 +82,8 @@ type ProfessionalQualificationsFormInputs = z.infer<typeof FormSchema>;
 export default function RegisterStep4Page() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
+  const potentialLocale = pathname.split('/')[1];
+  const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
 
   const { toast } = useToast();

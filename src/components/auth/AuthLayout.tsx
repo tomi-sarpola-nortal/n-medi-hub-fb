@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Landmark, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -38,8 +38,8 @@ export default function AuthLayout({
 }: AuthLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
+  const potentialLocale = pathname.split('/')[1];
+  const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
 
   const translatedBackButtonText = t[backButtonTextKey] || "Back";

@@ -54,7 +54,9 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { state, toggleSidebar } = useSidebar(); 
-  const locale = router.locale || 'en';
+  
+  const potentialLocale = pathname.split('/')[1];
+  const locale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(locale);
 
 
@@ -188,4 +190,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-

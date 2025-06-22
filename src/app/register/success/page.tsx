@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AuthLayout from '@/components/auth/AuthLayout';
@@ -23,8 +23,8 @@ const getClientTranslations = (locale: string) => {
 export default function RegistrationSuccessPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
+  const potentialLocale = pathname.split('/')[1];
+  const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
 
   return (

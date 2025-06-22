@@ -33,18 +33,23 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  // Ensure currentLocale falls back to 'en' if router.locale is undefined during initial render
-  const currentLocale = initialLocale || router.locale || 'en'; 
+
+  const potentialLocale = pathname.split('/')[1];
+  const calculatedLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
+  const currentLocale = initialLocale || calculatedLocale;
   
   const t = getClientTranslations(currentLocale);
 
   const handleChange = (newLocale: string) => {
-    const currentPathWithoutLocale = pathname.startsWith(`/${currentLocale}`)
-      ? pathname.substring(`/${currentLocale}`.length) || '/'
-      : pathname;
+    // This logic correctly rebuilds the URL without the old locale prefix
+    const pathSegments = pathname.split('/');
+    const currentPathIsLocalePrefixed = ['en', 'de'].includes(pathSegments[1]);
+    const basePath = currentPathIsLocalePrefixed ? pathSegments.slice(2).join('/') : pathSegments.slice(1).join('/');
     
-    const newUrl = `${currentPathWithoutLocale}?${searchParams.toString()}`;
-    router.push(newUrl, { locale: newLocale });
+    // Construct the new path without adding an extra slash at the beginning if basePath is empty
+    const newPath = `/${basePath}${basePath ? '?' : ''}${searchParams.toString()}`;
+    
+    router.push(newPath, { locale: newLocale });
   };
 
   return (
@@ -70,4 +75,3 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
     </div>
   );
 }
-

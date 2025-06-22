@@ -2,7 +2,7 @@
 "use client"; // This is the content from the old step1-part2, now becoming step2
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -56,8 +56,8 @@ interface PasswordCriteria {
 export default function RegisterStep2PasswordPage() { // Renamed component for clarity
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentLocale = searchParams.get('locale') || router.locale || pathname.split('/')[1] || 'en';
+  const potentialLocale = pathname.split('/')[1];
+  const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
 
   const { toast } = useToast();
@@ -84,7 +84,7 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
     }
   }, [router, toast]);
 
-  const form = useForm<PasswordFormInputs>({
+  const form = useForm<PasswordFormInputs>({ // form initialization moved up
     resolver: zodResolver(FormSchema),
     defaultValues: {
       password: '',
@@ -93,14 +93,23 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
     mode: 'onTouched', 
   });
 
+  const passwordValue = form.watch('password'); // Watch the password field
+
   const handlePasswordChange = (password: string) => {
-    setPasswordCriteria({
+    setPasswordCriteria({ // Updated setPasswordCriteria with corrected logic
       minLength: password.length >= 8,
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       number: /\d/.test(password),
     });
   };
+
+  // Effect to update password criteria whenever the password value changes
+  useEffect(() => {
+ if (passwordValue !== undefined) { // Ensure passwordValue is not undefined initially
+      handlePasswordChange(passwordValue);
+    }
+  }, [passwordValue]);
 
   const onSubmit: SubmitHandler<PasswordFormInputs> = async (data) => {
     setIsLoading(true);
@@ -153,10 +162,6 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
                   id="password"
                   type="password"
                   {...form.register('password')}
-                  onChange={(e) => {
-                    form.handleChange(e); 
-                    handlePasswordChange(e.target.value);
-                  }}
                   className={form.formState.errors.password ? "border-destructive" : ""}
                 />
                 {form.formState.errors.password && (
@@ -203,4 +208,3 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
     </AuthLayout>
   );
 }
-
