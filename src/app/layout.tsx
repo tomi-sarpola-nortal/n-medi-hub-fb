@@ -1,8 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
+import { Providers } from '@/context/providers';
 
-import { AuthProvider } from "@/context/auth-context";
 export const metadata: Metadata = {
   title: 'Zahn Aerzte Kammer V6',
   description: 'Dental Chamber Management Portal',
@@ -25,10 +24,9 @@ export default function RootLayout({
       </head>
 
       <body className="font-body antialiased">
- <AuthProvider>
- {children}
- </AuthProvider>
-        <Toaster />
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

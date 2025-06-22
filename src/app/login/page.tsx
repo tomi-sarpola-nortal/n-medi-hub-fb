@@ -57,9 +57,10 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsLoading(true);
     const result = await login(data.email, data.password);
-    setIsLoading(false);
+    setIsLoading(false); // Set loading false after login attempt is complete
+
     if (result.success) {
-      // AuthProvider will redirect to /dashboard
+      router.push('/dashboard'); // Explicit redirect on success
     } else {
       toast({
         title: t.login_error_title || "Login Failed",

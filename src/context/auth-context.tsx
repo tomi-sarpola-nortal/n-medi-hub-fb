@@ -68,18 +68,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, error };
     }
 
-    setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // onAuthStateChanged will handle setting the user state after fetching profile
-      // No need to manually setUser here if onAuthStateChanged is robust
-      setLoading(false);
-      router.push('/dashboard'); // Redirect after successful login
+      await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will handle setting the user state.
+      // The component calling login will handle UI changes (loading state, redirect).
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
-      setLoading(false);
-      return { success: false, error: error.message || "Failed to login." };
+      let errorMessage: string;
+      switch (error.code) {
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+        case 'auth/invalid-email':
+          errorMessage = "Invalid email or password. Please try again.";
+          break;
+        case 'auth/internal-error':
+          errorMessage = "An internal authentication error occurred. Please check that your Firebase project configuration is correct and that the Email/Password sign-in provider is enabled in the Firebase console.";
+          break;
+        default:
+          errorMessage = "An unexpected error occurred during login. Please try again later.";
+          break;
+      }
+      return { success: false, error: errorMessage };
     }
   };
 
