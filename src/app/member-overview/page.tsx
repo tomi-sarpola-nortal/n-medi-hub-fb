@@ -9,6 +9,7 @@ import { getTranslations } from '@/lib/translations';
 import { ArrowLeft, PlusCircle, Search } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
+import Link from 'next/link';
 
 interface MemberReview {
     id: string;
@@ -169,7 +170,9 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                     <TableCell>{member.trainingPoints}</TableCell>
                                     <TableCell>{member.repHours}</TableCell>
                                     <TableCell>
-                                        <Button variant="outline" size="sm">{t.member_list_table_action_button || "VIEW"}</Button>
+                                        <Button variant="outline" size="sm" asChild>
+                                            <Link href={`/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
