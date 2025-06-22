@@ -77,7 +77,7 @@ export interface RegistrationData {
   city?: string;
   stateOrProvince?: string;
   phoneNumber?: string;
-  idDocument?: File | null;
+  idDocumentUrl?: string;
   idDocumentName?: string;
 
   // Step 4: Professional Qualifications
@@ -88,12 +88,12 @@ export interface RegistrationData {
   university?: string;
   approbationNumber?: string;
   approbationDate?: Date; 
-  diplomaFile?: File | null;
-  diplomaFileName?: string;
-  approbationCertificateFile?: File | null;
-  approbationCertificateFileName?: string;
-  specialistRecognitionFile?: File | null;
-  specialistRecognitionFileName?: string;
+  diplomaUrl?: string;
+  diplomaName?: string;
+  approbationCertificateUrl?: string;
+  approbationCertificateName?: string;
+  specialistRecognitionUrl?: string;
+  specialistRecognitionName?: string;
 
   // Step 5: Practice Information
   practiceName?: string;

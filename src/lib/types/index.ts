@@ -86,7 +86,7 @@ export interface Person {
   city?: string;
   stateOrProvince?: string; // This could be the same as 'region' or more specific
   phoneNumber?: string;
-  idDocumentName?: string; // Name of the uploaded ID file
+  idDocumentUrl?: string; 
 
   // Professional Qualifications from Step 4
   currentProfessionalTitle?: ProfessionalTitleId;
@@ -96,9 +96,9 @@ export interface Person {
   university?: string;
   approbationNumber?: string;
   approbationDate?: string;
-  diplomaFileName?: string; // Name of the uploaded diploma file
-  approbationCertificateFileName?: string; // Name of the uploaded approbation cert file
-  specialistRecognitionFileName?: string; // Name of the uploaded specialist recog file
+  diplomaUrl?: string; 
+  approbationCertificateUrl?: string;
+  specialistRecognitionUrl?: string;
   
   // Practice Information from Step 5
   practiceName?: string;
@@ -116,8 +116,6 @@ export interface Person {
 }
 
 // Data needed to create a new person document in Firestore, after Firebase Auth user is created.
-// This is the data beyond what Firebase Auth stores.
-// It also includes 'email' as we decided to store it in Firestore as well for querying.
 export type PersonCreationData = Omit<Person, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Data structure for the registration form state (in registrationStore.ts)
@@ -131,15 +129,15 @@ export interface RegistrationFormData {
   role: UserRole;
   region: string;
   dentistId?: string;
-  avatarUrl?: string; // Will be used for initial profile setup
-  status?: 'pending_approval' | 'active' | 'inactive' | 'rejected'; // Default to pending_approval
-  otpEnabled?: boolean; // Default to false
+  avatarUrl?: string; 
+  status?: 'pending_approval' | 'active' | 'inactive' | 'rejected'; 
+  otpEnabled?: boolean; 
   
   // Step 3
   title?: string;
   firstName?: string;
   lastName?: string;
-  dateOfBirth?: Date; // Stored as Date object in client-store, formatted for Firestore
+  dateOfBirth?: Date; 
   placeOfBirth?: string;
   nationality?: string;
   streetAddress?: string;
@@ -147,7 +145,7 @@ export interface RegistrationFormData {
   city?: string;
   stateOrProvince?: string;
   phoneNumber?: string;
-  idDocument?: File | null;
+  idDocumentUrl?: string;
   idDocumentName?: string;
 
   // Step 4
@@ -158,12 +156,12 @@ export interface RegistrationFormData {
   university?: string;
   approbationNumber?: string;
   approbationDate?: string;
-  diplomaFile?: File | null;
-  diplomaFileName?: string;
-  approbationCertificateFile?: File | null;
-  approbationCertificateFileName?: string;
-  specialistRecognitionFile?: File | null;
-  specialistRecognitionFileName?: string;
+  diplomaUrl?: string;
+  diplomaName?: string;
+  approbationCertificateUrl?: string;
+  approbationCertificateName?: string;
+  specialistRecognitionUrl?: string;
+  specialistRecognitionName?: string;
 
   // Step 5
   practiceName?: string;

@@ -60,7 +60,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     city: data.city,
     stateOrProvince: data.stateOrProvince,
     phoneNumber: data.phoneNumber,
-    idDocumentName: data.idDocumentName,
+    idDocumentUrl: data.idDocumentUrl,
 
     // Professional Qualifications
     currentProfessionalTitle: data.currentProfessionalTitle,
@@ -70,9 +70,9 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     university: data.university,
     approbationNumber: data.approbationNumber,
     approbationDate: data.approbationDate,
-    diplomaFileName: data.diplomaFileName,
-    approbationCertificateFileName: data.approbationCertificateFileName,
-    specialistRecognitionFileName: data.specialistRecognitionFileName,
+    diplomaUrl: data.diplomaUrl,
+    approbationCertificateUrl: data.approbationCertificateUrl,
+    specialistRecognitionUrl: data.specialistRecognitionUrl,
     
     // Practice Information
     practiceName: data.practiceName,

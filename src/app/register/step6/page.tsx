@@ -61,20 +61,18 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ title, data, locale, t })
     }
   };
 
-  const renderValue = (itemValue?: string | string[] | null | Date, label?: string) => {
+  const renderValue = (itemValue?: string | string[] | null | Date) => {
     if (itemValue === undefined || itemValue === null || (typeof itemValue === 'string' && itemValue.trim() === '') || (Array.isArray(itemValue) && itemValue.length === 0) ) {
       return <span className="text-muted-foreground italic">{t.register_review_not_provided || "Not provided"}</span>;
     }
-    if (label === t.register_step2_label_dateOfBirth) {
-        return formatDate(itemValue);
-    }
+    
     if (Array.isArray(itemValue)) {
       return itemValue.join(', ');
     }
     if (itemValue instanceof Date) {
         return formatDate(itemValue);
     }
-    // For file names, display them directly
+    
     if (typeof itemValue === 'string' && (itemValue.endsWith('.pdf') || itemValue.endsWith('.jpg') || itemValue.endsWith('.jpeg') || itemValue.endsWith('.png'))) {
         return (
             <div className="flex items-center space-x-2 text-sm text-foreground">
@@ -93,7 +91,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ title, data, locale, t })
         {data.map((item, index) => (
           <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-border last:border-b-0">
             <p className="text-sm font-medium text-muted-foreground">{item.label}:</p>
-            <p className="text-sm text-foreground text-right sm:text-left">{renderValue(item.value, item.label)}</p>
+            <p className="text-sm text-foreground text-right sm:text-left">{renderValue(item.value)}</p>
           </div>
         ))}
       </div>
@@ -149,10 +147,10 @@ export default function RegisterStep6Page() {
       const personDataToCreate: PersonCreationData = {
         name: `${registrationData.title || ''} ${registrationData.firstName} ${registrationData.lastName}`.trim(),
         email: registrationData.email,
-        role: registrationData.role || 'dentist', // Default role or one selected during flow
-        region: registrationData.stateOrProvince || 'N/A', // Assuming stateOrProvince is the region
-        dentistId: registrationData.dentistId || undefined, // if provided
-        avatarUrl: `https://avatar.vercel.sh/${registrationData.email}.png?size=100`, // Default avatar
+        role: registrationData.role || 'dentist', 
+        region: registrationData.stateOrProvince || 'N/A', 
+        dentistId: registrationData.dentistId || undefined, 
+        avatarUrl: `https://avatar.vercel.sh/${registrationData.email}.png?size=100`, 
         status: 'pending_approval',
         otpEnabled: false,
         
@@ -168,7 +166,7 @@ export default function RegisterStep6Page() {
         city: registrationData.city,
         stateOrProvince: registrationData.stateOrProvince,
         phoneNumber: registrationData.phoneNumber,
-        idDocumentName: registrationData.idDocumentName,
+        idDocumentUrl: registrationData.idDocumentUrl,
 
         // Professional Qualifications (Step 4)
         currentProfessionalTitle: registrationData.currentProfessionalTitle,
@@ -178,9 +176,9 @@ export default function RegisterStep6Page() {
         university: registrationData.university,
         approbationNumber: registrationData.approbationNumber,
         approbationDate: registrationData.approbationDate,
-        diplomaFileName: registrationData.diplomaFileName,
-        approbationCertificateFileName: registrationData.approbationCertificateFileName,
-        specialistRecognitionFileName: registrationData.specialistRecognitionFileName,
+        diplomaUrl: registrationData.diplomaUrl,
+        approbationCertificateUrl: registrationData.approbationCertificateUrl,
+        specialistRecognitionUrl: registrationData.specialistRecognitionUrl,
         
         // Practice Information (Step 5)
         practiceName: registrationData.practiceName,
@@ -202,7 +200,7 @@ export default function RegisterStep6Page() {
         title: t.register_step6_success_title || "Registration Submitted",
         description: t.register_step6_success_desc || "Your application has been successfully submitted for review.",
       });
-      router.push('/register/success'); // Navigate to success page
+      router.push('/register/success'); 
 
     } catch (error: any) {
       console.error("Registration submission error:", error);
@@ -230,7 +228,7 @@ export default function RegisterStep6Page() {
     { label: t.register_step2_label_title || "Title", value: t[getTranslationKey(registrationData.title, TITLES_MAP) || ''] || registrationData.title },
     { label: t.register_step2_label_firstName || "First Name", value: registrationData.firstName },
     { label: t.register_step2_label_lastName || "Last Name", value: registrationData.lastName },
-    { label: t.register_step2_label_dateOfBirth || "Date of Birth", value: registrationData.dateOfBirth },
+    { label: t.register_step2_label_dateOfBirth || "Date of Birth", value: registrationData.dateOfBirth ? format(registrationData.dateOfBirth, 'dd.MM.yyyy') : null },
     { label: t.register_step2_label_placeOfBirth || "Place of Birth", value: registrationData.placeOfBirth },
     { label: t.register_step2_label_nationality || "Nationality", value: t[getTranslationKey(registrationData.nationality, NATIONALITIES_MAP) || ''] || registrationData.nationality },
     { label: t.register_step2_label_streetAddress || "Street Address", value: registrationData.streetAddress },
@@ -245,14 +243,14 @@ export default function RegisterStep6Page() {
   const profQualDataItems = [
     { label: t.register_step4_label_prof_title || "Professional Title", value: t[getTranslationKeysForArray([registrationData.currentProfessionalTitle!], PROFESSIONAL_TITLES)[0]] || registrationData.currentProfessionalTitle },
     { label: t.register_step4_label_specializations || "Specializations", value: getTranslationKeysForArray(registrationData.specializations, DENTAL_SPECIALIZATIONS).map(key => t[key] || key).join(', ') },
-    { label: t.register_step4_label_languages || "Languages", value: registrationData.languages },
-    { label: t.register_step4_label_graduation_date || "Graduation Date", value: registrationData.graduationDate },
+    { label: t.register_step4_label_languages || "Languages", value: registrationData.languages?.join(', ') },
+    { label: t.register_step4_label_graduation_date || "Graduation Date", value: registrationData.graduationDate ? format(new Date(registrationData.graduationDate), 'dd.MM.yyyy') : null },
     { label: t.register_step4_label_university || "University", value: registrationData.university },
     { label: t.register_step4_label_approbation_number || "Approbation Number", value: registrationData.approbationNumber },
-    { label: t.register_step4_label_approbation_date || "Approbation Date", value: registrationData.approbationDate },
-    { label: t.register_step4_label_diploma || "Diploma File", value: registrationData.diplomaFileName },
-    { label: t.register_step4_label_approbation_cert || "Approbation Cert. File", value: registrationData.approbationCertificateFileName },
-    { label: t.register_step4_label_specialist_recognition || "Specialist Recog. File", value: registrationData.specialistRecognitionFileName },
+    { label: t.register_step4_label_approbation_date || "Approbation Date", value: registrationData.approbationDate ? format(new Date(registrationData.approbationDate), 'dd.MM.yyyy') : null },
+    { label: t.register_step4_label_diploma || "Diploma File", value: registrationData.diplomaName },
+    { label: t.register_step4_label_approbation_cert || "Approbation Cert. File", value: registrationData.approbationCertificateName },
+    { label: t.register_step4_label_specialist_recognition || "Specialist Recog. File", value: registrationData.specialistRecognitionName },
   ];
 
   const practiceInfoDataItems = [
@@ -335,5 +333,3 @@ export default function RegisterStep6Page() {
     </AuthLayout>
   );
 }
-
-    

@@ -25,6 +25,7 @@ import {
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { LanguageInput } from '@/components/ui/language-input';
+import { uploadFile } from '@/services/storageService';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -49,8 +50,7 @@ const baseFileSchema = z
   .refine(
     (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
     "Only .pdf, .jpg, .jpeg, .png formats are supported."
-  )
-  .transform(files => files?.[0] || null);
+  );
 
 const optionalFileSchema = z
   .custom<FileList>()
@@ -60,8 +60,7 @@ const optionalFileSchema = z
   .refine(
     (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
     "Only .pdf, .jpg, .jpeg, .png formats are supported."
-  )
-  .transform(files => (files && files.length > 0) ? files[0] : null);
+  );
 
 
 const FormSchema = z.object({
@@ -103,15 +102,14 @@ export default function RegisterStep4Page() {
       university: "",
       approbationNumber: "",
       approbationDate: undefined,
-      diplomaFile: null,
-      approbationCertificateFile: null,
-      specialistRecognitionFile: null,
+      diplomaFile: undefined,
+      approbationCertificateFile: undefined,
+      specialistRecognitionFile: undefined,
     },
   });
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    // Check for essential data from previous steps
     if (!storedData.email || !storedData.password || !storedData.firstName ) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
@@ -120,11 +118,11 @@ export default function RegisterStep4Page() {
       });
       router.replace('/register/step1');
     } else {
-      if (storedData.diplomaFileName) setSelectedDiplomaFileName(storedData.diplomaFileName);
-      if (storedData.approbationCertificateFileName) setSelectedApprobationCertificateFileName(storedData.approbationCertificateFileName);
-      if (storedData.specialistRecognitionFileName) setSelectedSpecialistRecognitionFileName(storedData.specialistRecognitionFileName);
+      setSelectedDiplomaFileName(storedData.diplomaName || null);
+      setSelectedApprobationCertificateFileName(storedData.approbationCertificateName || null);
+      setSelectedSpecialistRecognitionFileName(storedData.specialistRecognitionName || null);
       
-      const dataToReset = {
+      form.reset({
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
         languages: storedData.languages || [],
@@ -132,11 +130,7 @@ export default function RegisterStep4Page() {
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
         approbationDate: storedData.approbationDate ? new Date(storedData.approbationDate) : undefined,
-        diplomaFile: storedData.diplomaFile || null,
-        approbationCertificateFile: storedData.approbationCertificateFile || null,
-        specialistRecognitionFile: storedData.specialistRecognitionFile || null,
-      };
-      form.reset(dataToReset as any);
+      });
     }
   }, [router, toast, t]);
 
@@ -158,23 +152,50 @@ export default function RegisterStep4Page() {
 
   const onSubmit: SubmitHandler<ProfessionalQualificationsFormInputs> = async (data) => {
     setIsLoading(true);
-    
-    const diplomaFileToStore = data.diplomaFile as File | null;
-    const approbationCertificateFileToStore = data.approbationCertificateFile as File | null;
-    const specialistRecognitionFileToStore = data.specialistRecognitionFile as File | null;
+    const storedData = getRegistrationData();
+    const uploadPath = `registrations/${storedData.email}/qualifications`;
 
-    updateRegistrationData({
-      ...data,
-      diplomaFile: diplomaFileToStore,
-      diplomaFileName: diplomaFileToStore?.name,
-      approbationCertificateFile: approbationCertificateFileToStore,
-      approbationCertificateFileName: approbationCertificateFileToStore?.name,
-      specialistRecognitionFile: specialistRecognitionFileToStore,
-      specialistRecognitionFileName: specialistRecognitionFileToStore?.name,
-    });
+    try {
+        let diplomaUrl: string | undefined = getRegistrationData().diplomaUrl;
+        if (data.diplomaFile) {
+            const diplomaFileToUpload = data.diplomaFile[0];
+            diplomaUrl = await uploadFile(diplomaFileToUpload, uploadPath);
+            updateRegistrationData({ diplomaName: diplomaFileToUpload.name });
+        }
 
-    router.push('/register/step5'); 
-    setIsLoading(false);
+        let approbationCertificateUrl: string | undefined = getRegistrationData().approbationCertificateUrl;
+        if (data.approbationCertificateFile) {
+            const certFileToUpload = data.approbationCertificateFile[0];
+            approbationCertificateUrl = await uploadFile(certFileToUpload, uploadPath);
+            updateRegistrationData({ approbationCertificateName: certFileToUpload.name });
+        }
+
+        let specialistRecognitionUrl: string | undefined = getRegistrationData().specialistRecognitionUrl;
+        if (data.specialistRecognitionFile) {
+            const specialistFileToUpload = data.specialistRecognitionFile[0];
+            specialistRecognitionUrl = await uploadFile(specialistFileToUpload, uploadPath);
+            updateRegistrationData({ specialistRecognitionName: specialistFileToUpload.name });
+        }
+
+        updateRegistrationData({
+            ...data,
+            diplomaUrl,
+            approbationCertificateUrl,
+            specialistRecognitionUrl,
+        });
+
+        router.push('/register/step5');
+
+    } catch (error) {
+        console.error("File upload failed in step 4:", error);
+        toast({
+            title: "Upload Failed",
+            description: "Could not upload one or more documents. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

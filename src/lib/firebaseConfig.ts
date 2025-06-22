@@ -1,7 +1,8 @@
 
 import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth'; // Import getAuth
+import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,6 +16,7 @@ const firebaseConfig: FirebaseOptions = {
 let app;
 let db: ReturnType<typeof getFirestore> | null = null;
 let auth: ReturnType<typeof getAuth> | null = null;
+let storage: ReturnType<typeof getStorage> | null = null;
 
 // Only initialize if the critical config values are present
 if (firebaseConfig.apiKey && firebaseConfig.projectId) {
@@ -25,9 +27,10 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   }
   db = getFirestore(app);
   auth = getAuth(app);
+  storage = getStorage(app);
 } else {
     // This warning will appear in the browser's console if the .env file is not set up
     console.warn("Firebase configuration is incomplete or missing from .env file. Firebase services will be unavailable.");
 }
 
-export { db, auth };
+export { db, auth, storage };

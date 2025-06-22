@@ -17,6 +17,7 @@ import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { getRegistrationData, updateRegistrationData } from '@/lib/registrationStore';
 import { DatePickerInput } from '@/components/ui/date-picker';
+import { uploadFile } from '@/services/storageService';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -54,8 +55,7 @@ const FormSchema = z.object({
     .refine(
       (files) => files && ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
       "Only .pdf, .jpg, .jpeg, .png formats are supported."
-    )
-    .transform(files => files?.[0] || null),
+    ),
 });
 
 type PersonalDataFormInputs = z.infer<typeof FormSchema>;
@@ -116,7 +116,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         city: storedData.city || '',
         stateOrProvince: storedData.stateOrProvince || '',
         phoneNumber: storedData.phoneNumber || '',
-        // idDocument is handled by Controller and native file input state
       };
       form.reset(dataToReset as any);
       if (storedData.idDocumentName) {
@@ -128,15 +127,35 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
 
   const onSubmit: SubmitHandler<PersonalDataFormInputs> = async (data) => {
     setIsLoading(true);
-    const fileToStore = data.idDocument as File | null;
+    const storedData = getRegistrationData();
+    
+    try {
+        const fileToUpload = data.idDocument?.[0];
+        if (!fileToUpload) {
+            throw new Error("ID Document file is missing.");
+        }
 
-    updateRegistrationData({
-      ...data,
-      idDocument: fileToStore, 
-      idDocumentName: fileToStore?.name, 
-    });
-    router.push('/register/step4'); // Navigate to Step 4
-    setIsLoading(false);
+        const uploadPath = `registrations/${storedData.email}/id_documents`;
+        const downloadURL = await uploadFile(fileToUpload, uploadPath);
+
+        updateRegistrationData({
+            ...data,
+            idDocumentUrl: downloadURL,
+            idDocumentName: fileToUpload.name, 
+        });
+
+        router.push('/register/step4');
+
+    } catch (error) {
+        console.error("File upload failed:", error);
+        toast({
+            title: "Upload Failed",
+            description: "Could not upload your ID document. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
