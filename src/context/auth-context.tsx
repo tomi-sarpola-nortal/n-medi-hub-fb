@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { User, UserRole, RegistrationFormData, PersonCreationData } from '@/lib/types';
+import type { Person } from '@/lib/types';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebaseConfig';
@@ -15,18 +15,18 @@ import {
 import { getPersonById, createPerson, findPersonByEmail } from '@/services/personService'; // findPersonByEmail for seeding if needed
 
 interface AuthContextType {
-  user: User | null;
+  user: Person | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   loading: boolean;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Exposing setUser for flexibility e.g. profile updates
+  setUser: React.Dispatch<React.SetStateAction<Person | null>>; // Exposing setUser for flexibility e.g. profile updates
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Person | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // https://firebase.google.com/docs/reference/js/firebase.User
         const personProfile = await getPersonById(firebaseUser.uid);
         if (personProfile) {
-          setUser(personProfile); // Our User type matches Person structure
+          setUser(personProfile);
         } else {
           // This case might happen if Firestore document creation failed after auth user creation
           // Or if it's a new user whose profile isn't created yet (should be handled during registration)

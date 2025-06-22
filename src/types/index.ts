@@ -12,7 +12,12 @@ export interface User {
   id: string; // Corresponds to Firestore document ID (which will be Firebase Auth UID)
   name: string;
   email: string; // Should be unique (from Firebase Auth)
-  // hashedPassword is removed as Firebase Auth handles it
+  
+  // Personal Data
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+
   role: UserRole;
   region: string; 
   dentistId?: string; // Unique for dentists, assigned by LK
@@ -57,15 +62,18 @@ export interface Person {
   id: string; // This will be the Firebase Auth UID
   name: string;
   email: string; 
-  // hashedPassword is removed
   role: UserRole; 
   region: string; // e.g. "Bayern", "Wien"
   dentistId?: string; 
-  avatarUrl?: string; // Consider renaming to profileImage for consistency with User type
+  avatarUrl?: string; 
   status: 'pending_approval' | 'active' | 'inactive' | 'rejected';
   otpEnabled: boolean; 
   otpSecret?: string; 
   
+  // Add missing fields to make it a complete user representation
+  approved?: boolean;
+  educationPoints?: number;
+
   // Personal Data from Step 3
   title?: string;
   firstName?: string;

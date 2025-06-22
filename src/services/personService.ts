@@ -45,6 +45,8 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     status: data.status,
     otpEnabled: data.otpEnabled,
     otpSecret: data.otpSecret,
+    approved: data.approved,
+    educationPoints: data.educationPoints,
     
     // Personal Data
     title: data.title,

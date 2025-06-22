@@ -1,24 +1,27 @@
 
+"use client";
+
+import { useAuth } from '@/context/auth-context';
 import AppLayout from '@/components/layout/AppLayout';
-import type { User } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getTranslations } from '@/lib/translations'; 
-import { GraduationCap, CalendarCheck, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { GraduationCap, CalendarCheck, MapPin, Phone, Mail, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-// Mock user data for the dashboard page.
-const getCurrentUser = async (): Promise<User> => {
-  return {
-    id: 'user123',
-    name: 'Dr. Sabine Müller',
-    email: 'sabine.mueller@example.com',
-    role: 'dentist',
-    region: 'Wien',
-    avatarUrl: `https://placehold.co/100x100.png`,
-    dentistId: 'ZA-2025-0842',
-  };
+// Helper for client-side translations
+const getClientTranslations = (locale: string) => {
+  try {
+    if (locale === 'de') {
+      return require('../../../locales/de.json');
+    }
+    return require('../../../locales/en.json');
+  } catch (e) {
+    console.warn("Translation file not found for dashboard page, falling back to en");
+    return require('../../../locales/en.json');
+  }
 };
+
 
 const mockRepresentationRequests = [
     {
@@ -37,15 +40,30 @@ interface DashboardPageProps {
   params: { locale: string };
 }
 
-export default async function DashboardPage({ params }: DashboardPageProps) {
-  const user = await getCurrentUser();
-  const t = getTranslations(params.locale);
+export default function DashboardPage({ params }: DashboardPageProps) {
+  const { user, loading } = useAuth();
+  const [t, setT] = useState<Record<string, string> | null>(null);
 
-  const welcomeMessage = t.welcome_back.replace('{userName}', user.name);
+  useEffect(() => {
+    setT(getClientTranslations(params.locale));
+  }, [params.locale]);
+
+  if (loading || !user || !t) {
+    return (
+      <AppLayout pageTitle="Dashboard" locale={params.locale}>
+        <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+  
+  const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
+  const welcomeMessage = t.welcome_back.replace('{userName}', fullName);
   const pageTitle = t.dashboard_page_title || "Dashboard";
 
   return (
-    <AppLayout user={user} pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={params.locale}>
       <div className="flex-1 space-y-8 p-4 md:p-8">
         <h2 className="text-3xl font-bold tracking-tight font-headline">
           {welcomeMessage}

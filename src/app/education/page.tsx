@@ -1,5 +1,6 @@
+
 import AppLayout from '@/components/layout/AppLayout';
-import type { User } from '@/types';
+import type { Person } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,8 +9,10 @@ import { Separator } from '@/components/ui/separator';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getTranslations } from '@/lib/translations';
+import { Timestamp } from 'firebase/firestore';
 
-const getCurrentUser = async (): Promise<User> => {
+const getCurrentUser = async (): Promise<Person> => {
+  // This mock now returns a Person to match the updated AppLayout prop types
   return {
     id: 'user123',
     name: 'Dr. Sabine Müller',
@@ -18,6 +21,13 @@ const getCurrentUser = async (): Promise<User> => {
     region: 'Bayern',
     avatarUrl: `https://placehold.co/100x100.png?text=SM`,
     dentistId: 'ZA-2025-0842',
+    title: 'Dr.',
+    firstName: 'Sabine',
+    lastName: 'Müller',
+    status: 'active',
+    otpEnabled: false,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
   };
 };
 
