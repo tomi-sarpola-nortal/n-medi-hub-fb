@@ -78,7 +78,6 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
   const onSubmit = async (data: PersonalDataFormInputs) => {
     setIsLoading(true);
     try {
-      // Destructure to remove the FileList object before creating the update payload
       const { idDocument, ...restOfData } = data;
 
       const updateData: Partial<Person> = {
@@ -87,13 +86,13 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
         name: `${data.title || ''} ${data.firstName} ${data.lastName}`.trim(),
       };
       
-      const fileToUpload = data.idDocument?.[0];
+      const fileToUpload = idDocument?.[0];
       if (fileToUpload) {
         const uploadPath = `users/${user.id}/id_documents`;
         const downloadURL = await uploadFile(fileToUpload, uploadPath);
         updateData.idDocumentUrl = downloadURL;
         updateData.idDocumentName = fileToUpload.name;
-        setSelectedFileName(fileToUpload.name); // Update display name on success
+        setSelectedFileName(fileToUpload.name);
       }
 
       await updatePerson(user.id, updateData);
@@ -121,10 +120,6 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
     if (files && files.length > 0) {
       form.setValue('idDocument', files, { shouldValidate: true });
       setSelectedFileName(files[0].name);
-    } else {
-      // Don't reset to undefined, as it would clear the field unnecessarily
-      // The user might just be cancelling the file dialog.
-      // If they want to remove the file, a different UI mechanism would be needed.
     }
   };
 
@@ -342,5 +337,3 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
     </Form>
   );
 }
-
-    

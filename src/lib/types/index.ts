@@ -86,18 +86,18 @@ export interface Person {
   city?: string;
   stateOrProvince?: string; // This could be the same as 'region' or more specific
   phoneNumber?: string;
-  idDocumentUrl?: string; 
+  idDocumentUrl?: string;
   idDocumentName?: string;
 
   // Professional Qualifications from Step 4
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
   languages?: string[];
-  graduationDate?: string;
+  graduationDate?: string; // Storing as YYYY-MM-DD string
   university?: string;
   approbationNumber?: string;
-  approbationDate?: string;
-  diplomaUrl?: string; 
+  approbationDate?: string; // Storing as YYYY-MM-DD string
+  diplomaUrl?: string;
   diplomaName?: string;
   approbationCertificateUrl?: string;
   approbationCertificateName?: string;
@@ -149,6 +149,7 @@ export interface RegistrationFormData {
   city?: string;
   stateOrProvince?: string;
   phoneNumber?: string;
+  idDocument?: File | null;
   idDocumentUrl?: string;
   idDocumentName?: string;
 
@@ -156,14 +157,17 @@ export interface RegistrationFormData {
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
   languages?: string[];
-  graduationDate?: string;
+  graduationDate?: Date;
   university?: string;
   approbationNumber?: string;
-  approbationDate?: string;
+  approbationDate?: Date;
+  diplomaFile?: File | null;
   diplomaUrl?: string;
   diplomaName?: string;
+  approbationCertificateFile?: File | null;
   approbationCertificateUrl?: string;
   approbationCertificateName?: string;
+  specialistRecognitionFile?: File | null;
   specialistRecognitionUrl?: string;
   specialistRecognitionName?: string;
 
@@ -181,4 +185,3 @@ export interface RegistrationFormData {
   // Step 6
   agreedToTerms?: boolean;
 }
-

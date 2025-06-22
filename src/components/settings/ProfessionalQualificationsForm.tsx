@@ -58,9 +58,9 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  const [selectedDiplomaFileName, setSelectedDiplomaFileName] = useState<string | null>(user.diplomaName || null);
-  const [selectedApprobationCertificateFileName, setSelectedApprobationCertificateFileName] = useState<string | null>(user.approbationCertificateName || null);
-  const [selectedSpecialistRecognitionFileName, setSelectedSpecialistRecognitionFileName] = useState<string | null>(user.specialistRecognitionName || null);
+  const [selectedDiplomaName, setSelectedDiplomaName] = useState<string | null>(user.diplomaName || null);
+  const [selectedApprobationCertificateName, setSelectedApprobationCertificateName] = useState<string | null>(user.approbationCertificateName || null);
+  const [selectedSpecialistRecognitionName, setSelectedSpecialistRecognitionName] = useState<string | null>(user.specialistRecognitionName || null);
 
 
   const form = useForm<FormInputs>({
@@ -106,26 +106,26 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
         approbationDate: data.approbationDate instanceof Date ? data.approbationDate.toISOString().split('T')[0] : data.approbationDate,
       };
 
-      if (data.diplomaFile?.[0]) {
-        const file = data.diplomaFile[0];
+      if (diplomaFile?.[0]) {
+        const file = diplomaFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.diplomaUrl = url;
         updateData.diplomaName = file.name;
-        setSelectedDiplomaFileName(file.name);
+        setSelectedDiplomaName(file.name);
       }
-      if (data.approbationCertificateFile?.[0]) {
-        const file = data.approbationCertificateFile[0];
+      if (approbationCertificateFile?.[0]) {
+        const file = approbationCertificateFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.approbationCertificateUrl = url;
         updateData.approbationCertificateName = file.name;
-        setSelectedApprobationCertificateFileName(file.name);
+        setSelectedApprobationCertificateName(file.name);
       }
-      if (data.specialistRecognitionFile?.[0]) {
-        const file = data.specialistRecognitionFile[0];
+      if (specialistRecognitionFile?.[0]) {
+        const file = specialistRecognitionFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.specialistRecognitionUrl = url;
         updateData.specialistRecognitionName = file.name;
-        setSelectedSpecialistRecognitionFileName(file.name);
+        setSelectedSpecialistRecognitionName(file.name);
       }
 
       await updatePerson(user.id, updateData);
@@ -302,14 +302,14 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
-                            {selectedDiplomaFileName || (t.register_step2_button_selectFile || "Select File")}
+                            {selectedDiplomaName || (t.register_step2_button_selectFile || "Select File")}
                         </label>
                         <Input
                             id="diplomaFile-input"
                             type="file"
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaFileName)}
+                            onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaName)}
                         />
                     </div>
                     </FormControl>
@@ -331,14 +331,14 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
-                            {selectedApprobationCertificateFileName || (t.register_step2_button_selectFile || "Select File")}
+                            {selectedApprobationCertificateName || (t.register_step2_button_selectFile || "Select File")}
                         </label>
                         <Input
                             id="approbationCertificateFile-input"
                             type="file"
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateFileName)}
+                            onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateName)}
                         />
                     </div>
                     </FormControl>
@@ -360,14 +360,14 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
-                            {selectedSpecialistRecognitionFileName || (t.register_step2_button_selectFile || "Select File")}
+                            {selectedSpecialistRecognitionName || (t.register_step2_button_selectFile || "Select File")}
                         </label>
                         <Input
                             id="specialistRecognitionFile-input"
                             type="file"
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionFileName)}
+                            onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionName)}
                         />
                     </div>
                     </FormControl>
@@ -386,5 +386,3 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
     </Form>
   );
 }
-
-    
