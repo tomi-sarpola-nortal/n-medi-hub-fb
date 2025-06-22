@@ -34,6 +34,10 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
   if (!data) {
     throw new Error(`Document data is undefined for snapshot ID: ${snapshot.id}`);
   }
+
+  const createdAtTimestamp = data.createdAt as Timestamp;
+  const updatedAtTimestamp = data.updatedAt as Timestamp;
+
   return {
     id: snapshot.id,
     name: data.name,
@@ -89,8 +93,8 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     practiceWebsite: data.practiceWebsite,
     healthInsuranceContracts: data.healthInsuranceContracts,
 
-    createdAt: data.createdAt as Timestamp,
-    updatedAt: data.updatedAt as Timestamp,
+    createdAt: createdAtTimestamp?.toDate().toISOString(),
+    updatedAt: updatedAtTimestamp?.toDate().toISOString(),
   };
 };
 

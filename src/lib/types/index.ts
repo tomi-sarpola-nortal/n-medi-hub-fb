@@ -31,8 +31,8 @@ export interface User {
   approved?: boolean; 
   educationPoints?: number; 
 
-  createdAt?: Timestamp; 
-  updatedAt?: Timestamp; 
+  createdAt?: string; 
+  updatedAt?: string; 
 }
 
 
@@ -115,8 +115,8 @@ export interface Person {
   practiceWebsite?: string;
   healthInsuranceContracts?: HealthInsuranceContractId[];
 
-  createdAt: Timestamp; 
-  updatedAt: Timestamp; 
+  createdAt?: string; 
+  updatedAt?: string; 
 }
 
 // Data needed to create a new person document in Firestore, after Firebase Auth user is created.
