@@ -95,26 +95,23 @@ export default function RegisterStep4Page() {
 
   const form = useForm<ProfessionalQualificationsFormInputs>({
     resolver: zodResolver(FormSchema),
-    defaultValues: () => {
-      const storedData = getRegistrationData();
-      return {
-        currentProfessionalTitle: storedData.currentProfessionalTitle || "",
-        specializations: storedData.specializations || [],
-        languages: storedData.languages || "",
-        graduationDate: storedData.graduationDate || "",
-        university: storedData.university || "",
-        approbationNumber: storedData.approbationNumber || "",
-        approbationDate: storedData.approbationDate || "",
-        diplomaFile: undefined, 
-        approbationCertificateFile: undefined,
-        specialistRecognitionFile: undefined,
-      };
+    defaultValues: {
+      currentProfessionalTitle: "",
+      specializations: [],
+      languages: "",
+      graduationDate: "",
+      university: "",
+      approbationNumber: "",
+      approbationDate: "",
+      diplomaFile: null,
+      approbationCertificateFile: null,
+      specialistRecognitionFile: null,
     },
   });
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    // Check for essential data from previous steps (e.g. step3 personal data)
+    // Check for essential data from previous steps
     if (!storedData.email || !storedData.password || !storedData.firstName ) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
@@ -126,6 +123,7 @@ export default function RegisterStep4Page() {
       if (storedData.diplomaFileName) setSelectedDiplomaFileName(storedData.diplomaFileName);
       if (storedData.approbationCertificateFileName) setSelectedApprobationCertificateFileName(storedData.approbationCertificateFileName);
       if (storedData.specialistRecognitionFileName) setSelectedSpecialistRecognitionFileName(storedData.specialistRecognitionFileName);
+      
       form.reset({
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
@@ -134,9 +132,13 @@ export default function RegisterStep4Page() {
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
         approbationDate: storedData.approbationDate || "",
+        // Reset file inputs to their stored File object or null
+        diplomaFile: storedData.diplomaFile || null,
+        approbationCertificateFile: storedData.approbationCertificateFile || null,
+        specialistRecognitionFile: storedData.specialistRecognitionFile || null,
       });
     }
-  }, [router, toast, t, form]);
+  }, [router, toast, t]); // Removed 'form' from dependencies to prevent re-renders
 
 
   const handleFileChange = (
@@ -184,7 +186,7 @@ export default function RegisterStep4Page() {
       pageTitle={t.register_page_main_title || "Registration"}
       pageSubtitle={t.register_step4_subtitle || "Please provide your professional qualifications."}
       showBackButton={true}
-      backButtonHref="/register/step3" // Back to new Step 3 (Personal Data)
+      backButtonHref="/register/step3"
       backButtonTextKey="register_back_button"
     >
       <div className="w-full max-w-2xl">
