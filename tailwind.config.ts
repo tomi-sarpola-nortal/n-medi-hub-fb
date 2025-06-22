@@ -70,6 +70,20 @@ export default {
           'user-info-foreground': 'hsl(var(--muted-foreground))',
           'user-info-hover-background': 'hsl(var(--accent))',
         },
+        badge: {
+          vorlage: {
+            DEFAULT: 'hsl(var(--badge-vorlage-background))',
+            foreground: 'hsl(var(--badge-vorlage-foreground))',
+          },
+          leitlinie: {
+            DEFAULT: 'hsl(var(--badge-leitlinie-background))',
+            foreground: 'hsl(var(--badge-leitlinie-foreground))',
+          },
+          empfehlung: {
+            DEFAULT: 'hsl(var(--badge-empfehlung-background))',
+            foreground: 'hsl(var(--badge-empfehlung-foreground))',
+          },
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -102,4 +116,3 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
-
