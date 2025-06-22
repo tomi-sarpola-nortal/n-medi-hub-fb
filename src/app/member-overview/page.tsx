@@ -6,46 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getTranslations } from '@/lib/translations';
-import { ArrowLeft, PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
-
-interface MemberReview {
-    id: string;
-    name: string;
-    date: string;
-    changeType: string;
-}
-
-interface Member {
-    id: string;
-    dentistId: string;
-    name: string;
-    status: 'active' | 'in-review' | 'inactive';
-    lastUpdate: string;
-    trainingPoints: string;
-    repHours: string;
-}
-
-const membersToReview: MemberReview[] = [
-    { id: '1', name: 'Dr. Anna Huber', date: '21.05.2025', changeType: 'Datenänderung' },
-    { id: '2', name: 'Dr. Mehmet Yilmaz', date: '21.05.2025', changeType: 'Datenänderung' },
-];
-
-const allMembers: Member[] = [
-    { id: '1', dentistId: 'ZA-2023-0145', name: 'Dr. Thomas Müller', status: 'active', lastUpdate: '15.04.2025', trainingPoints: '125/150', repHours: '12 Stunden' },
-    { id: '2', dentistId: 'ZA-2022-0892', name: 'Dr. Sabine Weber', status: 'active', lastUpdate: '22.03.2025', trainingPoints: '150/150', repHours: '5 Stunden' },
-    { id: '3', dentistId: 'ZA-2024-0067', name: 'Dr. Mehmet Yilmaz', status: 'in-review', lastUpdate: '08.05.2023', trainingPoints: '85/150', repHours: '34 Stunden' },
-    { id: '4', dentistId: 'ZA-2021-0456', name: 'Dr. Julia Hoffmann', status: 'active', lastUpdate: '12.02.2025', trainingPoints: '142/150', repHours: '81 Stunden' },
-    { id: '5', dentistId: 'ZA-2020-1234', name: 'Dr. Markus Fischer', status: 'inactive', lastUpdate: '30.11.2024', trainingPoints: '120/150', repHours: '32 Stunden' },
-    { id: '6', dentistId: 'ZA-2023-0578', name: 'Dr. Katharina Becker', status: 'active', lastUpdate: '05.04.2025', trainingPoints: '150/150', repHours: '15 Stunden' },
-    { id: '7', dentistId: 'ZA-2022-0345', name: 'Dr. Stefan Wagner', status: 'active', lastUpdate: '18.03.2025', trainingPoints: '138/150', repHours: '7 Stunden' },
-    { id: '8', dentistId: 'ZA-2024-0112', name: 'Dr. Laura Schmidt', status: 'in-review', lastUpdate: '22.04.2025', trainingPoints: '65/150', repHours: '0 Stunden' },
-];
-
-const ITEMS_PER_PAGE = 8;
-const TOTAL_MOCK_ITEMS = 1873;
+import { getAllPersons } from '@/services/personService';
+import type { Person } from '@/lib/types';
+import { format } from 'date-fns';
 
 interface MemberOverviewPageProps {
   params: { locale: string };
@@ -54,13 +21,16 @@ interface MemberOverviewPageProps {
 export default async function MemberOverviewPage({ params }: MemberOverviewPageProps) {
   const t = getTranslations(params.locale);
   const pageTitle = t.member_overview_page_title || "Member Overview";
-  const currentPage = 1; 
-  const totalPages = Math.ceil(TOTAL_MOCK_ITEMS / ITEMS_PER_PAGE);
+  
+  const allPersons = await getAllPersons();
 
-  const statusKeyMap = {
-      'active': 'member_list_status_active',
-      'in-review': 'member_list_status_in_review',
-      'inactive': 'member_list_status_inactive',
+  const membersToReview = allPersons.filter(p => p.status === 'pending_approval');
+
+  const statusKeyMap: Record<Person['status'], string> = {
+      active: 'member_list_status_active',
+      pending_approval: 'member_list_status_in_review',
+      inactive: 'member_list_status_inactive',
+      rejected: 'member_list_status_inactive',
   };
 
   return (
@@ -69,11 +39,11 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                        <ArrowLeft className="h-6 w-6 text-muted-foreground hidden lg:block"/>
                         {pageTitle}
                     </h1>
                     <div className="text-sm text-muted-foreground mt-2">
-                        <span>{t.member_overview_breadcrumb_dashboard || "Dashboard"} / </span>
+                        <Link href="/dashboard" className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
+                        <span className="mx-1">/</span>
                         <span className="font-medium text-foreground">{t.member_overview_breadcrumb_current || "Member Overview"}</span>
                     </div>
                 </div>
@@ -89,18 +59,22 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                     <CardDescription>{t.member_review_description || "Here you can review data changes from members."}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {membersToReview.map((member, index) => (
+                    {membersToReview.length > 0 ? membersToReview.map((member, index) => (
                         <div key={member.id}>
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div>
                                     <p className="font-semibold">{member.name}</p>
-                                    <p className="text-sm text-muted-foreground">{member.date} | {t.data_change_label || "Data Change"}</p>
+                                    <p className="text-sm text-muted-foreground">{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'} | {t.data_change_label || "Data Change"}</p>
                                 </div>
-                                <Button variant="outline" className="w-full sm:w-auto">{t.member_review_action_button || "PERFORM REVIEW"}</Button>
+                                <Button asChild variant="outline" className="w-full sm:w-auto">
+                                   <Link href={`/member-overview/${member.id}/review`}>{t.member_review_action_button || "PERFORM REVIEW"}</Link>
+                                </Button>
                             </div>
                             {index < membersToReview.length - 1 && <Separator className="mt-4"/>}
                         </div>
-                    ))}
+                    )) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">{t.member_review_no_pending || "No pending member reviews at the moment."}</p>
+                    )}
                 </CardContent>
             </Card>
 
@@ -159,44 +133,29 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {allMembers.map(member => (
+                            {allPersons.length > 0 ? allPersons.map(member => (
                                 <TableRow key={member.id}>
-                                    <TableCell>{member.dentistId}</TableCell>
+                                    <TableCell>{member.dentistId || '-'}</TableCell>
                                     <TableCell className="font-medium">{member.name}</TableCell>
                                     <TableCell>
                                         <StatusBadge status={member.status}>{t[statusKeyMap[member.status]] || member.status}</StatusBadge>
                                     </TableCell>
-                                    <TableCell>{member.lastUpdate}</TableCell>
-                                    <TableCell>{member.trainingPoints}</TableCell>
-                                    <TableCell>{member.repHours}</TableCell>
+                                    <TableCell>{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}</TableCell>
+                                    <TableCell>{member.educationPoints ? `${member.educationPoints} / 150` : 'N/A'}</TableCell>
+                                    <TableCell>{"-"}</TableCell>
                                     <TableCell>
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
                                         </Button>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-center h-24">No members found.</TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
-
-                    <div className="mt-6 flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">
-                            {t.member_list_pagination_showing
-                            .replace('{start}', (ITEMS_PER_PAGE * (currentPage -1) + 1).toString())
-                            .replace('{end}', Math.min(ITEMS_PER_PAGE * currentPage, TOTAL_MOCK_ITEMS).toString())
-                            .replace('{total}', TOTAL_MOCK_ITEMS.toString())
-                            }
-                        </p>
-                        <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" disabled={currentPage === 1}>{t.member_list_pagination_back || "Back"}</Button>
-                            {[1, 2, 3].map(page => (
-                               <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" className="w-9">{page}</Button>
-                            ))}
-                            <span>...</span>
-                             <Button variant="outline" size="sm" className="w-9">{totalPages}</Button>
-                            <Button variant="outline" size="sm" disabled={currentPage === totalPages}>{t.member_list_pagination_next || "Next"}</Button>
-                        </div>
-                    </div>
                 </CardContent>
             </Card>
 

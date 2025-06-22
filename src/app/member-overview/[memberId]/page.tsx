@@ -5,11 +5,11 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTranslations } from '@/lib/translations';
 import { ArrowLeft, AlertTriangle, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useEffect, useState } from 'react';
+import type { Person } from '@/lib/types';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -35,7 +35,7 @@ const mockMember = {
   dentistId: 'A-1029843',
   trainingPoints: '85/150',
   repHours: '34',
-  status: 'in-review' as const,
+  status: 'pending_approval' as const, // Changed from 'in-review' to match schema
   lastUpdate: '08.05.2023',
   title: 'Dr.',
   firstName: 'Mehmet',
@@ -103,10 +103,11 @@ export default function MemberReviewPage({ params }: MemberReviewPageProps) {
   const member = mockMember;
   const pageTitle = t.member_review_page_title?.replace('{memberName}', member.name) || member.name;
   
-  const statusKeyMap = {
+  const statusKeyMap: Record<Person['status'], string> = {
       'active': 'member_list_status_active',
-      'in-review': 'member_list_status_in_review',
+      'pending_approval': 'member_list_status_in_review',
       'inactive': 'member_list_status_inactive',
+      'rejected': 'member_list_status_inactive',
   };
 
   if (Object.keys(t).length === 0) {
@@ -166,15 +167,18 @@ export default function MemberReviewPage({ params }: MemberReviewPageProps) {
                         </CardContent>
                     </Card>
 
-                    <div className="mt-6 p-4 bg-amber-50 border border-amber-300 rounded-md flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <AlertTriangle className="h-8 w-8 text-amber-500 flex-shrink-0"/>
-                        <div className="flex-grow">
-                            <p className="font-medium">{t.member_review_alert_text || "This member has recently submitted changes to their master data. Please review them. You can still see the last approved data here."}</p>
+                    {member.status === 'pending_approval' && (
+                        <div className="mt-6 p-4 bg-amber-50 border border-amber-300 rounded-md flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <AlertTriangle className="h-8 w-8 text-amber-500 flex-shrink-0"/>
+                            <div className="flex-grow">
+                                <p className="font-medium">{t.member_review_alert_text || "This member has recently submitted changes to their master data. Please review them. You can still see the last approved data here."}</p>
+                            </div>
+                            <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto mt-2 sm:mt-0">
+                            <Link href={`/member-overview/${params.memberId}/review`}>{t.member_review_alert_button || "PERFORM REVIEW"}</Link>
+                            </Button>
                         </div>
-                        <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto mt-2 sm:mt-0">
-                           <Link href={`/member-overview/${params.memberId}/review`}>{t.member_review_alert_button || "PERFORM REVIEW"}</Link>
-                        </Button>
-                    </div>
+                    )}
+
 
                     <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-1 space-y-6">

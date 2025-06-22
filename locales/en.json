@@ -368,5 +368,6 @@
   "documents_delete_dialog_title": "Are you sure?",
   "documents_delete_dialog_desc": "This action cannot be undone. This will permanently delete the document.",
   "documents_delete_dialog_confirm": "Delete",
-  "documents_delete_dialog_cancel": "Cancel"
+  "documents_delete_dialog_cancel": "Cancel",
+  "member_review_no_pending": "No pending member reviews at the moment."
 }
