@@ -65,19 +65,16 @@ export default function RegisterStep5Page() {
 
   const form = useForm<PracticeInfoFormInputs>({
     resolver: zodResolver(FormSchema),
-    defaultValues: () => {
-      const storedData = getRegistrationData();
-      return {
-        practiceName: storedData.practiceName || "",
-        practiceStreetAddress: storedData.practiceStreetAddress || "",
-        practicePostalCode: storedData.practicePostalCode || "",
-        practiceCity: storedData.practiceCity || "",
-        practicePhoneNumber: storedData.practicePhoneNumber || "",
-        practiceFaxNumber: storedData.practiceFaxNumber || "",
-        practiceEmail: storedData.practiceEmail || "",
-        practiceWebsite: storedData.practiceWebsite || "",
-        healthInsuranceContracts: storedData.healthInsuranceContracts || [],
-      };
+    defaultValues: {
+      practiceName: "",
+      practiceStreetAddress: "",
+      practicePostalCode: "",
+      practiceCity: "",
+      practicePhoneNumber: "",
+      practiceFaxNumber: "",
+      practiceEmail: "",
+      practiceWebsite: "",
+      healthInsuranceContracts: [],
     },
   });
 
@@ -104,7 +101,7 @@ export default function RegisterStep5Page() {
             healthInsuranceContracts: storedData.healthInsuranceContracts || [],
         });
     }
-  }, [router, toast, t, form]);
+  }, [router, toast, t]);
 
   const onSubmit: SubmitHandler<PracticeInfoFormInputs> = async (data) => {
     setIsLoading(true);
