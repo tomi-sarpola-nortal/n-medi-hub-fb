@@ -21,6 +21,13 @@ import {
 
 const PERSONS_COLLECTION = 'persons';
 
+// Helper function to ensure Firestore is initialized
+const checkDb = () => {
+  if (!db) {
+    throw new Error("Firestore is not initialized. Please check your Firebase configuration in the .env file.");
+  }
+};
+
 // Helper to convert Firestore document snapshot to Person type
 const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapshot<any>): Person => {
   const data = snapshot.data();
@@ -91,6 +98,7 @@ export async function createPerson(
   uid: string,
   personData: PersonCreationData // This now includes all fields from Person minus id, createdAt, updatedAt
 ): Promise<void> {
+  checkDb();
   const personDocRef = doc(db, PERSONS_COLLECTION, uid);
   await setDoc(personDocRef, {
     ...personData, 
@@ -105,6 +113,7 @@ export async function createPerson(
  * @returns A Person object if found, otherwise null.
  */
 export async function getPersonById(id: string): Promise<Person | null> {
+  checkDb();
   const docRef = doc(db, PERSONS_COLLECTION, id);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) {
@@ -122,6 +131,7 @@ export async function updatePerson(
   id: string,
   updates: Partial<PersonCreationData> 
 ): Promise<void> {
+  checkDb();
   const docRef = doc(db, PERSONS_COLLECTION, id);
   await updateDoc(docRef, {
     ...updates,
@@ -134,6 +144,7 @@ export async function updatePerson(
  * @param id - The ID of the person to delete.
  */
 export async function deletePerson(id: string): Promise<void> {
+  checkDb();
   const docRef = doc(db, PERSONS_COLLECTION, id);
   await deleteDoc(docRef);
 }
@@ -144,6 +155,7 @@ export async function deletePerson(id: string): Promise<void> {
  * @returns A Person object if found, otherwise null.
  */
 export async function findPersonByEmail(email: string): Promise<Person | null> {
+  checkDb();
   const q = query(collection(db, PERSONS_COLLECTION), where('email', '==', email));
   const querySnapshot = await getDocs(q);
   if (querySnapshot.empty) {
@@ -159,6 +171,7 @@ export async function findPersonByEmail(email: string): Promise<Person | null> {
  * @returns A Person object if found, otherwise null.
  */
 export async function findPersonByDentistId(dentistId: string): Promise<Person | null> {
+  checkDb();
   const q = query(collection(db, PERSONS_COLLECTION), where('dentistId', '==', dentistId));
   const querySnapshot = await getDocs(q);
   if (querySnapshot.empty) {
@@ -174,6 +187,7 @@ export async function findPersonByDentistId(dentistId: string): Promise<Person |
  * @returns An array of Person objects.
  */
 export async function getAllPersons(): Promise<Person[]> {
+  checkDb();
   const querySnapshot = await getDocs(collection(db, PERSONS_COLLECTION));
   return querySnapshot.docs.map(snapshotToPerson);
 }

@@ -31,6 +31,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // If auth is not configured, don't attempt to listen for state changes.
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
@@ -57,6 +63,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    if (!auth) {
+      const error = "Firebase is not configured. Please check your environment variables.";
+      return { success: false, error };
+    }
+
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -73,6 +84,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
+    if (!auth) {
+      console.error("Firebase is not configured. Cannot log out.");
+      return;
+    }
+
     setLoading(true);
     try {
       await signOut(auth);

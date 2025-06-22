@@ -12,23 +12,22 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Validate critical Firebase configuration
-if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  const errorMessage = "CRITICAL: Firebase configuration is incomplete. 'apiKey' or 'projectId' is missing. Please ensure NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID are correctly set in your .env file. Firestore cannot be initialized, and the application may not function correctly.";
-  console.error(errorMessage);
-  throw new Error(errorMessage);
-}
-
-// Initialize Firebase
 let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
+let db: ReturnType<typeof getFirestore> | null = null;
+let auth: ReturnType<typeof getAuth> | null = null;
+
+// Only initialize if the critical config values are present
+if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
+  }
+  db = getFirestore(app);
+  auth = getAuth(app);
 } else {
-  app = getApp();
+    // This warning will appear in the browser's console if the .env file is not set up
+    console.warn("Firebase configuration is incomplete or missing from .env file. Firebase services will be unavailable.");
 }
 
-const db = getFirestore(app);
-const auth = getAuth(app); // Initialize Firebase Auth
-// const storage = getStorage(app); // Uncomment if you plan to use Storage
-
-export { db, auth /*, storage */ };
+export { db, auth };
