@@ -1,6 +1,6 @@
 
 {
-  "welcome_back": "Welcome back, {userName}!",
+  "welcome_back": "Welcome, {userName}!",
   "dashboard_page_title": "Dashboard",
   "education_page_title": "My Advanced Trainings",
   "education_breadcrumb_dashboard": "Dashboard",
@@ -13,6 +13,9 @@
   "sidebar_profile": "Profile",
   "sidebar_account": "Account",
   "sidebar_logout": "Logout",
+  "sidebar_my_trainings": "My Trainings",
+  "sidebar_my_representations": "My Representations",
+  "sidebar_document_templates": "Document Templates",
   "header_my_account": "My Account",
   "header_settings": "Settings",
   "header_profile": "Profile",
@@ -145,6 +148,7 @@
   "register_step4_data_saved_title": "Professional Qualifications Saved",
   "register_step4_data_saved_desc": "Your professional qualifications have been temporarily saved. Proceed to the next step.",
   "register_step4_prof_title_zahnarzt": "Dentist",
+  "dentist": "Dentist",
   "register_step4_prof_title_fachzahnarzt_kfo": "Specialist Dentist for Orthodontics",
   "register_step4_prof_title_fachzahnarzt_oralchirurgie": "Specialist Dentist for Oral Surgery",
   "register_step4_prof_title_assistenzzahnarzt": "Assistant Dentist",
@@ -189,5 +193,19 @@
   "register_success_card_title": "Thank You!",
   "register_success_card_message_line1": "Your application has been successfully submitted to the Dental Chamber Salzburg.",
   "register_success_card_message_line2": "After review, you will receive your dentist ID and further information via email.",
-  "register_success_button_to_login": "TO LOGIN"
+  "register_success_button_to_login": "TO LOGIN",
+
+  "dashboard_training_status_title": "Your Training Status",
+  "dashboard_training_status_points": "Training Points",
+  "dashboard_training_status_button": "VIEW MY TRAININGS",
+  "dashboard_representation_status_title": "Your Representations",
+  "dashboard_representation_status_hours": "Confirmed Representation Hours",
+  "dashboard_representation_status_button": "VIEW MY REPRESENTATIONS",
+  "dashboard_chamber_info_title": "Your State Chamber",
+  "dashboard_chamber_name": "Vienna Dental Chamber",
+  "dashboard_chamber_office_hours": "Mon-Thu: 8:00 AM - 4:30 PM\nFri: 8:00 AM - 2:00 PM",
+  "dashboard_confirm_reps_title": "Confirm Representations",
+  "dashboard_confirm_reps_description": "Here you can confirm representations where you were represented.",
+  "dashboard_confirm_reps_confirm_button": "CONFIRM",
+  "dashboard_confirm_reps_decline_button": "DECLINE"
 }
