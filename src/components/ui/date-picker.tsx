@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -16,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 interface DatePickerInputProps {
-  value?: Date;
+  value?: Date | string | null;
   onChange: (date?: Date) => void;
   placeholder?: string;
   disabled?: ((date: Date) => boolean) | boolean;
@@ -29,20 +30,21 @@ export function DatePickerInput({
   disabled,
 }: DatePickerInputProps) {
   const { toast } = useToast();
+  
+  const dateValue = React.useMemo(() => {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return isValid(date) ? date : undefined;
+  }, [value]);
+
   const [inputValue, setInputValue] = React.useState<string>(
-    value ? format(value, "yyyy-MM-dd") : ""
+    dateValue ? format(dateValue, "yyyy-MM-dd") : ""
   );
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (value) {
-      if (isValid(value)) {
-        setInputValue(format(value, "yyyy-MM-dd"));
-      }
-    } else {
-      setInputValue("");
-    }
-  }, [value]);
+    setInputValue(dateValue ? format(dateValue, "yyyy-MM-dd") : "");
+  }, [dateValue]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -107,7 +109,7 @@ export function DatePickerInput({
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={value}
+          selected={dateValue}
           onSelect={handleDateSelect}
           initialFocus
           disabled={isDateDisabled}
