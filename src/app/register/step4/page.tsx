@@ -3,17 +3,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useForm, type SubmitHandler, Controller } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UploadCloud, FileText as FileIcon, CalendarIcon } from 'lucide-react';
+import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { 
@@ -24,11 +23,7 @@ import {
   type SpecializationId 
 } from '@/lib/registrationStore';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-
+import { DatePickerInput } from '@/components/ui/date-picker';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -128,7 +123,7 @@ export default function RegisterStep4Page() {
       if (storedData.approbationCertificateFileName) setSelectedApprobationCertificateFileName(storedData.approbationCertificateFileName);
       if (storedData.specialistRecognitionFileName) setSelectedSpecialistRecognitionFileName(storedData.specialistRecognitionFileName);
       
-      form.reset({
+      const dataToReset = {
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
         languages: storedData.languages || "",
@@ -139,7 +134,8 @@ export default function RegisterStep4Page() {
         diplomaFile: storedData.diplomaFile || null,
         approbationCertificateFile: storedData.approbationCertificateFile || null,
         specialistRecognitionFile: storedData.specialistRecognitionFile || null,
-      });
+      };
+      form.reset(dataToReset as any);
     }
   }, [router, toast, t]);
 
@@ -281,37 +277,15 @@ export default function RegisterStep4Page() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>{t.register_step4_label_graduation_date || "Date of Graduation"}*</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1950-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <FormControl>
+                        <DatePickerInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1950-01-01")
+                          }
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -351,37 +325,15 @@ export default function RegisterStep4Page() {
                   render={({ field }) => (
                      <FormItem className="flex flex-col">
                       <FormLabel>{t.register_step4_label_approbation_date || "Date of Approbation (if available)"}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1950-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                       <FormControl>
+                        <DatePickerInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1950-01-01")
+                          }
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

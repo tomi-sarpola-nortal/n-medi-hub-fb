@@ -11,15 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, CalendarIcon, UploadCloud, FileText as FileIcon } from 'lucide-react'; 
+import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react'; 
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { getRegistrationData, updateRegistrationData } from '@/lib/registrationStore';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { DatePickerInput } from '@/components/ui/date-picker';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -106,12 +103,12 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
       router.replace('/register/step1');
     } else {
       setStoredEmail(storedData.email);
-      form.reset({
+      const dataToReset = {
         email: storedData.email,
         title: storedData.title || '',
         firstName: storedData.firstName || '',
         lastName: storedData.lastName || '',
-        dateOfBirth: storedData.dateOfBirth instanceof Date ? storedData.dateOfBirth : undefined,
+        dateOfBirth: storedData.dateOfBirth ? new Date(storedData.dateOfBirth) : undefined,
         placeOfBirth: storedData.placeOfBirth || '',
         nationality: storedData.nationality || '',
         streetAddress: storedData.streetAddress || '',
@@ -120,7 +117,8 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         stateOrProvince: storedData.stateOrProvince || '',
         phoneNumber: storedData.phoneNumber || '',
         // idDocument is handled by Controller and native file input state
-      });
+      };
+      form.reset(dataToReset as any);
       if (storedData.idDocumentName) {
         setSelectedFileName(storedData.idDocumentName);
       }
@@ -221,29 +219,12 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
                     name="dateOfBirth"
                     control={form.control}
                     render={({ field }) => (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <DatePickerInput
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder={t.register_step2_placeholder_dateOfBirth || "YYYY-MM-DD"}
+                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                      />
                     )}
                   />
                   {form.formState.errors.dateOfBirth && <p className="text-xs text-destructive mt-1">{form.formState.errors.dateOfBirth.message}</p>}

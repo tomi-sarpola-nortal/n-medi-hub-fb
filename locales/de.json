@@ -90,7 +90,7 @@
   "register_step2_label_firstName": "Vorname",
   "register_step2_label_lastName": "Nachname",
   "register_step2_label_dateOfBirth": "Geburtsdatum",
-  "register_step2_placeholder_dateOfBirth": "Datum auswählen",
+  "register_step2_placeholder_dateOfBirth": "JJJJ-MM-TT",
   "register_step2_label_placeOfBirth": "Geburtsort",
   "register_step2_label_nationality": "Staatsbürgerschaft",
   "register_step2_label_streetAddress": "Straße und Hausnummer",
