@@ -235,12 +235,12 @@ export async function getAllPersons(): Promise<Person[]> {
 /**
  * Processes a review for a pending person.
  * @param personId The ID of the person to review.
- * @param decision The review decision: 'approve', 'reject', or 'deny'.
- * @param justification An optional reason for rejection/denial.
+ * @param decision The review decision: 'approve' or 'deny'.
+ * @param justification An optional reason for denial.
  */
 export async function reviewPerson(
     personId: string, 
-    decision: 'approve' | 'reject' | 'deny', 
+    decision: 'approve' | 'deny', 
     justification?: string
 ): Promise<void> {
     'use server';

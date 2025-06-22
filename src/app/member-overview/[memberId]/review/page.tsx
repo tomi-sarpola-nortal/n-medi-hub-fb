@@ -108,7 +108,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
     
     setIsSubmitting(true);
     try {
-        await reviewPerson(person.id, reviewDecision as any, justification);
+        await reviewPerson(person.id, reviewDecision as 'approve' | 'deny', justification);
         toast({ title: "Success", description: "The review has been submitted successfully." });
         router.push('/member-overview');
     } catch (error) {
@@ -233,15 +233,11 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="approve" id="r-approve" />
-                                <Label htmlFor="r-approve">{t.member_review_approve_option || "Datenänderung genehmigen"}</Label>
-                            </div>
-                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="reject" id="r-reject" />
-                                <Label htmlFor="r-reject">{t.member_review_reject_option || "Datenänderung zurückweisen"}</Label>
+                                <Label htmlFor="r-approve">{t.member_review_approve_option || "Approve data change"}</Label>
                             </div>
                              <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="deny" id="r-deny" />
-                                <Label htmlFor="r-deny">{t.member_review_deny_option || "Datenänderung ablehnen"}</Label>
+                                <Label htmlFor="r-deny">{t.member_review_deny_option || "Deny data change"}</Label>
                             </div>
                         </RadioGroup>
 

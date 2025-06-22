@@ -300,7 +300,6 @@
   "member_review_old_data": "Alt",
   "member_review_new_data": "Neu",
   "member_review_approve_option": "Datenänderung genehmigen",
-  "member_review_reject_option": "Datenänderung zurückweisen",
   "member_review_deny_option": "Datenänderung ablehnen",
   "member_review_justification_label": "Begründung",
   "member_review_justification_placeholder": "z. B. Fortbildungsnachweise fehlen",
@@ -372,5 +371,3 @@
   "documents_delete_dialog_cancel": "Abbrechen",
   "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen."
 }
-
-    

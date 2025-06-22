@@ -300,7 +300,6 @@
   "member_review_old_data": "Old",
   "member_review_new_data": "New",
   "member_review_approve_option": "Approve data change",
-  "member_review_reject_option": "Reject data change",
   "member_review_deny_option": "Deny data change",
   "member_review_justification_label": "Justification",
   "member_review_justification_placeholder": "e.g. missing training certificates",
@@ -372,5 +371,3 @@
   "documents_delete_dialog_cancel": "Cancel",
   "member_review_no_pending": "No pending member reviews at the moment."
 }
-
-    
