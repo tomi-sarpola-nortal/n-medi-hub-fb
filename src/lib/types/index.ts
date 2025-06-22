@@ -93,10 +93,10 @@ export interface Person {
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
   languages?: string[];
-  graduationDate?: string; // Storing as YYYY-MM-DD string
+  graduationDate?: string;
   university?: string;
   approbationNumber?: string;
-  approbationDate?: string; // Storing as YYYY-MM-DD string
+  approbationDate?: string;
   diplomaUrl?: string;
   diplomaName?: string;
   approbationCertificateUrl?: string;
