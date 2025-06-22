@@ -83,7 +83,7 @@ const FileDisplay = ({ name, size }: { name: string; size: string }) => (
   </div>
 );
 
-const ChangeItem = ({ label, oldValue, newValue }: { label: string; oldValue: React.ReactNode; newValue: React.ReactNode }) => (
+const ChangeItem = ({ label, oldValue, newValue, t }: { label: string; oldValue: React.ReactNode; newValue: React.ReactNode; t: Record<string, string> }) => (
     <div className="py-4 border-b last:border-b-0">
         <p className="text-sm text-muted-foreground mb-2">{label}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
@@ -105,16 +105,17 @@ const ChangeItem = ({ label, oldValue, newValue }: { label: string; oldValue: Re
 
 
 export default function DataReviewPage({ params }: DataReviewPageProps) {
+  const { memberId, locale } = params;
   const [t, setT] = useState<Record<string, string>>({});
   const [reviewDecision, setReviewDecision] = useState('approve');
   const [person, setPerson] = useState<Person | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    setT(getClientTranslations(params.locale));
+    setT(getClientTranslations(locale));
     async function fetchPerson() {
         try {
-            const fetchedPerson = await getPersonById(params.memberId);
+            const fetchedPerson = await getPersonById(memberId);
             setPerson(fetchedPerson);
         } catch (error) {
             console.error("Failed to fetch person data:", error);
@@ -124,7 +125,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
         }
     }
     fetchPerson();
-  }, [params.locale, params.memberId]);
+  }, [locale, memberId]);
 
   const pageTitle = t.member_review_page_title_review || "Datenänderung prüfen";
 
@@ -138,7 +139,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
 
   if (isLoading) {
     return (
-        <AppLayout pageTitle="Loading..." locale={params.locale}>
+        <AppLayout pageTitle="Loading..." locale={locale}>
             <div className="flex-1 space-y-6 p-4 md:p-8 flex justify-center items-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
@@ -148,7 +149,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
   
   if (!person) {
        return (
-        <AppLayout pageTitle="Error" locale={params.locale}>
+        <AppLayout pageTitle="Error" locale={locale}>
             <div className="flex-1 space-y-6 p-4 md:p-8 text-center">
                 <p>Member not found.</p>
                 <Button asChild><Link href="/member-overview">Go Back</Link></Button>
@@ -165,12 +166,12 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
   });
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-6 p-4 md:p-8">
              <div className="flex items-center justify-between">
                 <div>
                      <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                        <Link href={`/member-overview/${params.memberId}`} className="hidden lg:block">
+                        <Link href={`/member-overview/${memberId}`} className="hidden lg:block">
                             <ArrowLeft className="h-6 w-6 text-muted-foreground"/>
                         </Link>
                         {pageTitle}
@@ -180,7 +181,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                         <span className="mx-1">/</span>
                         <Link href="/member-overview" className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
                         <span className="mx-1">/</span>
-                        <Link href={`/member-overview/${params.memberId}`} className="hover:underline">{person.name}</Link>
+                        <Link href={`/member-overview/${memberId}`} className="hover:underline">{person.name}</Link>
                         <span className="mx-1">/</span>
                         <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Datenänderung prüfen"}</span>
                     </div>
@@ -195,7 +196,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                 <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
                         <h3 className="font-semibold mb-2">{t.member_review_info_section_title || "Informationen zur Prüfung"}</h3>
-                        <InfoRow label={t.member_review_info_name || "Vor- und Nachname"} value={person.name} href={`/member-overview/${params.memberId}`} />
+                        <InfoRow label={t.member_review_info_name || "Vor- und Nachname"} value={person.name} href={`/member-overview/${memberId}`} />
                         <InfoRow label={t.member_review_info_id || "Zahnarzt-ID"} value={person.dentistId || '-'} />
                         <InfoRow label={t.member_review_info_change_date || "Datum der Datenänderung"} value={new Date().toLocaleDateString()} />
                         <InfoRow label={t.member_review_info_chamber || "Kammerzugehörigkeit"} value={person.region || '-'} />
@@ -211,6 +212,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                                 label={t[change.labelKey] || change.field}
                                 oldValue={renderChangeValue(change.oldValue)}
                                 newValue={renderChangeValue(change.newValue)}
+                                t={t}
                             />
                         ))}
                     </div>
@@ -225,6 +227,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                                 label={t[change.labelKey] || change.field}
                                 oldValue={renderChangeValue(change.oldValue)}
                                 newValue={renderChangeValue(change.newValue)}
+                                t={t}
                             />
                         ))}
                     </div>
