@@ -126,57 +126,11 @@ export function getRegistrationData(): RegistrationData {
 }
 
 export function clearRegistrationData() {
-    // Clear Step 1
-    (registrationDataStore as any).email = undefined;
-    // Clear Step 2
-    (registrationDataStore as any).password = undefined;
-
-    // Clear Step 3
-    (registrationDataStore as any).title = undefined;
-    (registrationDataStore as any).firstName = undefined;
-    (registrationDataStore as any).lastName = undefined;
-    (registrationDataStore as any).dateOfBirth = undefined;
-    (registrationDataStore as any).placeOfBirth = undefined;
-    (registrationDataStore as any).nationality = undefined;
-    (registrationDataStore as any).streetAddress = undefined;
-    (registrationDataStore as any).postalCode = undefined;
-    (registrationDataStore as any).city = undefined;
-    (registrationDataStore as any).stateOrProvince = undefined;
-    (registrationDataStore as any).phoneNumber = undefined;
-    (registrationDataStore as any).idDocument = undefined;
-    (registrationDataStore as any).idDocumentName = undefined;
-    
-    // Clear Step 4
-    (registrationDataStore as any).currentProfessionalTitle = undefined;
-    (registrationDataStore as any).specializations = undefined;
-    (registrationDataStore as any).languages = undefined;
-    (registrationDataStore as any).graduationDate = undefined;
-    (registrationDataStore as any).university = undefined;
-    (registrationDataStore as any).approbationNumber = undefined;
-    (registrationDataStore as any).approbationDate = undefined;
-    (registrationDataStore as any).diplomaFile = undefined;
-    (registrationDataStore as any).diplomaFileName = undefined;
-    (registrationDataStore as any).approbationCertificateFile = undefined;
-    (registrationDataStore as any).approbationCertificateFileName = undefined;
-    (registrationDataStore as any).specialistRecognitionFile = undefined;
-    (registrationDataStore as any).specialistRecognitionFileName = undefined;
-
-    // Clear Step 5
-    (registrationDataStore as any).practiceName = undefined;
-    (registrationDataStore as any).practiceStreetAddress = undefined;
-    (registrationDataStore as any).practicePostalCode = undefined;
-    (registrationDataStore as any).practiceCity = undefined;
-    (registrationDataStore as any).practicePhoneNumber = undefined;
-    (registrationDataStore as any).practiceFaxNumber = undefined;
-    (registrationDataStore as any).practiceEmail = undefined;
-    (registrationDataStore as any).practiceWebsite = undefined;
-    (registrationDataStore as any).healthInsuranceContracts = undefined;
-    
-    // Clear Step 6
-    (registrationDataStore as any).agreedToTerms = undefined;
-
-    // Clear other fields as they are added
-    console.log("Registration data cleared.");
+  // More robust way to clear the store object
+  Object.keys(registrationDataStore).forEach(key => {
+    delete (registrationDataStore as any)[key];
+  });
+  console.log("Registration data cleared.");
 }
 
 // Helper to get translation key for a value from a map

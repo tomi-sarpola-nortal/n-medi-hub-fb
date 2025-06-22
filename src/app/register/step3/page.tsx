@@ -125,7 +125,7 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         setSelectedFileName(storedData.idDocumentName);
       }
     }
-  }, [router, toast, t, form]); // Added form to dependency array as it's used in reset
+  }, [router, toast, t]); // Removed form from dependency array
 
 
   const onSubmit: SubmitHandler<PersonalDataFormInputs> = async (data) => {

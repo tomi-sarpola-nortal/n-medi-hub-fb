@@ -16,7 +16,7 @@ export interface User {
   role: UserRole;
   region: string; 
   dentistId?: string; // Unique for dentists, assigned by LK
-  profileImage?: string; // Renamed from avatarUrl for consistency
+  avatarUrl?: string; // Standardized from profileImage
   
   status?: 'pending_approval' | 'active' | 'inactive' | 'rejected';
   

@@ -62,7 +62,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ title, data, locale, t })
   };
 
   const renderValue = (itemValue?: string | string[] | null | Date, label?: string) => {
-    if (itemValue === undefined || itemValue === null || (typeof itemValue === 'string' && itemValue.trim() === '')) {
+    if (itemValue === undefined || itemValue === null || (typeof itemValue === 'string' && itemValue.trim() === '') || (Array.isArray(itemValue) && itemValue.length === 0) ) {
       return <span className="text-muted-foreground italic">{t.register_review_not_provided || "Not provided"}</span>;
     }
     if (label === t.register_step2_label_dateOfBirth) {

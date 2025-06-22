@@ -18,7 +18,6 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (formData: RegistrationFormData) => Promise<{ success: boolean; error?: string; userId?: string }>;
   logout: () => Promise<void>;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<User | null>>; // Exposing setUser for flexibility e.g. profile updates
@@ -73,52 +72,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (formData: RegistrationFormData): Promise<{ success: boolean; error?: string; userId?: string }> => {
-    if (!formData.password) {
-      return { success: false, error: "Password is required for registration." };
-    }
-    setLoading(true);
-    try {
-      // Step 1: Create user in Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const firebaseUser = userCredential.user;
-
-      // Step 2: Create user profile in Firestore
-      // Prepare data for Firestore, excluding password
-      const personDataToCreate: PersonCreationData & { email: string } = {
-        name: formData.name,
-        email: formData.email, // Store email in Firestore for easier querying/display
-        role: formData.role,
-        region: formData.region,
-        dentistId: formData.dentistId,
-        avatarUrl: formData.avatarUrl || `https://avatar.vercel.sh/${formData.email}.png?size=100`, // Default avatar
-        status: formData.status || 'pending_approval', // Default status
-        otpEnabled: formData.otpEnabled || false,
-        // otpSecret will be handled if/when OTP is fully implemented
-      };
-
-      await createPerson(firebaseUser.uid, personDataToCreate);
-      
-      // onAuthStateChanged will handle setting the user from Firestore
-      // For immediate UI update, we can manually set user if needed, but onAuthStateChanged is preferred for consistency
-      // const newPersonProfile = await getPersonById(firebaseUser.uid);
-      // if (newPersonProfile) setUser(newPersonProfile);
-
-      setLoading(false);
-      router.push('/dashboard'); // Redirect after successful registration
-      return { success: true, userId: firebaseUser.uid };
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      setLoading(false);
-      // Clean up Firebase Auth user if Firestore profile creation fails?
-      // This is complex. For now, just return error.
-      // if (auth.currentUser && error.code !== 'auth/email-already-in-use') {
-      //   await auth.currentUser.delete();
-      // }
-      return { success: false, error: error.message || "Failed to register." };
-    }
-  };
-
   const logout = async () => {
     setLoading(true);
     try {
@@ -133,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, register, logout, loading, setUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

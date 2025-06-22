@@ -117,7 +117,7 @@ export function AppSidebar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="w-full h-auto p-0 justify-start items-center gap-3 hover:bg-sidebar-user-info-hover-background">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.profileImage || `https://avatar.vercel.sh/${user.email}.png?size=40`} alt={user.name || "User"} data-ai-hint="avatar person" />
+                  <AvatarImage src={user.avatarUrl || `https://avatar.vercel.sh/${user.email}.png?size=40`} alt={user.name || "User"} data-ai-hint="avatar person" />
                   <AvatarFallback>
                     <UserCircle className="h-10 w-10 text-muted-foreground" />
                   </AvatarFallback>
