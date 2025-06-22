@@ -121,30 +121,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const firebaseUser = auth.currentUser;
+    const userDataForCleanup = user; // Capture user data before any operations
 
     try {
         setLoading(true);
 
-        // 1. Delete Storage Files
-        const filesToDelete = [
-            user.idDocumentUrl,
-            user.diplomaUrl,
-            user.approbationCertificateUrl,
-            user.specialistRecognitionUrl,
-        ].filter(Boolean) as string[];
-
-        await Promise.all(filesToDelete.map(url => deleteFileByUrl(url)));
-        console.log("Associated files deleted from Storage.");
-
-        // 2. Delete Firestore Document
-        await deletePerson(firebaseUser.uid);
-        console.log("User document deleted from Firestore.");
-
-        // 3. Delete Auth User
+        // 1. Attempt to delete the Auth User FIRST. This is the critical operation that might require re-authentication.
         await deleteUser(firebaseUser);
-        console.log("Firebase Auth user deleted.");
+        console.log("Firebase Auth user deleted successfully.");
 
-        setUser(null);
+        // 2. If Auth deletion succeeds, proceed to delete Firestore Document and Storage files.
+        // These operations are less likely to fail and don't require re-authentication.
+        try {
+            await deletePerson(userDataForCleanup.id);
+            console.log("User document deleted from Firestore.");
+
+            const filesToDelete = [
+                userDataForCleanup.idDocumentUrl,
+                userDataForCleanup.diplomaUrl,
+                userDataForCleanup.approbationCertificateUrl,
+                userDataForCleanup.specialistRecognitionUrl,
+            ].filter(Boolean) as string[];
+
+            if (filesToDelete.length > 0) {
+                await Promise.all(filesToDelete.map(url => deleteFileByUrl(url)));
+                console.log("Associated files in Storage deleted.");
+            }
+        } catch (cleanupError) {
+            console.error("Error during post-auth-deletion cleanup:", cleanupError);
+            // The main account is deleted, but we log that cleanup failed.
+            // The user is effectively deleted from an auth perspective, so we still treat it as a success.
+        }
+
+        setUser(null); // Clear local state
         router.push('/login');
         
         return { success: true };
@@ -152,12 +161,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error: any) {
         console.error("Account deletion failed:", error);
         let errorMessage = "Failed to delete account. Please try again.";
+
         if (error.code === 'auth/requires-recent-login') {
-            errorMessage = "This operation is sensitive and requires a recent login. Please log out and log back in before deleting your account.";
+            errorMessage = "This operation is sensitive and requires a recent login. Please log out and log back in before trying to delete your account.";
         } else if (error.message) {
             errorMessage = error.message;
         }
+        
+        // IMPORTANT: Because the auth deletion failed, we did not delete Firestore or Storage data.
         return { success: false, error: errorMessage };
+
     } finally {
         setLoading(false);
     }
