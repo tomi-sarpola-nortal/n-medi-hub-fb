@@ -5,7 +5,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileUp, FileText, Download, Trash2, ArrowLeft, Loader2, File } from 'lucide-react';
+import { FileUp, Download, Trash2, ArrowLeft, Loader2, File } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
@@ -42,6 +42,24 @@ type FilterType = 'all' | 'vorlage' | 'leitlinie' | 'empfehlung';
 interface DocumentsPageProps {
   params: { locale: string };
 }
+
+// Icon Components for File Types
+const PdfFileIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="h-6 w-6">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="#E53E3E" />
+    <path d="M14 2v6h6L14 2z" fill="#FED7D7" />
+    <text x="8.5" y="17" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="4.5" fill="#FFF">PDF</text>
+  </svg>
+);
+
+const WordFileIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="h-6 w-6">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="#4299E1" />
+    <path d="M14 2v6h6L14 2z" fill="#BEE3F8" />
+    <text x="8.5" y="17.5" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="5.5" fill="#FFF">W</text>
+  </svg>
+);
+
 
 export default function DocumentsPage({ params }: DocumentsPageProps) {
   const router = useRouter();
@@ -182,7 +200,9 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                       <TableCell>{doc.lastChange}</TableCell>
                       <TableCell>
                         {doc.fileFormat === 'PDF' ? (
-                          <FileText className="h-5 w-5 text-muted-foreground" />
+                          <PdfFileIcon />
+                        ) : doc.fileFormat === 'Word' ? (
+                          <WordFileIcon />
                         ) : (
                           <File className="h-5 w-5 text-muted-foreground" />
                         )}
