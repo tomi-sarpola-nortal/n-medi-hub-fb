@@ -91,7 +91,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ title, data, locale, t })
         {data.map((item, index) => (
           <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-border last:border-b-0">
             <p className="text-sm font-medium text-muted-foreground">{item.label}:</p>
-            <p className="text-sm text-foreground text-right sm:text-left">{renderValue(item.value)}</p>
+            <div className="text-sm text-foreground text-right sm:text-left">{renderValue(item.value)}</div>
           </div>
         ))}
       </div>
