@@ -10,15 +10,18 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
+  deleteUser,
   type User as FirebaseUser // Alias to avoid naming conflict
 } from 'firebase/auth';
-import { getPersonById, createPerson, findPersonByEmail } from '@/services/personService'; // findPersonByEmail for seeding if needed
+import { getPersonById, deletePerson } from '@/services/personService';
+import { deleteFileByUrl } from '@/services/storageService';
 
 interface AuthContextType {
   user: Person | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  deleteUserAccount: () => Promise<{ success: boolean; error?: string }>;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<Person | null>>; // Exposing setUser for flexibility e.g. profile updates
 }
@@ -112,8 +115,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const deleteUserAccount = async (): Promise<{ success: boolean; error?: string }> => {
+    if (!auth?.currentUser || !user) {
+        return { success: false, error: "No user is currently logged in." };
+    }
+
+    const firebaseUser = auth.currentUser;
+
+    try {
+        setLoading(true);
+
+        // 1. Delete Storage Files
+        const filesToDelete = [
+            user.idDocumentUrl,
+            user.diplomaUrl,
+            user.approbationCertificateUrl,
+            user.specialistRecognitionUrl,
+        ].filter(Boolean) as string[];
+
+        await Promise.all(filesToDelete.map(url => deleteFileByUrl(url)));
+        console.log("Associated files deleted from Storage.");
+
+        // 2. Delete Firestore Document
+        await deletePerson(firebaseUser.uid);
+        console.log("User document deleted from Firestore.");
+
+        // 3. Delete Auth User
+        await deleteUser(firebaseUser);
+        console.log("Firebase Auth user deleted.");
+
+        setUser(null);
+        router.push('/login');
+        
+        return { success: true };
+
+    } catch (error: any) {
+        console.error("Account deletion failed:", error);
+        let errorMessage = "Failed to delete account. Please try again.";
+        if (error.code === 'auth/requires-recent-login') {
+            errorMessage = "This operation is sensitive and requires a recent login. Please log out and log back in before deleting your account.";
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return { success: false, error: errorMessage };
+    } finally {
+        setLoading(false);
+    }
+};
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, loading, setUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, deleteUserAccount, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

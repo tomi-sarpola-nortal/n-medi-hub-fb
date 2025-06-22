@@ -221,5 +221,19 @@
   "settings_save_error_desc": "Could not save your changes. Please try again.",
   "settings_personal_data_success_desc": "Your personal data has been successfully updated.",
   "settings_prof_qual_success_desc": "Your professional qualifications have been successfully updated.",
-  "settings_practice_info_success_desc": "Your practice information has been successfully updated."
+  "settings_practice_info_success_desc": "Your practice information has been successfully updated.",
+  "settings_danger_zone_title": "Danger Zone",
+  "settings_danger_zone_desc": "This action is permanent and cannot be undone.",
+  "settings_delete_account_button": "Delete My Account",
+  "settings_delete_dialog_title": "Are you absolutely sure?",
+  "settings_delete_dialog_desc_part1": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers, including all uploaded documents.",
+  "settings_delete_dialog_desc_part2": "Please type",
+  "settings_delete_dialog_desc_part3": "to confirm.",
+  "settings_delete_dialog_cancel": "Cancel",
+  "settings_delete_dialog_confirm": "Delete Account",
+  "settings_delete_error_code_mismatch_title": "Incorrect Code",
+  "settings_delete_error_code_mismatch_desc": "The confirmation code does not match.",
+  "settings_delete_success_title": "Account Deleted",
+  "settings_delete_success_desc": "Your account has been permanently deleted.",
+  "settings_delete_error_title": "Deletion Failed"
 }

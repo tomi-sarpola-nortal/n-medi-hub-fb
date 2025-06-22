@@ -221,5 +221,19 @@
   "settings_save_error_desc": "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
   "settings_personal_data_success_desc": "Ihre persönlichen Daten wurden erfolgreich aktualisiert.",
   "settings_prof_qual_success_desc": "Ihre beruflichen Qualifikationen wurden erfolgreich aktualisiert.",
-  "settings_practice_info_success_desc": "Ihre Ordinationsinformationen wurden erfolgreich aktualisiert."
+  "settings_practice_info_success_desc": "Ihre Ordinationsinformationen wurden erfolgreich aktualisiert.",
+  "settings_danger_zone_title": "Gefahrenzone",
+  "settings_danger_zone_desc": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden.",
+  "settings_delete_account_button": "Mein Konto löschen",
+  "settings_delete_dialog_title": "Sind Sie absolut sicher?",
+  "settings_delete_dialog_desc_part1": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird Ihr Konto dauerhaft gelöscht und alle Ihre Daten von unseren Servern entfernt, einschließlich aller hochgeladenen Dokumente.",
+  "settings_delete_dialog_desc_part2": "Bitte geben Sie",
+  "settings_delete_dialog_desc_part3": "ein, um zu bestätigen.",
+  "settings_delete_dialog_cancel": "Abbrechen",
+  "settings_delete_dialog_confirm": "Konto löschen",
+  "settings_delete_error_code_mismatch_title": "Falscher Code",
+  "settings_delete_error_code_mismatch_desc": "Der Bestätigungscode stimmt nicht überein.",
+  "settings_delete_success_title": "Konto gelöscht",
+  "settings_delete_success_desc": "Ihr Konto wurde dauerhaft gelöscht.",
+  "settings_delete_error_title": "Löschen fehlgeschlagen"
 }

@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import PersonalDataForm from '@/components/settings/PersonalDataForm';
 import ProfessionalQualificationsForm from '@/components/settings/ProfessionalQualificationsForm';
 import PracticeInformationForm from '@/components/settings/PracticeInformationForm';
+import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { useEffect, useState } from 'react';
 
 // Helper for client-side translations
@@ -79,6 +80,8 @@ export default function SettingsPage({ params }: SettingsPageProps) {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        <DeleteAccountSection user={user} t={t} />
       </div>
     </AppLayout>
   );
