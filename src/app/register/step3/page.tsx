@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react'; 
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
-import { getRegistrationData, updateRegistrationData } from '@/lib/registrationStore';
+import { getRegistrationData, updateRegistrationData, type RegistrationData } from '@/lib/registrationStore';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { uploadFile } from '@/services/storageService';
 
@@ -35,6 +35,7 @@ const getClientTranslations = (locale: string) => {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
+// Schema is relaxed; validation happens in onSubmit
 const FormSchema = z.object({
   title: z.string().optional(),
   firstName: z.string().min(1, { message: "First name is required." }),
@@ -50,10 +51,11 @@ const FormSchema = z.object({
   email: z.string().email(), 
   idDocument: z
     .custom<FileList>()
-    .refine((files) => files && files.length === 1, "ID document is required.")
-    .refine((files) => files && files?.[0]?.size <= MAX_FILE_SIZE, `File size should be less than 10MB.`)
+    .optional()
+    .nullable()
+    .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `File size should be less than 10MB.`)
     .refine(
-      (files) => files && ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+      (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
       "Only .pdf, .jpg, .jpeg, .png formats are supported."
     ),
 });
@@ -122,7 +124,7 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         setSelectedFileName(storedData.idDocumentName);
       }
     }
-  }, [router, toast, t]);
+  }, [router, toast, t, form]);
 
 
   const onSubmit: SubmitHandler<PersonalDataFormInputs> = async (data) => {
@@ -130,18 +132,29 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
     const storedData = getRegistrationData();
     
     try {
+        let fileUpdate: Partial<RegistrationData> = {};
         const fileToUpload = data.idDocument?.[0];
-        if (!fileToUpload) {
-            throw new Error("ID Document file is missing.");
+
+        if (fileToUpload) {
+            const uploadPath = `registrations/${storedData.email}/id_documents`;
+            const downloadURL = await uploadFile(fileToUpload, uploadPath);
+            fileUpdate.idDocumentUrl = downloadURL;
+            fileUpdate.idDocumentName = fileToUpload.name;
+        } else if (!storedData.idDocumentUrl) {
+            // No new file and no existing file in store, this is an error
+            toast({
+                title: t.register_step2_label_idDocument || "ID Document Required",
+                description: "Please select your ID card or passport to continue.",
+                variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
         }
 
-        const uploadPath = `registrations/${storedData.email}/id_documents`;
-        const downloadURL = await uploadFile(fileToUpload, uploadPath);
-
+        // Combine form data with file update data and save to store
         updateRegistrationData({
             ...data,
-            idDocumentUrl: downloadURL,
-            idDocumentName: fileToUpload.name, 
+            ...fileUpdate,
         });
 
         router.push('/register/step4');
@@ -164,8 +177,9 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
       form.setValue('idDocument', files, { shouldValidate: true });
       setSelectedFileName(files[0].name);
     } else {
-      form.setValue('idDocument', undefined, { shouldValidate: true });
-      setSelectedFileName(null);
+      // Don't clear the selected file name if the user cancels file selection
+      // only if we want to programmatically clear it.
+      // This part can be left empty to retain the name unless a new file is chosen.
     }
   };
 
@@ -338,25 +352,19 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
                         className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                     >
                         <UploadCloud className="mr-2 h-4 w-4" />
-                        {selectedFileName ? (
-                            <span className="truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
-                                {selectedFileName}
-                            </span>
-                        ) : (
-                            t.register_step2_button_selectFile || "Select File"
-                        )}
+                        <span className="truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                           {selectedFileName || (t.register_step2_button_selectFile || "Select File")}
+                        </span>
                     </label>
                     <Input
                         id="idDocument-file"
                         type="file"
                         className="hidden"
                         accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={(e) => {
-                            handleFileChange(e);
-                        }}
+                        onChange={handleFileChange}
                     />
                 </div>
-                {selectedFileName && (
+                {selectedFileName && !form.formState.errors.idDocument && (
                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
                         <FileIcon className="h-4 w-4 mr-1 text-primary" />
                         <span>{t.register_step2_selected_file || "Selected:"} {selectedFileName}</span>

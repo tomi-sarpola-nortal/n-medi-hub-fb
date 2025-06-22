@@ -20,7 +20,8 @@ import {
   updateRegistrationData, 
   DENTAL_SPECIALIZATIONS, 
   PROFESSIONAL_TITLES,
-  type SpecializationId 
+  type SpecializationId,
+  type RegistrationData
 } from '@/lib/registrationStore';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { DatePickerInput } from '@/components/ui/date-picker';
@@ -43,15 +44,6 @@ const getClientTranslations = (locale: string) => {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
-const baseFileSchema = z
-  .custom<FileList>()
-  .refine((files) => files && files.length > 0, "File is required.")
-  .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 10MB.`)
-  .refine(
-    (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
-    "Only .pdf, .jpg, .jpeg, .png formats are supported."
-  );
-
 const optionalFileSchema = z
   .custom<FileList>()
   .optional()
@@ -62,7 +54,6 @@ const optionalFileSchema = z
     "Only .pdf, .jpg, .jpeg, .png formats are supported."
   );
 
-
 const FormSchema = z.object({
   currentProfessionalTitle: z.string().min(1, { message: "Professional title is required." }),
   specializations: z.array(z.string()).min(1, { message: "At least one specialization must be selected." }),
@@ -71,7 +62,7 @@ const FormSchema = z.object({
   university: z.string().min(1, { message: "University/College is required." }),
   approbationNumber: z.string().optional(),
   approbationDate: z.date().optional().nullable(),
-  diplomaFile: baseFileSchema,
+  diplomaFile: optionalFileSchema,
   approbationCertificateFile: optionalFileSchema,
   specialistRecognitionFile: optionalFileSchema,
 });
@@ -132,7 +123,7 @@ export default function RegisterStep4Page() {
         approbationDate: storedData.approbationDate ? new Date(storedData.approbationDate) : undefined,
       });
     }
-  }, [router, toast, t]);
+  }, [router, toast, t, form]);
 
 
   const handleFileChange = (
@@ -144,9 +135,6 @@ export default function RegisterStep4Page() {
     if (files && files.length > 0) {
       form.setValue(fieldName, files as any, { shouldValidate: true });
       setFileNameState(files[0].name);
-    } else {
-      form.setValue(fieldName, null as any, { shouldValidate: true }); 
-      setFileNameState(null);
     }
   };
 
@@ -156,32 +144,47 @@ export default function RegisterStep4Page() {
     const uploadPath = `registrations/${storedData.email}/qualifications`;
 
     try {
-        let diplomaUrl: string | undefined = getRegistrationData().diplomaUrl;
-        if (data.diplomaFile) {
-            const diplomaFileToUpload = data.diplomaFile[0];
-            diplomaUrl = await uploadFile(diplomaFileToUpload, uploadPath);
-            updateRegistrationData({ diplomaName: diplomaFileToUpload.name });
+        let fileUpdates: Partial<RegistrationData> = {};
+
+        // Handle diploma file
+        if (data.diplomaFile?.[0]) {
+            const file = data.diplomaFile[0];
+            const url = await uploadFile(file, uploadPath);
+            fileUpdates.diplomaUrl = url;
+            fileUpdates.diplomaName = file.name;
         }
 
-        let approbationCertificateUrl: string | undefined = getRegistrationData().approbationCertificateUrl;
-        if (data.approbationCertificateFile) {
-            const certFileToUpload = data.approbationCertificateFile[0];
-            approbationCertificateUrl = await uploadFile(certFileToUpload, uploadPath);
-            updateRegistrationData({ approbationCertificateName: certFileToUpload.name });
+        // Handle approbation certificate file
+        if (data.approbationCertificateFile?.[0]) {
+            const file = data.approbationCertificateFile[0];
+            const url = await uploadFile(file, uploadPath);
+            fileUpdates.approbationCertificateUrl = url;
+            fileUpdates.approbationCertificateName = file.name;
+        }
+        
+        // Handle specialist recognition file
+        if (data.specialistRecognitionFile?.[0]) {
+            const file = data.specialistRecognitionFile[0];
+            const url = await uploadFile(file, uploadPath);
+            fileUpdates.specialistRecognitionUrl = url;
+            fileUpdates.specialistRecognitionName = file.name;
         }
 
-        let specialistRecognitionUrl: string | undefined = getRegistrationData().specialistRecognitionUrl;
-        if (data.specialistRecognitionFile) {
-            const specialistFileToUpload = data.specialistRecognitionFile[0];
-            specialistRecognitionUrl = await uploadFile(specialistFileToUpload, uploadPath);
-            updateRegistrationData({ specialistRecognitionName: specialistFileToUpload.name });
+        // Now validate that the mandatory diploma file is present either from new upload or from store
+        if (!fileUpdates.diplomaUrl && !storedData.diplomaUrl) {
+            toast({
+                title: t.register_step4_label_diploma || "Diploma Required",
+                description: "Please upload your diploma/certificate to continue.",
+                variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
         }
 
+        // Combine form data with file updates and save to store
         updateRegistrationData({
             ...data,
-            diplomaUrl,
-            approbationCertificateUrl,
-            specialistRecognitionUrl,
+            ...fileUpdates,
         });
 
         router.push('/register/step5');
@@ -368,7 +371,7 @@ export default function RegisterStep4Page() {
                 <FormField
                   control={form.control}
                   name="diplomaFile"
-                  render={({ field }) => ( 
+                  render={() => ( 
                     <FormItem>
                       <FormLabel>{t.register_step4_label_diploma || "Diploma/Certificate of Dental Studies"}*</FormLabel>
                        <FormControl>
@@ -378,7 +381,7 @@ export default function RegisterStep4Page() {
                                 className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
-                                {selectedDiplomaFileName || (t.register_step2_button_selectFile || "Select File")}
+                                <span className="truncate">{selectedDiplomaFileName || (t.register_step2_button_selectFile || "Select File")}</span>
                             </label>
                             <Input
                                 id="diplomaFile-input"
@@ -389,12 +392,6 @@ export default function RegisterStep4Page() {
                             />
                         </div>
                         </FormControl>
-                        {selectedDiplomaFileName && (
-                            <FormDescription className="flex items-center text-xs text-muted-foreground">
-                                <FileIcon className="h-4 w-4 mr-1 text-primary" />
-                                {t.register_step2_selected_file || "Selected:"} {selectedDiplomaFileName}
-                            </FormDescription>
-                        )}
                         <FormDescription>{t.register_step2_file_formats || "Accepted formats: PDF, JPG, PNG (max. 10MB)"}</FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -404,7 +401,7 @@ export default function RegisterStep4Page() {
                  <FormField
                   control={form.control}
                   name="approbationCertificateFile"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>{t.register_step4_label_approbation_cert || "Approbation Certificate (if available)"}</FormLabel>
                        <FormControl>
@@ -414,7 +411,7 @@ export default function RegisterStep4Page() {
                                 className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
-                                {selectedApprobationCertificateFileName || (t.register_step2_button_selectFile || "Select File")}
+                                <span className="truncate">{selectedApprobationCertificateFileName || (t.register_step2_button_selectFile || "Select File")}</span>
                             </label>
                             <Input
                                 id="approbationCertificateFile-input"
@@ -425,12 +422,6 @@ export default function RegisterStep4Page() {
                             />
                         </div>
                         </FormControl>
-                        {selectedApprobationCertificateFileName && (
-                             <FormDescription className="flex items-center text-xs text-muted-foreground">
-                                <FileIcon className="h-4 w-4 mr-1 text-primary" />
-                                {t.register_step2_selected_file || "Selected:"} {selectedApprobationCertificateFileName}
-                            </FormDescription>
-                        )}
                         <FormDescription>{t.register_step2_file_formats || "Accepted formats: PDF, JPG, PNG (max. 10MB)"}</FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -440,7 +431,7 @@ export default function RegisterStep4Page() {
                 <FormField
                   control={form.control}
                   name="specialistRecognitionFile"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>{t.register_step4_label_specialist_recognition || "Dental Specialist Recognition (if available)"}</FormLabel>
                        <FormControl>
@@ -450,7 +441,7 @@ export default function RegisterStep4Page() {
                                 className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
-                                {selectedSpecialistRecognitionFileName || (t.register_step2_button_selectFile || "Select File")}
+                                <span className="truncate">{selectedSpecialistRecognitionFileName || (t.register_step2_button_selectFile || "Select File")}</span>
                             </label>
                             <Input
                                 id="specialistRecognitionFile-input"
@@ -461,12 +452,6 @@ export default function RegisterStep4Page() {
                             />
                         </div>
                         </FormControl>
-                        {selectedSpecialistRecognitionFileName && (
-                            <FormDescription className="flex items-center text-xs text-muted-foreground">
-                                <FileIcon className="h-4 w-4 mr-1 text-primary" />
-                               {t.register_step2_selected_file || "Selected:"} {selectedSpecialistRecognitionFileName}
-                            </FormDescription>
-                        )}
                         <FormDescription>{t.register_step2_file_formats || "Accepted formats: PDF, JPG, PNG (max. 10MB)"}</FormDescription>
                       <FormMessage />
                     </FormItem>
