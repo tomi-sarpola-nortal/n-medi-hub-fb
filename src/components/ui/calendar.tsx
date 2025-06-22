@@ -1,13 +1,64 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import { DayPicker, useNavigation } from "react-day-picker"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { format, subYears, addYears } from 'date-fns';
 
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
+
+function CalendarCaption() {
+  const { goToMonth, nextMonth, previousMonth, displayMonth } = useNavigation();
+
+  return (
+    <div className="flex items-center justify-between px-1 pt-1 mb-2">
+      <div className="flex items-center space-x-1">
+        <Button
+          onClick={() => goToMonth(subYears(displayMonth, 1))}
+          variant="outline"
+          className="h-7 w-7 bg-transparent p-0"
+        >
+          <span className="sr-only">Go to previous year</span>
+          <ChevronsLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          disabled={!previousMonth}
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+          variant="outline"
+          className="h-7 w-7 bg-transparent p-0"
+        >
+          <span className="sr-only">Go to previous month</span>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      </div>
+      <span className="text-sm font-medium">
+        {format(displayMonth, 'MMMM yyyy')}
+      </span>
+      <div className="flex items-center space-x-1">
+        <Button
+          disabled={!nextMonth}
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+          variant="outline"
+          className="h-7 w-7 bg-transparent p-0"
+        >
+          <span className="sr-only">Go to next month</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        <Button
+          onClick={() => goToMonth(addYears(displayMonth, 1))}
+          variant="outline"
+          className="h-7 w-7 bg-transparent p-0"
+        >
+          <span className="sr-only">Go to next year</span>
+          <ChevronsRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 function Calendar({
   className,
@@ -22,15 +73,7 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
+        caption: "hidden", // Hide the default caption, we're replacing it
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
@@ -46,7 +89,7 @@ function Calendar({
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
         day_outside:
-          "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
+          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
@@ -54,12 +97,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
+        Caption: CalendarCaption,
       }}
       {...props}
     />
