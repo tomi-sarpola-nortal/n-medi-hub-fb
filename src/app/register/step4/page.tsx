@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
+import { Loader2, UploadCloud, FileText as FileIcon, CalendarIcon } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import { 
@@ -24,6 +24,10 @@ import {
   type SpecializationId 
 } from '@/lib/registrationStore';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 
 // Helper for client-side translations
@@ -68,10 +72,10 @@ const FormSchema = z.object({
   currentProfessionalTitle: z.string().min(1, { message: "Professional title is required." }),
   specializations: z.array(z.string()).min(1, { message: "At least one specialization must be selected." }),
   languages: z.string().min(1, { message: "Languages are required." }),
-  graduationDate: z.string().min(1, { message: "Graduation date is required." }),
+  graduationDate: z.date({ required_error: "Graduation date is required." }),
   university: z.string().min(1, { message: "University/College is required." }),
   approbationNumber: z.string().optional(),
-  approbationDate: z.string().optional(),
+  approbationDate: z.date().optional(),
   diplomaFile: baseFileSchema,
   approbationCertificateFile: optionalFileSchema,
   specialistRecognitionFile: optionalFileSchema,
@@ -99,10 +103,10 @@ export default function RegisterStep4Page() {
       currentProfessionalTitle: "",
       specializations: [],
       languages: "",
-      graduationDate: "",
+      graduationDate: undefined,
       university: "",
       approbationNumber: "",
-      approbationDate: "",
+      approbationDate: undefined,
       diplomaFile: null,
       approbationCertificateFile: null,
       specialistRecognitionFile: null,
@@ -128,17 +132,16 @@ export default function RegisterStep4Page() {
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
         languages: storedData.languages || "",
-        graduationDate: storedData.graduationDate || "",
+        graduationDate: storedData.graduationDate ? new Date(storedData.graduationDate) : undefined,
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
-        approbationDate: storedData.approbationDate || "",
-        // Reset file inputs to their stored File object or null
+        approbationDate: storedData.approbationDate ? new Date(storedData.approbationDate) : undefined,
         diplomaFile: storedData.diplomaFile || null,
         approbationCertificateFile: storedData.approbationCertificateFile || null,
         specialistRecognitionFile: storedData.specialistRecognitionFile || null,
       });
     }
-  }, [router, toast, t, form]);
+  }, [router, toast, t]);
 
 
   const handleFileChange = (
@@ -276,11 +279,39 @@ export default function RegisterStep4Page() {
                   control={form.control}
                   name="graduationDate"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>{t.register_step4_label_graduation_date || "Date of Graduation"}*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="DD/MM/YYYY" {...field} />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1950-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -318,11 +349,39 @@ export default function RegisterStep4Page() {
                   control={form.control}
                   name="approbationDate"
                   render={({ field }) => (
-                    <FormItem>
+                     <FormItem className="flex flex-col">
                       <FormLabel>{t.register_step4_label_approbation_date || "Date of Approbation (if available)"}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="DD/MM/YYYY" {...field} />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>{t.register_step2_placeholder_dateOfBirth || "Pick a date"}</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1950-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

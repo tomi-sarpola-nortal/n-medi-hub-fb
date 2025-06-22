@@ -59,7 +59,7 @@ export const STATES_MAP: Record<string, string> = {
 };
 
 
-interface RegistrationData {
+export interface RegistrationData {
   // Step 1
   email?: string;
   // Step 2
@@ -84,10 +84,10 @@ interface RegistrationData {
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
   languages?: string; 
-  graduationDate?: string; 
+  graduationDate?: Date; 
   university?: string;
   approbationNumber?: string;
-  approbationDate?: string; 
+  approbationDate?: Date; 
   diplomaFile?: File | null;
   diplomaFileName?: string;
   approbationCertificateFile?: File | null;
@@ -114,7 +114,7 @@ interface RegistrationData {
   role?: UserRole; // This might be set to 'dentist' by default for this flow
 }
 
-export const registrationDataStore: RegistrationData = {};
+let registrationDataStore: RegistrationData = {};
 
 export function updateRegistrationData(data: Partial<RegistrationData>) {
   Object.assign(registrationDataStore, data);
@@ -126,10 +126,7 @@ export function getRegistrationData(): RegistrationData {
 }
 
 export function clearRegistrationData() {
-  // More robust way to clear the store object
-  Object.keys(registrationDataStore).forEach(key => {
-    delete (registrationDataStore as any)[key];
-  });
+  registrationDataStore = {};
   console.log("Registration data cleared.");
 }
 
