@@ -39,7 +39,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
   const toDateString = (dateValue: any): string | undefined => {
       if (!dateValue) return undefined;
       // If it's a Firestore Timestamp, convert it
-      if (typeof dateValue.toDate === 'function') {
+      if (dateValue && typeof dateValue.toDate === 'function') {
           return dateValue.toDate().toISOString().split('T')[0];
       }
       // If it's already a string, return it
@@ -121,12 +121,19 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
  */
 export async function createPerson(
   uid: string,
-  personData: PersonCreationData // This now includes all fields from Person minus id, createdAt, updatedAt
+  personData: PersonCreationData
 ): Promise<void> {
   checkDb();
   const personDocRef = doc(db, PERSONS_COLLECTION, uid);
+  
+  // Sanitize data: Firestore cannot store `undefined` values.
+  // Create a new object by filtering out any keys with `undefined` values.
+  const dataToSet = Object.fromEntries(
+    Object.entries(personData).filter(([_, v]) => v !== undefined && v !== null)
+  );
+
   await setDoc(personDocRef, {
-    ...personData, 
+    ...dataToSet, 
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -158,8 +165,14 @@ export async function updatePerson(
 ): Promise<void> {
   checkDb();
   const docRef = doc(db, PERSONS_COLLECTION, id);
+  
+  // Sanitize updates: Remove any keys with `undefined` values before updating.
+  const dataToUpdate = Object.fromEntries(
+    Object.entries(updates).filter(([_, v]) => v !== undefined)
+  );
+
   await updateDoc(docRef, {
-    ...updates,
+    ...dataToUpdate,
     updatedAt: serverTimestamp(),
   });
 }
