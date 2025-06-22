@@ -14,8 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
-import { auth } from '@/lib/firebaseConfig';
-import { fetchSignInMethodsForEmail } from 'firebase/auth';
+import { findPersonByEmail } from '@/services/personService'; // Changed import
 import { updateRegistrationData } from '@/lib/registrationStore'; 
 
 // Helper for client-side translations
@@ -56,8 +55,9 @@ export default function RegisterStep1Page() {
   const onSubmit: SubmitHandler<EmailFormInputs> = async (data) => {
     setIsLoading(true);
     try {
-      const methods = await fetchSignInMethodsForEmail(auth, data.email);
-      if (methods.length > 0) {
+      // New logic: Check against Firestore 'persons' collection
+      const existingUser = await findPersonByEmail(data.email);
+      if (existingUser) {
         toast({
           title: t.register_email_exists_title || "Email Already Registered",
           description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
