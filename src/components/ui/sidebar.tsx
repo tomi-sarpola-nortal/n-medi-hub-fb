@@ -182,7 +182,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "peer group hidden h-full w-[--sidebar-width] flex-col border-r border-sidebar-border bg-sidebar-background text-sidebar-foreground md:flex",
+            "peer group hidden h-full w-[--sidebar-width] shrink-0 flex-col border-r border-sidebar-border bg-sidebar-background text-sidebar-foreground md:flex",
             className
           )}
           ref={ref}
@@ -227,7 +227,6 @@ const Sidebar = React.forwardRef<
           className={cn(
             "duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
             "group-data-[collapsible=offcanvas]:w-0",
-            "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
               ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
@@ -665,7 +664,7 @@ const SidebarMenuSkeleton = React.forwardRef<
         />
       )}
       <Skeleton
-        className="h-4 w-3/4 flex-1"
+        className="h-4 w-full"
         data-sidebar="menu-skeleton-text"
       />
     </div>
