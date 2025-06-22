@@ -69,7 +69,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
   const potentialLocale = pathname.split('/')[1];
   const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
-  const currentYear = new Date().getFullYear();
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -126,7 +125,7 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         setSelectedFileName(storedData.idDocumentName);
       }
     }
-  }, [router, toast, t, form]);
+  }, [router, toast, t]);
 
 
   const onSubmit: SubmitHandler<PersonalDataFormInputs> = async (data) => {
@@ -242,9 +241,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
                             onSelect={field.onChange}
                             disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                             initialFocus
-                            captionLayout="dropdown-buttons"
-                            fromYear={1920}
-                            toYear={currentYear}
                           />
                         </PopoverContent>
                       </Popover>

@@ -89,7 +89,6 @@ export default function RegisterStep4Page() {
   const potentialLocale = pathname.split('/')[1];
   const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
-  const currentYear = new Date().getFullYear();
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +141,7 @@ export default function RegisterStep4Page() {
         specialistRecognitionFile: storedData.specialistRecognitionFile || null,
       });
     }
-  }, [router, toast, t, form]);
+  }, [router, toast, t]);
 
 
   const handleFileChange = (
@@ -310,9 +309,6 @@ export default function RegisterStep4Page() {
                               date > new Date() || date < new Date("1950-01-01")
                             }
                             initialFocus
-                            captionLayout="dropdown-buttons"
-                            fromYear={1960}
-                            toYear={currentYear}
                           />
                         </PopoverContent>
                       </Popover>
@@ -383,9 +379,6 @@ export default function RegisterStep4Page() {
                               date > new Date() || date < new Date("1950-01-01")
                             }
                             initialFocus
-                            captionLayout="dropdown-buttons"
-                            fromYear={1960}
-                            toYear={currentYear}
                           />
                         </PopoverContent>
                       </Popover>
