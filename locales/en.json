@@ -323,9 +323,11 @@
   "documents_table_header_last_change": "Last Change",
   "documents_table_header_format": "Format",
   "documents_table_header_action": "Action",
+  "documents_table_header_download": "Download",
   "documents_type_vorlage": "Template",
   "documents_type_leitlinie": "Guideline",
   "documents_type_empfehlung": "Recommendation",
+  "documents_footer_note": "The documents shown are provided centrally by your state chamber or the Austrian Dental Chamber. If you have any questions, please contact your chamber directly.",
   "representations_page_title": "My Representations",
   "representations_breadcrumb_dashboard": "Dashboard",
   "representations_breadcrumb_current": "My Representations",
@@ -348,3 +350,5 @@
   "representations_my_desc": "Here you can view representations where you were represented by others.",
   "representations_footer_note": "Representations can only be confirmed by the represented person. Your state chamber also has access to this data."
 }
+
+    

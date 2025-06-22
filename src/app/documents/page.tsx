@@ -1,12 +1,29 @@
 
+"use client";
+
 import AppLayout from '@/components/layout/AppLayout';
-import { getTranslations } from '@/lib/translations';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileUp, FileText, Download, Trash2 } from 'lucide-react';
+import { FileUp, FileText, Download, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
+import { useAuth } from '@/context/auth-context';
+import { useEffect, useState } from 'react';
+
+// Helper for client-side translations
+const getClientTranslations = (locale: string) => {
+  try {
+    if (locale === 'de') {
+      return require('../../../locales/de.json');
+    }
+    return require('../../../locales/en.json');
+  } catch (e) {
+    console.warn("Translation file not found for documents page, falling back to en");
+    return require('../../../locales/en.json');
+  }
+};
 
 interface DocumentTemplate {
     id: string;
@@ -32,33 +49,57 @@ const documentTypeMap = {
     'empfehlung': 'documents_type_empfehlung',
 };
 
-
 interface DocumentsPageProps {
   params: { locale: string };
 }
 
-export default async function DocumentsPage({ params }: DocumentsPageProps) {
-  const t = getTranslations(params.locale);
+export default function DocumentsPage({ params }: DocumentsPageProps) {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(params.locale));
+  }, [params.locale]);
+
+  if (loading || !user || !t) {
+    return (
+      <AppLayout pageTitle={t?.documents_page_title || "Document Templates"} locale={params.locale}>
+        <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
   const pageTitle = t.documents_page_title || "Document Templates";
+  const isLkMember = user.role === 'lk_member';
 
   return (
     <AppLayout pageTitle={pageTitle} locale={params.locale}>
         <div className="flex-1 space-y-6 p-4 md:p-8">
-            <div className="flex items-start justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                        {pageTitle}
-                    </h1>
-                     <div className="text-sm text-muted-foreground mt-2">
-                        <Link href="/dashboard" className="hover:underline">{t.documents_breadcrumb_dashboard || "Dashboard"}</Link>
-                        <span className="mx-1">/</span>
-                        <span className="font-medium text-foreground">{t.documents_breadcrumb_current || "Document Templates"}</span>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex" onClick={() => router.back()}>
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight font-headline">
+                            {pageTitle}
+                        </h1>
+                         <div className="text-sm text-muted-foreground mt-2">
+                            <Link href="/dashboard" className="hover:underline">{t.documents_breadcrumb_dashboard || "Dashboard"}</Link>
+                            <span className="mx-1">/</span>
+                            <span className="font-medium text-foreground">{t.documents_breadcrumb_current || "Document Templates"}</span>
+                        </div>
                     </div>
                 </div>
-                 <Button className="flex items-center gap-2">
-                    <FileUp className="h-5 w-5"/>
-                    <span className="hidden sm:inline">{t.documents_upload_button || "UPLOAD NEW DOCUMENT"}</span>
-                </Button>
+                 {isLkMember && (
+                    <Button className="flex items-center gap-2">
+                        <FileUp className="h-5 w-5"/>
+                        <span className="hidden sm:inline">{t.documents_upload_button || "UPLOAD NEW DOCUMENT"}</span>
+                    </Button>
+                 )}
             </div>
 
             <Card>
@@ -81,7 +122,9 @@ export default async function DocumentsPage({ params }: DocumentsPageProps) {
                                 <TableHead>{t.documents_table_header_publisher || "Publisher"}</TableHead>
                                 <TableHead>{t.documents_table_header_last_change || "Last Change"}</TableHead>
                                 <TableHead>{t.documents_table_header_format || "Format"}</TableHead>
-                                <TableHead className="text-right">{t.documents_table_header_action || "Action"}</TableHead>
+                                <TableHead className="text-right">
+                                    {isLkMember ? (t.documents_table_header_action || "Action") : (t.documents_table_header_download || "Download")}
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -103,9 +146,11 @@ export default async function DocumentsPage({ params }: DocumentsPageProps) {
                                             <Button variant="ghost" size="icon" aria-label="Download document">
                                                 <Download className="h-5 w-5 text-muted-foreground" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" aria-label="Delete document">
-                                                <Trash2 className="h-5 w-5 text-muted-foreground" />
-                                            </Button>
+                                            {isLkMember && (
+                                                <Button variant="ghost" size="icon" aria-label="Delete document">
+                                                    <Trash2 className="h-5 w-5 text-muted-foreground" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -114,7 +159,13 @@ export default async function DocumentsPage({ params }: DocumentsPageProps) {
                     </Table>
                 </CardContent>
             </Card>
+
+            <p className="text-xs text-muted-foreground">
+                {t.documents_footer_note || "The documents shown are provided centrally..."}
+            </p>
         </div>
     </AppLayout>
   )
 }
+
+    

@@ -323,9 +323,11 @@
   "documents_table_header_last_change": "Letzte Änderung",
   "documents_table_header_format": "Format",
   "documents_table_header_action": "Aktion",
+  "documents_table_header_download": "Download",
   "documents_type_vorlage": "Vorlage",
   "documents_type_leitlinie": "Leitlinie",
   "documents_type_empfehlung": "Empfehlung",
+  "documents_footer_note": "Die angezeigten Dokumente werden zentral von Ihrer Landeskammer oder der Österreichischen Zahnärztekammer bereitgestellt. Bei Fragen wenden Sie sich bitte direkt an Ihre Kammer.",
   "representations_page_title": "Meine Vertretungen",
   "representations_breadcrumb_dashboard": "Dashboard",
   "representations_breadcrumb_current": "Meine Vertretungen",
@@ -348,3 +350,5 @@
   "representations_my_desc": "Hier können Sie Vertretungen einsehen, bei denen Sie vertreten wurden.",
   "representations_footer_note": "Vertretungen können nur von der vertretenen Person bestätigt werden. Auch Ihre Landeskammer hat Zugriff auf diese Daten."
 }
+
+    
