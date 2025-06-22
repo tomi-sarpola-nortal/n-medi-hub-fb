@@ -4,8 +4,7 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getTranslations } from '@/lib/translations';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
@@ -13,6 +12,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import type { Person } from '@/lib/types';
+import { getPersonById } from '@/services/personService';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -32,14 +33,6 @@ interface DataReviewPageProps {
 }
 
 // Mock data for Dr. Mehmet Yilmaz's review
-const mockMember = {
-  id: '3',
-  name: 'Dr. Mehmet Yilmaz',
-  dentistId: 'ZA-2024-0067',
-  changeDate: '21.05.2026',
-  chamber: 'ZK Wien',
-};
-
 const mockChanges = {
   personal: [
     {
@@ -95,15 +88,15 @@ const ChangeItem = ({ label, oldValue, newValue }: { label: string; oldValue: Re
         <p className="text-sm text-muted-foreground mb-2">{label}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <div>
-                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">Alt</p>
+                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">{t.member_review_old_data || "Old"}</p>
                 <div className="text-sm font-medium text-foreground">
-                    {oldValue || <span className="italic text-muted-foreground">Nicht angegeben</span>}
+                    {oldValue || <span className="italic text-muted-foreground">{t.register_review_not_provided || "Not provided"}</span>}
                 </div>
             </div>
             <div>
-                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">Neu</p>
+                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">{t.member_review_new_data || "New"}</p>
                 <div className="text-sm font-semibold text-primary">
-                    {newValue || <span className="italic text-muted-foreground">Nicht angegeben</span>}
+                    {newValue || <span className="italic text-muted-foreground">{t.register_review_not_provided || "Not provided"}</span>}
                 </div>
             </div>
         </div>
@@ -114,10 +107,24 @@ const ChangeItem = ({ label, oldValue, newValue }: { label: string; oldValue: Re
 export default function DataReviewPage({ params }: DataReviewPageProps) {
   const [t, setT] = useState<Record<string, string>>({});
   const [reviewDecision, setReviewDecision] = useState('approve');
+  const [person, setPerson] = useState<Person | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     setT(getClientTranslations(params.locale));
-  }, [params.locale]);
+    async function fetchPerson() {
+        try {
+            const fetchedPerson = await getPersonById(params.memberId);
+            setPerson(fetchedPerson);
+        } catch (error) {
+            console.error("Failed to fetch person data:", error);
+            // Optionally set an error state here
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    fetchPerson();
+  }, [params.locale, params.memberId]);
 
   const pageTitle = t.member_review_page_title_review || "Datenänderung prüfen";
 
@@ -129,9 +136,33 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
     return value;
   };
 
-  if (Object.keys(t).length === 0) {
-      return <AppLayout pageTitle="Loading..." locale={params.locale}><div>Loading...</div></AppLayout>;
+  if (isLoading) {
+    return (
+        <AppLayout pageTitle="Loading..." locale={params.locale}>
+            <div className="flex-1 space-y-6 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AppLayout>
+    );
   }
+  
+  if (!person) {
+       return (
+        <AppLayout pageTitle="Error" locale={params.locale}>
+            <div className="flex-1 space-y-6 p-4 md:p-8 text-center">
+                <p>Member not found.</p>
+                <Button asChild><Link href="/member-overview">Go Back</Link></Button>
+            </div>
+        </AppLayout>
+    );
+  }
+  
+  // Replace mock old values with real ones from the person object.
+  const personalChanges = mockChanges.personal.map(change => {
+    if (change.field === 'lastName') return {...change, oldValue: person.lastName };
+    if (change.field === 'idDocument') return {...change, oldValue: person.idDocumentName ? { name: person.idDocumentName, size: 'N/A' } : null };
+    return change;
+  });
 
   return (
     <AppLayout pageTitle={pageTitle} locale={params.locale}>
@@ -149,7 +180,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                         <span className="mx-1">/</span>
                         <Link href="/member-overview" className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
                         <span className="mx-1">/</span>
-                        <Link href={`/member-overview/${params.memberId}`} className="hover:underline">{mockMember.name}</Link>
+                        <Link href={`/member-overview/${params.memberId}`} className="hover:underline">{person.name}</Link>
                         <span className="mx-1">/</span>
                         <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Datenänderung prüfen"}</span>
                     </div>
@@ -158,23 +189,23 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-xl font-headline">{mockMember.name}</CardTitle>
+                    <CardTitle className="text-xl font-headline">{person.name}</CardTitle>
                     <CardDescription>{t.member_review_page_subtitle || "Bitte überprüfen Sie die Daten nach Vollständigkeit und Richtigkeit."}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="bg-muted/30 p-4 rounded-lg">
                         <h3 className="font-semibold mb-2">{t.member_review_info_section_title || "Informationen zur Prüfung"}</h3>
-                        <InfoRow label={t.member_review_info_name || "Vor- und Nachname"} value={mockMember.name} href={`/member-overview/${params.memberId}`} />
-                        <InfoRow label={t.member_review_info_id || "Zahnarzt-ID"} value={mockMember.dentistId} />
-                        <InfoRow label={t.member_review_info_change_date || "Datum der Datenänderung"} value={mockMember.changeDate} />
-                        <InfoRow label={t.member_review_info_chamber || "Kammerzugehörigkeit"} value={mockMember.chamber} />
+                        <InfoRow label={t.member_review_info_name || "Vor- und Nachname"} value={person.name} href={`/member-overview/${params.memberId}`} />
+                        <InfoRow label={t.member_review_info_id || "Zahnarzt-ID"} value={person.dentistId || '-'} />
+                        <InfoRow label={t.member_review_info_change_date || "Datum der Datenänderung"} value={new Date().toLocaleDateString()} />
+                        <InfoRow label={t.member_review_info_chamber || "Kammerzugehörigkeit"} value={person.region || '-'} />
                     </div>
 
                     <Separator className="my-6" />
 
                     <div>
                         <h3 className="text-lg font-semibold mb-2">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
-                        {mockChanges.personal.map(change => (
+                        {personalChanges.map(change => (
                             <ChangeItem 
                                 key={change.field}
                                 label={t[change.labelKey] || change.field}
@@ -227,7 +258,6 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                                     id="justification" 
                                     placeholder={t.member_review_justification_placeholder || "z. B. Fortbildungsnachweise fehlen"}
                                     className="mt-2"
-                                    defaultValue={"z. B. Fortbildungsnachweise fehlen"}
                                 />
                             </div>
                         )}
