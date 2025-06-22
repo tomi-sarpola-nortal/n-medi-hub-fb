@@ -194,7 +194,6 @@
   "register_success_card_message_line1": "Ihr Antrag wurde erfolgreich an die Zahnärztekammer Salzburg übermittelt.",
   "register_success_card_message_line2": "Nach der Prüfung erhalten Sie Ihre Zahnarzt-ID und weitere Informationen per E-Mail.",
   "register_success_button_to_login": "ZUR ANMELDUNG",
-
   "dashboard_training_status_title": "Ihr Fortbildungsstand",
   "dashboard_training_status_points": "Fortbildungspunkten",
   "dashboard_training_status_button": "MEINE FORTBILDUNGEN ANSEHEN",
@@ -207,5 +206,20 @@
   "dashboard_confirm_reps_title": "Vertretungen bestätigen",
   "dashboard_confirm_reps_description": "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden.",
   "dashboard_confirm_reps_confirm_button": "BESTÄTIGEN",
-  "dashboard_confirm_reps_decline_button": "ABLEHNEN"
+  "dashboard_confirm_reps_decline_button": "ABLEHNEN",
+  "settings_page_title": "Einstellungen",
+  "settings_page_description": "Verwalten Sie Ihre Kontoeinstellungen und E-Mail-Präferenzen.",
+  "settings_personal_data_title": "Persönliche Daten",
+  "settings_personal_data_desc": "Aktualisieren Sie Ihre persönlichen Daten und Kontaktinformationen.",
+  "settings_prof_qual_title": "Berufliche Qualifikationen",
+  "settings_prof_qual_desc": "Verwalten Sie Ihre Berufsbezeichnungen, Fachrichtungen und Qualifikationen.",
+  "settings_practice_info_title": "Informationen zur Ordination",
+  "settings_practice_info_desc": "Aktualisieren Sie die Details Ihrer Hauptpraxis oder Klinik.",
+  "settings_button_save": "Änderungen speichern",
+  "settings_save_success_title": "Informationen gespeichert",
+  "settings_save_error_title": "Speichern fehlgeschlagen",
+  "settings_save_error_desc": "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+  "settings_personal_data_success_desc": "Ihre persönlichen Daten wurden erfolgreich aktualisiert.",
+  "settings_prof_qual_success_desc": "Ihre beruflichen Qualifikationen wurden erfolgreich aktualisiert.",
+  "settings_practice_info_success_desc": "Ihre Ordinationsinformationen wurden erfolgreich aktualisiert."
 }

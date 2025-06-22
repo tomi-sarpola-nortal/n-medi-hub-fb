@@ -194,7 +194,6 @@
   "register_success_card_message_line1": "Your application has been successfully submitted to the Dental Chamber Salzburg.",
   "register_success_card_message_line2": "After review, you will receive your dentist ID and further information via email.",
   "register_success_button_to_login": "TO LOGIN",
-
   "dashboard_training_status_title": "Your Training Status",
   "dashboard_training_status_points": "Training Points",
   "dashboard_training_status_button": "VIEW MY TRAININGS",
@@ -207,5 +206,20 @@
   "dashboard_confirm_reps_title": "Confirm Representations",
   "dashboard_confirm_reps_description": "Here you can confirm representations where you were represented.",
   "dashboard_confirm_reps_confirm_button": "CONFIRM",
-  "dashboard_confirm_reps_decline_button": "DECLINE"
+  "dashboard_confirm_reps_decline_button": "DECLINE",
+  "settings_page_title": "Settings",
+  "settings_page_description": "Manage your account settings and set e-mail preferences.",
+  "settings_personal_data_title": "Personal Data",
+  "settings_personal_data_desc": "Update your personal details and contact information.",
+  "settings_prof_qual_title": "Professional Qualifications",
+  "settings_prof_qual_desc": "Manage your professional titles, specializations, and qualifications.",
+  "settings_practice_info_title": "Practice Information",
+  "settings_practice_info_desc": "Update the details for your primary practice or clinic.",
+  "settings_button_save": "Save Changes",
+  "settings_save_success_title": "Information Saved",
+  "settings_save_error_title": "Save Failed",
+  "settings_save_error_desc": "Could not save your changes. Please try again.",
+  "settings_personal_data_success_desc": "Your personal data has been successfully updated.",
+  "settings_prof_qual_success_desc": "Your professional qualifications have been successfully updated.",
+  "settings_practice_info_success_desc": "Your practice information has been successfully updated."
 }
