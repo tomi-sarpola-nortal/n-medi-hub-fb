@@ -15,7 +15,7 @@ export default function RootLayout({
   params: { locale: string };
 }>) {
   return (
-    <html lang={params.locale || 'en'}>
+    <html lang={params.locale || 'en'} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
