@@ -171,7 +171,9 @@ export default function MemberReviewPage({ params }: MemberReviewPageProps) {
                         <div className="flex-grow">
                             <p className="font-medium">{t.member_review_alert_text || "This member has recently submitted changes to their master data. Please review them. You can still see the last approved data here."}</p>
                         </div>
-                        <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto mt-2 sm:mt-0">{t.member_review_alert_button || "PERFORM REVIEW"}</Button>
+                        <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto mt-2 sm:mt-0">
+                           <Link href={`/member-overview/${params.memberId}/review`}>{t.member_review_alert_button || "PERFORM REVIEW"}</Link>
+                        </Button>
                     </div>
 
                     <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
