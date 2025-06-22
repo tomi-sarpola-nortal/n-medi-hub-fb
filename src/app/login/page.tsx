@@ -62,9 +62,12 @@ export default function LoginPage() {
     if (result.success) {
       router.push('/dashboard'); // Explicit redirect on success
     } else {
+      // Check if the error is a translation key or a raw message
+      const errorMessage = t[result.error as string] || result.error || t.login_error_description;
+
       toast({
         title: t.login_error_title || "Login Failed",
-        description: result.error || t.login_error_description || "An unexpected error occurred. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -155,3 +158,5 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
+
+    

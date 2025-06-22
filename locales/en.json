@@ -58,6 +58,7 @@
   "login_footer_contact": "Contact",
   "login_error_title": "Login Failed",
   "login_error_description": "The email or password you entered is incorrect. Please try again.",
+  "login_error_pending_approval": "Your account is pending approval. You will receive an email once it has been reviewed.",
   "login_page_main_title": "Portal Login",
   "register_page_main_title": "Registration with the Austrian Dental Chamber",
   "register_step1_subtitle": "Please create an account first to continue with the registration.",
@@ -371,3 +372,5 @@
   "documents_delete_dialog_cancel": "Cancel",
   "member_review_no_pending": "No pending member reviews at the moment."
 }
+
+    

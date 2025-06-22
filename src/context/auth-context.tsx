@@ -72,9 +72,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // onAuthStateChanged will handle setting the user state.
-      // The component calling login will handle UI changes (loading state, redirect).
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+
+      // After successful authentication, fetch the user profile to check status
+      const personProfile = await getPersonById(firebaseUser.uid);
+
+      if (personProfile?.status === 'pending') {
+          await signOut(auth); // Log out the user
+          // Return a specific error key to be translated by the login page
+          return { success: false, error: "login_error_pending_approval" };
+      }
+
+      // If active or no profile found (onAuthStateChanged will handle the no profile case), proceed.
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
@@ -84,7 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         case 'auth/wrong-password':
         case 'auth/user-not-found':
         case 'auth/invalid-email':
-          errorMessage = "Invalid email or password. Please try again.";
+          errorMessage = "The email or password you entered is incorrect. Please try again.";
           break;
         case 'auth/internal-error':
           errorMessage = "An internal authentication error occurred. Please check that your Firebase project configuration is correct and that the Email/Password sign-in provider is enabled in the Firebase console.";
@@ -187,3 +197,5 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+    
