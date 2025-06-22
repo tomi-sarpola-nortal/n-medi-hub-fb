@@ -81,7 +81,7 @@ const InfoRow = ({ label, value, href }: { label: string; value: string; href?: 
 );
 
 const FileDisplay = ({ name, size }: { name: string; size: string }) => (
-  <div className="bg-muted/50 p-3 rounded-md flex items-center gap-3 hover:bg-muted cursor-pointer">
+  <div className="bg-muted/50 p-3 rounded-md flex items-center gap-3 hover:bg-muted cursor-pointer w-fit">
     <FileText className="h-6 w-6 text-primary flex-shrink-0" />
     <div>
       <p className="text-sm font-semibold text-foreground">{name}</p>
@@ -90,28 +90,44 @@ const FileDisplay = ({ name, size }: { name: string; size: string }) => (
   </div>
 );
 
-const DiffRow = ({ label, oldValue, newValue }: { label: string; oldValue: React.ReactNode; newValue: React.ReactNode }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 py-4 border-b last:border-none">
-      <div>
-        <p className="text-sm text-muted-foreground mb-1">{label}</p>
-        <div className="text-sm font-medium">{oldValue || <span className="italic text-muted-foreground">Nicht angegeben</span>}</div>
-      </div>
-       <div>
-        <p className="text-sm text-muted-foreground mb-1">Neu</p>
-        <div className="text-sm font-semibold text-primary">{newValue}</div>
-      </div>
-  </div>
+const ChangeItem = ({ label, oldValue, newValue }: { label: string; oldValue: React.ReactNode; newValue: React.ReactNode }) => (
+    <div className="py-4 border-b last:border-b-0">
+        <p className="text-sm text-muted-foreground mb-2">{label}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">Alt</p>
+                <div className="text-sm font-medium text-foreground">
+                    {oldValue || <span className="italic text-muted-foreground">Nicht angegeben</span>}
+                </div>
+            </div>
+            <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">Neu</p>
+                <div className="text-sm font-semibold text-primary">
+                    {newValue || <span className="italic text-muted-foreground">Nicht angegeben</span>}
+                </div>
+            </div>
+        </div>
+    </div>
 );
 
 
 export default function DataReviewPage({ params }: DataReviewPageProps) {
   const [t, setT] = useState<Record<string, string>>({});
+  const [reviewDecision, setReviewDecision] = useState('approve');
   
   useEffect(() => {
     setT(getClientTranslations(params.locale));
   }, [params.locale]);
 
   const pageTitle = t.member_review_page_title_review || "Datenänderung prüfen";
+
+  const renderChangeValue = (value: any) => {
+    if (!value) return null;
+    if (typeof value === 'object' && value.name && value.size) {
+        return <FileDisplay name={value.name} size={value.size} />;
+    }
+    return value;
+  };
 
   if (Object.keys(t).length === 0) {
       return <AppLayout pageTitle="Loading..." locale={params.locale}><div>Loading...</div></AppLayout>;
@@ -158,27 +174,13 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
 
                     <div>
                         <h3 className="text-lg font-semibold mb-2">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 py-4 border-b">
-                            <div><p className="text-sm font-semibold text-muted-foreground">Feld</p></div>
-                            <div className="grid grid-cols-2">
-                                <p className="text-sm font-semibold text-muted-foreground">Alt</p>
-                                <p className="text-sm font-semibold text-muted-foreground">Neu</p>
-                            </div>
-                        </div>
                         {mockChanges.personal.map(change => (
-                            <div key={change.field} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 py-4 border-b last:border-none">
-                                <p className="text-sm font-medium">{t[change.labelKey] || change.labelKey}</p>
-                                <div className="grid grid-cols-2 items-center">
-                                    <div className="text-sm">{change.oldValue || <i className="text-muted-foreground">Nicht zutreffend</i>}</div>
-                                    <div className="text-sm font-semibold text-primary">
-                                        {change.newValue && typeof change.newValue === 'object' ? (
-                                            <FileDisplay name={change.newValue.name} size={change.newValue.size} />
-                                        ) : (
-                                            change.newValue
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            <ChangeItem 
+                                key={change.field}
+                                label={t[change.labelKey] || change.field}
+                                oldValue={renderChangeValue(change.oldValue)}
+                                newValue={renderChangeValue(change.newValue)}
+                            />
                         ))}
                     </div>
 
@@ -186,28 +188,24 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
 
                     <div>
                         <h3 className="text-lg font-semibold mb-2">{t.member_review_prof_qual_title || "Berufliche Qualifikationen"}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 py-4 border-b">
-                            <div><p className="text-sm font-semibold text-muted-foreground">Feld</p></div>
-                            <div className="grid grid-cols-2">
-                                <p className="text-sm font-semibold text-muted-foreground">Alt</p>
-                                <p className="text-sm font-semibold text-muted-foreground">Neu</p>
-                            </div>
-                        </div>
-                        {mockChanges.professional.map(change => (
-                            <div key={change.field} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 py-4 border-b last:border-none">
-                                <p className="text-sm font-medium">{t[change.labelKey] || change.labelKey}</p>
-                                <div className="grid grid-cols-2 items-center">
-                                    <div className="text-sm">{change.oldValue}</div>
-                                    <div className="text-sm font-semibold text-primary">{change.newValue}</div>
-                                </div>
-                            </div>
+                         {mockChanges.professional.map(change => (
+                            <ChangeItem 
+                                key={change.field}
+                                label={t[change.labelKey] || change.field}
+                                oldValue={renderChangeValue(change.oldValue)}
+                                newValue={renderChangeValue(change.newValue)}
+                            />
                         ))}
                     </div>
 
                     <Separator className="my-6" />
 
                     <div className="space-y-6">
-                        <RadioGroup defaultValue="reject" className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+                        <RadioGroup 
+                            value={reviewDecision}
+                            onValueChange={setReviewDecision}
+                            className="flex flex-col sm:flex-row gap-4 sm:gap-8"
+                        >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="approve" id="r-approve" />
                                 <Label htmlFor="r-approve">{t.member_review_approve_option || "Datenänderung genehmigen"}</Label>
@@ -222,15 +220,17 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                             </div>
                         </RadioGroup>
 
-                        <div>
-                            <Label htmlFor="justification" className="font-semibold">{t.member_review_justification_label || "Begründung"}*</Label>
-                            <Textarea 
-                                id="justification" 
-                                placeholder={t.member_review_justification_placeholder || "z. B. Fortbildungsnachweise fehlen"}
-                                className="mt-2"
-                                defaultValue={"z. B. Fortbildungsnachweise fehlen"}
-                            />
-                        </div>
+                        {reviewDecision !== 'approve' && (
+                            <div>
+                                <Label htmlFor="justification" className="font-semibold">{t.member_review_justification_label || "Begründung"}*</Label>
+                                <Textarea 
+                                    id="justification" 
+                                    placeholder={t.member_review_justification_placeholder || "z. B. Fortbildungsnachweise fehlen"}
+                                    className="mt-2"
+                                    defaultValue={"z. B. Fortbildungsnachweise fehlen"}
+                                />
+                            </div>
+                        )}
 
                         <div className="flex items-center space-x-2">
                             <Checkbox id="confirm-check" />
