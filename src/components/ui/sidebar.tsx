@@ -177,12 +177,17 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const [isMounted, setIsMounted] = React.useState(false)
+
+    React.useEffect(() => {
+      setIsMounted(true)
+    }, [])
 
     if (collapsible === "none") {
       return (
         <div
           className={cn(
-            "peer group hidden h-full w-[--sidebar-width] shrink-0 flex-col border-r border-sidebar-border bg-sidebar-background text-sidebar-foreground md:flex",
+            "peer group hidden h-full shrink-0 flex-col border-r border-sidebar-border bg-sidebar-background text-sidebar-foreground md:flex",
             className
           )}
           ref={ref}
@@ -193,7 +198,7 @@ const Sidebar = React.forwardRef<
       )
     }
 
-    if (isMobile) {
+    if (isMounted && isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
