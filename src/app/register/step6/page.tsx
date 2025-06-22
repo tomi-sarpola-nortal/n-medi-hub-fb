@@ -140,12 +140,16 @@ export default function RegisterStep6Page() {
 
     setIsLoading(true);
     try {
+      console.log("REGISTRATION_SUBMIT: Starting process...");
+      
       // 1. Create Firebase Auth user
+      console.log("REGISTRATION_SUBMIT: Attempting to create Firebase Auth user for email:", registrationData.email);
       const userCredential = await createUserWithEmailAndPassword(auth, registrationData.email, registrationData.password);
       const firebaseUser = userCredential.user;
       const newUserId = firebaseUser.uid;
+      console.log("REGISTRATION_SUBMIT: Firebase Auth user created successfully. UID:", newUserId);
 
-      // 2. Prepare data for Firestore, starting with the original registration data
+      // 2. Prepare data for Firestore
       const personDataToCreate: PersonCreationData = {
         name: `${registrationData.title || ''} ${registrationData.firstName} ${registrationData.lastName}`.trim(),
         email: registrationData.email,
@@ -202,13 +206,16 @@ export default function RegisterStep6Page() {
         const fileName = registrationData[nameKey] as string | undefined;
         
         if (sourceUrl && fileName) {
+            console.log(`REGISTRATION_SUBMIT: Moving file '${fileName}' from temporary URL: ${sourceUrl}`);
             const targetPath = `users/${newUserId}/${targetFolder}/${fileName}`;
             const newUrl = await copyFileToNewLocation(sourceUrl, targetPath);
             (personDataToCreate as any)[urlKey] = newUrl;
+            console.log(`REGISTRATION_SUBMIT: File moved to permanent URL: ${newUrl}. Deleting temporary file.`);
             await deleteFileByUrl(sourceUrl);
         }
       };
       
+      console.log("REGISTRATION_SUBMIT: Preparing to move registration files to permanent storage...");
       const fileMovePromises = [
           moveAndUpdateLink('idDocumentUrl', 'idDocumentName', 'id_documents'),
           moveAndUpdateLink('diplomaUrl', 'diplomaName', 'qualifications'),
@@ -217,11 +224,17 @@ export default function RegisterStep6Page() {
       ];
 
       await Promise.all(fileMovePromises);
+      console.log("REGISTRATION_SUBMIT: All files moved successfully.");
+
 
       // 4. Create Firestore document with the now-permanent URLs
+      console.log("REGISTRATION_SUBMIT: Attempting to create Firestore person document with data:", personDataToCreate);
       await createPerson(newUserId, personDataToCreate);
+      console.log("REGISTRATION_SUBMIT: Firestore person document created successfully.");
+
 
       // 5. Cleanup and redirect
+      console.log("REGISTRATION_SUBMIT: Registration complete. Cleaning up session and redirecting...");
       clearRegistrationData();
       toast({
         title: t.register_step6_success_title || "Registration Submitted",
@@ -230,7 +243,7 @@ export default function RegisterStep6Page() {
       router.push('/register/success'); 
 
     } catch (error: any) {
-      console.error("Registration submission error:", error);
+      console.error("REGISTRATION_SUBMIT: Process failed.", error);
       toast({
         title: t.register_step6_submit_error_title || "Submission Failed",
         description: error.message || t.register_step6_submit_error_desc || "An error occurred while submitting your application. Please try again.",
