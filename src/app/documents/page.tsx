@@ -5,7 +5,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileUp, FileText, Download, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+import { FileUp, FileText, Download, Trash2, ArrowLeft, Loader2, File } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
@@ -181,7 +181,11 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                       <TableCell>{doc.publisher}</TableCell>
                       <TableCell>{doc.lastChange}</TableCell>
                       <TableCell>
-                        <FileText className="h-5 w-5 text-muted-foreground" />
+                        {doc.fileFormat === 'PDF' ? (
+                          <FileText className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <File className="h-5 w-5 text-muted-foreground" />
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
