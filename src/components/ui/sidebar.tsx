@@ -182,7 +182,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar-background text-sidebar-foreground", /* Changed from bg-sidebar */
+            "peer group hidden h-full w-[--sidebar-width] flex-col border-r border-sidebar-border bg-sidebar-background text-sidebar-foreground md:flex",
             className
           )}
           ref={ref}
@@ -764,4 +764,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
