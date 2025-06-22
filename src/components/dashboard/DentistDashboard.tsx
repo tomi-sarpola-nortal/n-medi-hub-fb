@@ -72,7 +72,9 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="outline" className="w-full">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Button>
+                        <Button variant="outline" className="w-full" asChild>
+                            <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
+                        </Button>
                     </CardFooter>
                 </Card>
 
