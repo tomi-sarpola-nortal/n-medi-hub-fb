@@ -61,6 +61,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     stateOrProvince: data.stateOrProvince,
     phoneNumber: data.phoneNumber,
     idDocumentUrl: data.idDocumentUrl,
+    idDocumentName: data.idDocumentName,
 
     // Professional Qualifications
     currentProfessionalTitle: data.currentProfessionalTitle,
@@ -71,8 +72,11 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     approbationNumber: data.approbationNumber,
     approbationDate: data.approbationDate,
     diplomaUrl: data.diplomaUrl,
+    diplomaName: data.diplomaName,
     approbationCertificateUrl: data.approbationCertificateUrl,
+    approbationCertificateName: data.approbationCertificateName,
     specialistRecognitionUrl: data.specialistRecognitionUrl,
+    specialistRecognitionName: data.specialistRecognitionName,
     
     // Practice Information
     practiceName: data.practiceName,
@@ -131,7 +135,7 @@ export async function getPersonById(id: string): Promise<Person | null> {
  */
 export async function updatePerson(
   id: string,
-  updates: Partial<PersonCreationData> 
+  updates: Partial<Person> 
 ): Promise<void> {
   checkDb();
   const docRef = doc(db, PERSONS_COLLECTION, id);

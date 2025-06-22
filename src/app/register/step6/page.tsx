@@ -167,6 +167,7 @@ export default function RegisterStep6Page() {
         stateOrProvince: registrationData.stateOrProvince,
         phoneNumber: registrationData.phoneNumber,
         idDocumentUrl: registrationData.idDocumentUrl,
+        idDocumentName: registrationData.idDocumentName,
 
         // Professional Qualifications (Step 4)
         currentProfessionalTitle: registrationData.currentProfessionalTitle,
@@ -177,8 +178,11 @@ export default function RegisterStep6Page() {
         approbationNumber: registrationData.approbationNumber,
         approbationDate: registrationData.approbationDate,
         diplomaUrl: registrationData.diplomaUrl,
+        diplomaName: registrationData.diplomaName,
         approbationCertificateUrl: registrationData.approbationCertificateUrl,
+        approbationCertificateName: registrationData.approbationCertificateName,
         specialistRecognitionUrl: registrationData.specialistRecognitionUrl,
+        specialistRecognitionName: registrationData.specialistRecognitionName,
         
         // Practice Information (Step 5)
         practiceName: registrationData.practiceName,

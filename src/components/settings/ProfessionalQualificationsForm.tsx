@@ -6,20 +6,32 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { updatePerson } from '@/services/personService';
-import type { Person, SpecializationId } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import type { Person } from '@/lib/types';
+import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { DENTAL_SPECIALIZATIONS, PROFESSIONAL_TITLES } from '@/lib/registrationStore';
 import { LanguageInput } from '../ui/language-input';
+import { uploadFile } from '@/services/storageService';
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+
+const optionalFileSchema = z
+  .custom<FileList>()
+  .optional()
+  .nullable()
+  .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 10MB.`)
+  .refine(
+    (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+    "Only .pdf, .jpg, .jpeg, .png formats are supported."
+  );
 
 const FormSchema = z.object({
     currentProfessionalTitle: z.string().min(1, { message: "Professional title is required." }),
@@ -29,6 +41,9 @@ const FormSchema = z.object({
     university: z.string().min(1, { message: "University/College is required." }),
     approbationNumber: z.string().optional(),
     approbationDate: z.union([z.date(), z.string()]).optional().nullable(),
+    diplomaFile: optionalFileSchema,
+    approbationCertificateFile: optionalFileSchema,
+    specialistRecognitionFile: optionalFileSchema,
 });
 
 type FormInputs = z.infer<typeof FormSchema>;
@@ -42,6 +57,11 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [selectedDiplomaFileName, setSelectedDiplomaFileName] = useState<string | null>(user.diplomaName || null);
+  const [selectedApprobationCertificateFileName, setSelectedApprobationCertificateFileName] = useState<string | null>(user.approbationCertificateName || null);
+  const [selectedSpecialistRecognitionFileName, setSelectedSpecialistRecognitionFileName] = useState<string | null>(user.specialistRecognitionName || null);
+
 
   const form = useForm<FormInputs>({
     resolver: zodResolver(FormSchema),
@@ -55,15 +75,50 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
       approbationDate: user.approbationDate ? new Date(user.approbationDate) : undefined,
     },
   });
+  
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    fieldName: keyof FormInputs,
+    setFileNameState: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      form.setValue(fieldName, files as any, { shouldValidate: true });
+      setFileNameState(files[0].name);
+    }
+  };
 
   const onSubmit = async (data: FormInputs) => {
     setIsLoading(true);
     try {
-      const updateData = {
+      const uploadPath = `users/${user.id}/qualifications`;
+      const updateData: Partial<Person> = {
         ...data,
         graduationDate: data.graduationDate instanceof Date ? data.graduationDate.toISOString().split('T')[0] : data.graduationDate,
         approbationDate: data.approbationDate instanceof Date ? data.approbationDate.toISOString().split('T')[0] : data.approbationDate,
       };
+
+      if (data.diplomaFile?.[0]) {
+        const file = data.diplomaFile[0];
+        const url = await uploadFile(file, uploadPath);
+        updateData.diplomaUrl = url;
+        updateData.diplomaName = file.name;
+        setSelectedDiplomaFileName(file.name);
+      }
+      if (data.approbationCertificateFile?.[0]) {
+        const file = data.approbationCertificateFile[0];
+        const url = await uploadFile(file, uploadPath);
+        updateData.approbationCertificateUrl = url;
+        updateData.approbationCertificateName = file.name;
+        setSelectedApprobationCertificateFileName(file.name);
+      }
+      if (data.specialistRecognitionFile?.[0]) {
+        const file = data.specialistRecognitionFile[0];
+        const url = await uploadFile(file, uploadPath);
+        updateData.specialistRecognitionUrl = url;
+        updateData.specialistRecognitionName = file.name;
+        setSelectedSpecialistRecognitionFileName(file.name);
+      }
 
       await updatePerson(user.id, updateData);
       setUser(prev => prev ? ({ ...prev, ...updateData }) : null);
@@ -224,6 +279,93 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                     <FormMessage />
                     </FormItem>
                 )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="diplomaFile"
+              render={() => ( 
+                <FormItem>
+                  <FormLabel>{t.register_step4_label_diploma || "Diploma/Certificate of Dental Studies"}</FormLabel>
+                   <FormControl>
+                    <div className="flex items-center space-x-2 mt-1">
+                        <label
+                            htmlFor="diplomaFile-input"
+                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                        >
+                            <UploadCloud className="mr-2 h-4 w-4" />
+                            {selectedDiplomaFileName || (t.register_step2_button_selectFile || "Select File")}
+                        </label>
+                        <Input
+                            id="diplomaFile-input"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaFileName)}
+                        />
+                    </div>
+                    </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="approbationCertificateFile"
+              render={() => (
+                <FormItem>
+                  <FormLabel>{t.register_step4_label_approbation_cert || "Approbation Certificate (if available)"}</FormLabel>
+                   <FormControl>
+                    <div className="flex items-center space-x-2 mt-1">
+                        <label
+                            htmlFor="approbationCertificateFile-input"
+                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                        >
+                            <UploadCloud className="mr-2 h-4 w-4" />
+                            {selectedApprobationCertificateFileName || (t.register_step2_button_selectFile || "Select File")}
+                        </label>
+                        <Input
+                            id="approbationCertificateFile-input"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateFileName)}
+                        />
+                    </div>
+                    </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="specialistRecognitionFile"
+              render={() => (
+                <FormItem>
+                  <FormLabel>{t.register_step4_label_specialist_recognition || "Dental Specialist Recognition (if available)"}</FormLabel>
+                   <FormControl>
+                    <div className="flex items-center space-x-2 mt-1">
+                        <label
+                            htmlFor="specialistRecognitionFile-input"
+                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                        >
+                            <UploadCloud className="mr-2 h-4 w-4" />
+                            {selectedSpecialistRecognitionFileName || (t.register_step2_button_selectFile || "Select File")}
+                        </label>
+                        <Input
+                            id="specialistRecognitionFile-input"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionFileName)}
+                        />
+                    </div>
+                    </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
             <div className="flex justify-end pt-4">

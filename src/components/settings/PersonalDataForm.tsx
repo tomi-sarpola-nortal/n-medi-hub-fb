@@ -13,9 +13,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { updatePerson } from '@/services/personService';
 import type { Person } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { uploadFile } from '@/services/storageService';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
 const FormSchema = z.object({
   title: z.string().optional(),
@@ -29,6 +33,15 @@ const FormSchema = z.object({
   city: z.string().min(1, { message: "City is required." }),
   stateOrProvince: z.string().min(1, { message: "State/Province is required." }),
   phoneNumber: z.string().optional(),
+  idDocument: z
+    .custom<FileList>()
+    .optional()
+    .nullable()
+    .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `File size should be less than 10MB.`)
+    .refine(
+      (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+      "Only .pdf, .jpg, .jpeg, .png formats are supported."
+    ),
 });
 
 type PersonalDataFormInputs = z.infer<typeof FormSchema>;
@@ -42,6 +55,8 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(user.idDocumentName || null);
+
 
   const form = useForm<PersonalDataFormInputs>({
     resolver: zodResolver(FormSchema),
@@ -63,12 +78,21 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
   const onSubmit = async (data: PersonalDataFormInputs) => {
     setIsLoading(true);
     try {
-      const updateData = {
+      const updateData: Partial<Person> = {
         ...data,
         dateOfBirth: data.dateOfBirth instanceof Date ? data.dateOfBirth.toISOString().split('T')[0] : data.dateOfBirth,
         name: `${data.title || ''} ${data.firstName} ${data.lastName}`.trim(),
       };
       
+      const fileToUpload = data.idDocument?.[0];
+      if (fileToUpload) {
+        const uploadPath = `users/${user.id}/id_documents`;
+        const downloadURL = await uploadFile(fileToUpload, uploadPath);
+        updateData.idDocumentUrl = downloadURL;
+        updateData.idDocumentName = fileToUpload.name;
+        setSelectedFileName(fileToUpload.name); // Update display name on success
+      }
+
       await updatePerson(user.id, updateData);
       
       setUser(prev => prev ? ({ ...prev, ...updateData }) : null);
@@ -86,6 +110,18 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      form.setValue('idDocument', files, { shouldValidate: true });
+      setSelectedFileName(files[0].name);
+    } else {
+      // Don't reset to undefined, as it would clear the field unnecessarily
+      // The user might just be cancelling the file dialog.
+      // If they want to remove the file, a different UI mechanism would be needed.
     }
   };
 
@@ -259,6 +295,35 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 <FormItem>
                     <FormLabel>{t.register_step2_label_phoneNumber || "Phone Number"}</FormLabel>
                     <FormControl><Input type="tel" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            
+            <FormField
+                control={form.control}
+                name="idDocument"
+                render={() => (
+                <FormItem>
+                    <FormLabel>{t.register_step2_label_idDocument || "ID Card or Passport"}</FormLabel>
+                    <FormControl>
+                        <div className="flex items-center space-x-2 mt-1">
+                            <label
+                                htmlFor="idDocument-file"
+                                className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                            >
+                                <UploadCloud className="mr-2 h-4 w-4" />
+                                {selectedFileName || (t.register_step2_button_selectFile || "Select File")}
+                            </label>
+                            <Input
+                                id="idDocument-file"
+                                type="file"
+                                className="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={handleFileChange}
+                            />
+                        </div>
+                    </FormControl>
                     <FormMessage />
                 </FormItem>
                 )}

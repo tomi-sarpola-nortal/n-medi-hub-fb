@@ -87,6 +87,7 @@ export interface Person {
   stateOrProvince?: string; // This could be the same as 'region' or more specific
   phoneNumber?: string;
   idDocumentUrl?: string; 
+  idDocumentName?: string;
 
   // Professional Qualifications from Step 4
   currentProfessionalTitle?: ProfessionalTitleId;
@@ -97,8 +98,11 @@ export interface Person {
   approbationNumber?: string;
   approbationDate?: string;
   diplomaUrl?: string; 
+  diplomaName?: string;
   approbationCertificateUrl?: string;
+  approbationCertificateName?: string;
   specialistRecognitionUrl?: string;
+  specialistRecognitionName?: string;
   
   // Practice Information from Step 5
   practiceName?: string;
@@ -177,3 +181,4 @@ export interface RegistrationFormData {
   // Step 6
   agreedToTerms?: boolean;
 }
+
