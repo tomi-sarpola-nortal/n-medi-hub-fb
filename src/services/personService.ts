@@ -287,8 +287,7 @@ export async function getPendingPersons(limitValue?: number): Promise<Person[]> 
     let q = query(
         personsCollection,
         where('role', '==', 'dentist'),
-        where('status', '==', 'pending'),
-        orderBy('updatedAt', 'desc') // Get the most recently updated ones first
+        where('status', '==', 'pending')
     );
 
     if (limitValue) {
