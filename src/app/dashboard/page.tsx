@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { GraduationCap, CalendarCheck, MapPin, Phone, Mail, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -42,11 +43,20 @@ interface DashboardPageProps {
 
 export default function DashboardPage({ params }: DashboardPageProps) {
   const { user, loading } = useAuth();
+  const router = useRouter();
   const [t, setT] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
     setT(getClientTranslations(params.locale));
   }, [params.locale]);
+  
+  useEffect(() => {
+    // If auth state is resolved and there's no user, redirect to login
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
+
 
   if (loading || !user || !t) {
     return (
