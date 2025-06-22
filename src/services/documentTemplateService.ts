@@ -45,8 +45,12 @@ export async function addDocumentTemplate(
 ): Promise<string> {
   checkServices();
 
+  // Sanitize publisher name to create a valid path segment.
+  // Replaces non-alphanumeric characters with underscores and converts to lowercase.
+  const publisherPath = metadata.publisher.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
   const uniqueFileName = `${uuidv4()}-${file.name}`;
-  const storageRef = ref(storage, `${DOC_TEMPLATES_COLLECTION}/${uniqueFileName}`);
+  const storagePath = `${DOC_TEMPLATES_COLLECTION}/${publisherPath}/${uniqueFileName}`;
+  const storageRef = ref(storage, storagePath);
   
   // 1. Upload file to Storage
   const snapshot = await uploadBytes(storageRef, file);
