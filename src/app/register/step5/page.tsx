@@ -106,10 +106,6 @@ export default function RegisterStep5Page() {
   const onSubmit: SubmitHandler<PracticeInfoFormInputs> = async (data) => {
     setIsLoading(true);
     updateRegistrationData(data);
-    toast({
-      title: t.register_step5_data_saved_title || "Practice Information Saved",
-      description: t.register_step5_data_saved_desc || "Your practice information has been temporarily saved.",
-    });
     router.push('/register/step6'); 
     setIsLoading(false);
   };

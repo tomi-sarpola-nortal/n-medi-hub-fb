@@ -114,10 +114,6 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
   const onSubmit: SubmitHandler<PasswordFormInputs> = async (data) => {
     setIsLoading(true);
     updateRegistrationData({ password: data.password });
-    toast({
-      title: t.register_step1_part2_password_saved_title || "Password Saved",
-      description: t.register_step1_part2_password_saved_desc || "Password has been temporarily saved. Proceed to the next step.",
-    });
     router.push('/register/step3'); // Navigate to the new Step 3 (Personal Data)
     setIsLoading(false);
   };

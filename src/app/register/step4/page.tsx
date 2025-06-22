@@ -138,7 +138,7 @@ export default function RegisterStep4Page() {
         specialistRecognitionFile: storedData.specialistRecognitionFile || null,
       });
     }
-  }, [router, toast, t]); // Removed 'form' from dependencies to prevent re-renders
+  }, [router, toast, t, form]);
 
 
   const handleFileChange = (
@@ -173,10 +173,6 @@ export default function RegisterStep4Page() {
       specialistRecognitionFileName: specialistRecognitionFileToStore?.name,
     });
 
-    toast({
-      title: t.register_step4_data_saved_title || "Professional Qualifications Saved",
-      description: t.register_step4_data_saved_desc || "Your professional qualifications have been temporarily saved.",
-    });
     router.push('/register/step5'); 
     setIsLoading(false);
   };

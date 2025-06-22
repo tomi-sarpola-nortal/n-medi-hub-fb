@@ -75,7 +75,7 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
   const [storedEmail, setStoredEmail] = useState<string>('');
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
-  const form = useForm<PersonalDataFormInputs>({ // form initialization moved up
+  const form = useForm<PersonalDataFormInputs>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       email: '', 
@@ -136,10 +136,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
       ...data,
       idDocument: fileToStore, 
       idDocumentName: fileToStore?.name, 
-    });
-    toast({
-      title: t.register_step2_data_saved_title || "Personal Data Saved",
-      description: t.register_step2_data_saved_desc || "Your personal information has been temporarily saved.",
     });
     router.push('/register/step4'); // Navigate to Step 4
     setIsLoading(false);

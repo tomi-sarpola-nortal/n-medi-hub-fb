@@ -69,10 +69,6 @@ export default function RegisterStep1Page() {
       } else {
         // Email is available
         updateRegistrationData({ email: data.email }); // Save email to store
-        toast({
-          title: t.register_email_valid_title || "Email Verified",
-          description: t.register_email_valid_description || "Email address is valid and available. Proceeding to the next step.",
-        });
         router.push(`/register/step2`); // Navigate to the new Step 2 (Password page)
       }
     } catch (error: any) {
