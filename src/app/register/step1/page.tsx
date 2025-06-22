@@ -14,8 +14,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
-import { findPersonByEmail } from '@/services/personService'; // Changed import
-import { updateRegistrationData } from '@/lib/registrationStore'; 
+import { findPersonByEmail } from '@/services/personService';
+import { updateRegistrationData, getRegistrationData } from '@/lib/registrationStore'; 
+import { v4 as uuidv4 } from 'uuid';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -66,8 +67,14 @@ export default function RegisterStep1Page() {
         return; // Stop the process
       }
       
+      const currentData = getRegistrationData();
+      const sessionId = currentData.sessionId || uuidv4();
+
       // Email is available, proceed to the next step.
-      updateRegistrationData({ email: data.email });
+      updateRegistrationData({ 
+        email: data.email,
+        sessionId: sessionId,
+      });
       router.push(`/register/step2`);
 
     } catch (error: any) {

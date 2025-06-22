@@ -60,6 +60,9 @@ export const STATES_MAP: Record<string, string> = {
 
 
 export interface RegistrationData {
+  // Session ID for anonymous file uploads
+  sessionId?: string;
+
   // Step 1
   email?: string;
   // Step 2

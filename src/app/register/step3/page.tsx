@@ -1,5 +1,5 @@
 
-"use client"; // This is the content from the old step2, now becoming step3
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -35,7 +35,6 @@ const getClientTranslations = (locale: string) => {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
-// Schema is relaxed; validation happens in onSubmit
 const FormSchema = z.object({
   title: z.string().optional(),
   firstName: z.string().min(1, { message: "First name is required." }),
@@ -62,7 +61,7 @@ const FormSchema = z.object({
 
 type PersonalDataFormInputs = z.infer<typeof FormSchema>;
 
-export default function RegisterStep3PersonalDataPage() { // Renamed component for clarity
+export default function RegisterStep3PersonalDataPage() {
   const router = useRouter();
   const pathname = usePathname();
   const potentialLocale = pathname.split('/')[1];
@@ -96,7 +95,7 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email || !storedData.password) { 
+    if (!storedData.email || !storedData.password || !storedData.sessionId) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
         description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
@@ -136,12 +135,11 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
         const fileToUpload = data.idDocument?.[0];
 
         if (fileToUpload) {
-            const uploadPath = `registrations/${storedData.email}/id_documents`;
+            const uploadPath = `registrations/${storedData.sessionId}/id_documents`;
             const downloadURL = await uploadFile(fileToUpload, uploadPath);
             fileUpdate.idDocumentUrl = downloadURL;
             fileUpdate.idDocumentName = fileToUpload.name;
         } else if (!storedData.idDocumentUrl) {
-            // No new file and no existing file in store, this is an error
             toast({
                 title: t.register_step2_label_idDocument || "ID Document Required",
                 description: "Please select your ID card or passport to continue.",
@@ -151,7 +149,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
             return;
         }
 
-        // Combine form data with file update data and save to store
         updateRegistrationData({
             ...data,
             ...fileUpdate,
@@ -176,10 +173,6 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
     if (files && files.length > 0) {
       form.setValue('idDocument', files, { shouldValidate: true });
       setSelectedFileName(files[0].name);
-    } else {
-      // Don't clear the selected file name if the user cancels file selection
-      // only if we want to programmatically clear it.
-      // This part can be left empty to retain the name unless a new file is chosen.
     }
   };
 
@@ -197,13 +190,13 @@ export default function RegisterStep3PersonalDataPage() { // Renamed component f
   return (
     <AuthLayout
       pageTitle={t.register_page_main_title || "Registration"}
-      pageSubtitle={t.register_step2_subtitle || "Please fill in your personal details."} // Subtitle for personal data
+      pageSubtitle={t.register_step2_subtitle || "Please fill in your personal details."}
       showBackButton={true}
-      backButtonHref="/register/step2" // Back to new Step 2 (Password)
+      backButtonHref="/register/step2"
       backButtonTextKey="register_back_button"
     >
       <div className="w-full max-w-2xl">
-        <RegistrationStepper currentStep={3} totalSteps={6} /> {/* Now Step 3 */}
+        <RegistrationStepper currentStep={3} totalSteps={6} />
         <Card className="shadow-xl w-full">
           <CardHeader className="text-left">
             <CardTitle className="font-headline text-2xl">{t.register_step2_card_title || "Personal Data"}</CardTitle>

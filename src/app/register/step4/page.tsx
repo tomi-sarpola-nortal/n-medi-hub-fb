@@ -141,12 +141,11 @@ export default function RegisterStep4Page() {
   const onSubmit: SubmitHandler<ProfessionalQualificationsFormInputs> = async (data) => {
     setIsLoading(true);
     const storedData = getRegistrationData();
-    const uploadPath = `registrations/${storedData.email}/qualifications`;
+    const uploadPath = `registrations/${storedData.sessionId}/qualifications`;
 
     try {
         let fileUpdates: Partial<RegistrationData> = {};
 
-        // Handle diploma file
         if (data.diplomaFile?.[0]) {
             const file = data.diplomaFile[0];
             const url = await uploadFile(file, uploadPath);
@@ -154,7 +153,6 @@ export default function RegisterStep4Page() {
             fileUpdates.diplomaName = file.name;
         }
 
-        // Handle approbation certificate file
         if (data.approbationCertificateFile?.[0]) {
             const file = data.approbationCertificateFile[0];
             const url = await uploadFile(file, uploadPath);
@@ -162,7 +160,6 @@ export default function RegisterStep4Page() {
             fileUpdates.approbationCertificateName = file.name;
         }
         
-        // Handle specialist recognition file
         if (data.specialistRecognitionFile?.[0]) {
             const file = data.specialistRecognitionFile[0];
             const url = await uploadFile(file, uploadPath);
@@ -170,7 +167,6 @@ export default function RegisterStep4Page() {
             fileUpdates.specialistRecognitionName = file.name;
         }
 
-        // Now validate that the mandatory diploma file is present either from new upload or from store
         if (!fileUpdates.diplomaUrl && !storedData.diplomaUrl) {
             toast({
                 title: t.register_step4_label_diploma || "Diploma Required",
@@ -181,7 +177,6 @@ export default function RegisterStep4Page() {
             return;
         }
 
-        // Combine form data with file updates and save to store
         updateRegistrationData({
             ...data,
             ...fileUpdates,
