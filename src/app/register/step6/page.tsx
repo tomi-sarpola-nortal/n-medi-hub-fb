@@ -28,6 +28,7 @@ import {
 import { auth } from '@/lib/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { createPerson } from '@/services/personService';
+import { copyFileToNewLocation, deleteFileByUrl } from '@/services/storageService';
 import type { PersonCreationData } from '@/types';
 import { format } from 'date-fns';
 
@@ -91,7 +92,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ title, data, locale, t })
         {data.map((item, index) => (
           <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-border last:border-b-0">
             <p className="text-sm font-medium text-muted-foreground">{item.label}:</p>
-            <div className="text-sm text-foreground text-right sm:text-left">{renderValue(item.value)}</div>
+            <div className="text-sm text-foreground text-left sm:text-right">{renderValue(item.value)}</div>
           </div>
         ))}
       </div>
@@ -142,8 +143,9 @@ export default function RegisterStep6Page() {
       // 1. Create Firebase Auth user
       const userCredential = await createUserWithEmailAndPassword(auth, registrationData.email, registrationData.password);
       const firebaseUser = userCredential.user;
+      const newUserId = firebaseUser.uid;
 
-      // 2. Prepare data for Firestore
+      // 2. Prepare data for Firestore, starting with the original registration data
       const personDataToCreate: PersonCreationData = {
         name: `${registrationData.title || ''} ${registrationData.firstName} ${registrationData.lastName}`.trim(),
         email: registrationData.email,
@@ -153,8 +155,6 @@ export default function RegisterStep6Page() {
         avatarUrl: `https://avatar.vercel.sh/${registrationData.email}.png?size=100`, 
         status: 'pending_approval',
         otpEnabled: false,
-        
-        // Personal Data (Step 3)
         title: registrationData.title,
         firstName: registrationData.firstName,
         lastName: registrationData.lastName,
@@ -168,8 +168,6 @@ export default function RegisterStep6Page() {
         phoneNumber: registrationData.phoneNumber,
         idDocumentUrl: registrationData.idDocumentUrl,
         idDocumentName: registrationData.idDocumentName,
-
-        // Professional Qualifications (Step 4)
         currentProfessionalTitle: registrationData.currentProfessionalTitle,
         specializations: registrationData.specializations,
         languages: registrationData.languages,
@@ -183,8 +181,6 @@ export default function RegisterStep6Page() {
         approbationCertificateName: registrationData.approbationCertificateName,
         specialistRecognitionUrl: registrationData.specialistRecognitionUrl,
         specialistRecognitionName: registrationData.specialistRecognitionName,
-        
-        // Practice Information (Step 5)
         practiceName: registrationData.practiceName,
         practiceStreetAddress: registrationData.practiceStreetAddress,
         practicePostalCode: registrationData.practicePostalCode,
@@ -196,9 +192,36 @@ export default function RegisterStep6Page() {
         healthInsuranceContracts: registrationData.healthInsuranceContracts,
       };
 
-      // 3. Create Firestore document
-      await createPerson(firebaseUser.uid, personDataToCreate);
+      // 3. Move files to permanent location and update the data object
+      const moveAndUpdateLink = async (
+        urlKey: keyof RegistrationData,
+        nameKey: keyof RegistrationData,
+        targetFolder: 'id_documents' | 'qualifications'
+      ) => {
+        const sourceUrl = registrationData[urlKey] as string | undefined;
+        const fileName = registrationData[nameKey] as string | undefined;
+        
+        if (sourceUrl && fileName) {
+            const targetPath = `users/${newUserId}/${targetFolder}/${fileName}`;
+            const newUrl = await copyFileToNewLocation(sourceUrl, targetPath);
+            (personDataToCreate as any)[urlKey] = newUrl;
+            await deleteFileByUrl(sourceUrl);
+        }
+      };
+      
+      const fileMovePromises = [
+          moveAndUpdateLink('idDocumentUrl', 'idDocumentName', 'id_documents'),
+          moveAndUpdateLink('diplomaUrl', 'diplomaName', 'qualifications'),
+          moveAndUpdateLink('approbationCertificateUrl', 'approbationCertificateName', 'qualifications'),
+          moveAndUpdateLink('specialistRecognitionUrl', 'specialistRecognitionName', 'qualifications'),
+      ];
 
+      await Promise.all(fileMovePromises);
+
+      // 4. Create Firestore document with the now-permanent URLs
+      await createPerson(newUserId, personDataToCreate);
+
+      // 5. Cleanup and redirect
       clearRegistrationData();
       toast({
         title: t.register_step6_success_title || "Registration Submitted",
@@ -288,7 +311,7 @@ export default function RegisterStep6Page() {
           <CardContent className="space-y-8">
             <div className="p-4 bg-accent/20 border border-primary/50 rounded-md flex items-start space-x-3">
               <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-primary-foreground">{t.register_step6_info_message || "Your application will be reviewed by the Dental Chamber. You will receive an email with your Dentist ID upon successful review."}</p>
+              <p className="text-sm text-foreground">{t.register_step6_info_message || "Your application will be reviewed by the Dental Chamber. You will receive an email with your Dentist ID upon successful review."}</p>
             </div>
 
             <ReviewSection title={t.register_step2_card_title || "Personal Data"} data={personalDataItems} locale={currentLocale} t={t} />

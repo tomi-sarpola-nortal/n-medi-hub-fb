@@ -1,7 +1,8 @@
+
 "use client";
 
 import { storage } from '@/lib/firebaseConfig';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject, getBlob } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to ensure Storage is initialized
@@ -20,9 +21,8 @@ const checkStorage = () => {
 export async function uploadFile(file: File, path: string): Promise<string> {
   checkStorage();
 
-  // Create a unique filename to avoid overwrites
-  const uniqueFileName = `${uuidv4()}-${file.name}`;
-  const storageRef = ref(storage, `${path}/${uniqueFileName}`);
+  // Use the original file name for registrations, as it's more descriptive
+  const storageRef = ref(storage, `${path}/${file.name}`);
 
   // Upload the file
   const snapshot = await uploadBytes(storageRef, file);
@@ -32,6 +32,35 @@ export async function uploadFile(file: File, path: string): Promise<string> {
 
   return downloadURL;
 }
+
+
+/**
+ * Copies a file from a source URL to a new path in Firebase Storage.
+ * This is effectively a "move" when combined with delete, but it's a copy operation.
+ * @param sourceUrl The full download URL of the source file.
+ * @param targetPathWithFileName The full path in storage for the new file (e.g., 'users/userId/qualifications/diploma.pdf').
+ * @returns The download URL of the newly created file.
+ */
+export async function copyFileToNewLocation(sourceUrl: string, targetPathWithFileName: string): Promise<string> {
+  checkStorage();
+  
+  // 1. Get reference to the source file
+  const sourceRef = ref(storage, sourceUrl);
+  
+  // 2. Download the file's data as a Blob
+  const blob = await getBlob(sourceRef);
+
+  // 3. Create a reference to the new location
+  const targetRef = ref(storage, targetPathWithFileName);
+
+  // 4. Upload the blob to the new location
+  await uploadBytes(targetRef, blob);
+
+  // 5. Get and return the new download URL
+  const newDownloadURL = await getDownloadURL(targetRef);
+  return newDownloadURL;
+}
+
 
 /**
  * Deletes a file from Firebase Storage using its download URL.
