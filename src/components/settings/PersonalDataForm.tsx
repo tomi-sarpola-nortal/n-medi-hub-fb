@@ -78,8 +78,11 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
   const onSubmit = async (data: PersonalDataFormInputs) => {
     setIsLoading(true);
     try {
+      // Destructure to remove the FileList object before creating the update payload
+      const { idDocument, ...restOfData } = data;
+
       const updateData: Partial<Person> = {
-        ...data,
+        ...restOfData,
         dateOfBirth: data.dateOfBirth instanceof Date ? data.dateOfBirth.toISOString().split('T')[0] : data.dateOfBirth,
         name: `${data.title || ''} ${data.firstName} ${data.lastName}`.trim(),
       };
@@ -339,3 +342,5 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
     </Form>
   );
 }
+
+    

@@ -92,8 +92,16 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
     setIsLoading(true);
     try {
       const uploadPath = `users/${user.id}/qualifications`;
+      
+      const { 
+        diplomaFile, 
+        approbationCertificateFile, 
+        specialistRecognitionFile, 
+        ...restOfData 
+      } = data;
+
       const updateData: Partial<Person> = {
-        ...data,
+        ...restOfData,
         graduationDate: data.graduationDate instanceof Date ? data.graduationDate.toISOString().split('T')[0] : data.graduationDate,
         approbationDate: data.approbationDate instanceof Date ? data.approbationDate.toISOString().split('T')[0] : data.approbationDate,
       };
@@ -378,3 +386,5 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
     </Form>
   );
 }
+
+    
