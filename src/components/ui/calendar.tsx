@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -6,12 +7,17 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-r
 import { format, subYears, addYears } from 'date-fns';
 
 import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 function CalendarCaption() {
   const { goToMonth, nextMonth, previousMonth, displayMonth } = useNavigation();
+
+  // Guard against displayMonth being undefined during initial render
+  if (!displayMonth) {
+    return null;
+  }
 
   return (
     <div className="flex items-center justify-between px-1 pt-1 mb-2">
@@ -81,8 +87,8 @@ function Calendar({
         row: "flex w-full mt-2",
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+          "hover:bg-accent focus-visible:bg-accent focus-visible:outline-none" // Using custom hover/focus from buttonVariants ghost
         ),
         day_range_end: "day-range-end",
         day_selected:
