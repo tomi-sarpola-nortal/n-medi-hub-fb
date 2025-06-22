@@ -128,6 +128,9 @@ export interface Person {
   practiceWebsite?: string;
   healthInsuranceContracts?: HealthInsuranceContractId[];
 
+  // Review information
+  rejectionReason?: string;
+
   createdAt?: string; 
   updatedAt?: string; 
 }

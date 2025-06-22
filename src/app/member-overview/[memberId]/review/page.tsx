@@ -13,7 +13,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Person } from '@/lib/types';
-import { getPersonById } from '@/services/personService';
+import { getPersonById, reviewPerson } from '@/services/personService';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -32,112 +34,95 @@ interface DataReviewPageProps {
   params: { memberId: string; locale: string };
 }
 
-// Mock data for Dr. Mehmet Yilmaz's review
-const mockChanges = {
-  personal: [
-    {
-      field: 'lastName',
-      labelKey: 'register_step2_label_lastName',
-      oldValue: 'Yilmaz',
-      newValue: 'Yilmaz-Schneider',
-    },
-    {
-      field: 'idDocument',
-      labelKey: 'register_step2_label_idDocument',
-      oldValue: null,
-      newValue: {
-        name: 'Yilmaz-Schneider-neu.pdf',
-        size: '422.4 kB',
-      },
-    },
-  ],
-  professional: [
-    {
-      field: 'specializations',
-      labelKey: 'register_step4_label_specializations',
-      oldValue: 'Allgemeine Zahnheilkunde, Prothetik',
-      newValue: 'Allgemeine Zahnheilkunde, Prothetik, Endodontie',
-    },
-  ],
-};
 
-
-const InfoRow = ({ label, value, href }: { label: string; value: string; href?: string }) => (
-    <div className="flex justify-between items-center py-2">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        {href ? (
-             <Link href={href} className="text-sm font-medium text-primary hover:underline">{value}</Link>
-        ) : (
-            <p className="text-sm font-medium">{value}</p>
-        )}
-    </div>
-);
-
-const FileDisplay = ({ name, size }: { name: string; size: string }) => (
-  <div className="bg-muted/50 p-3 rounded-md flex items-center gap-3 hover:bg-muted cursor-pointer w-fit">
-    <FileText className="h-6 w-6 text-primary flex-shrink-0" />
-    <div>
-      <p className="text-sm font-semibold text-foreground">{name}</p>
-      <p className="text-xs text-muted-foreground">{size}</p>
-    </div>
+const DataRow = ({ label, value }: { label: string; value?: string | null | string[] }) => (
+  <div className="py-2 border-b last:border-b-0">
+    <p className="text-sm text-muted-foreground">{label}</p>
+    <p className="text-base font-medium mt-1">
+        {Array.isArray(value) ? value.join(', ') : (value || <span className="italic text-muted-foreground">Nicht angegeben</span>)}
+    </p>
   </div>
 );
 
-const ChangeItem = ({ label, oldValue, newValue, t }: { label: string; oldValue: React.ReactNode; newValue: React.ReactNode; t: Record<string, string> }) => (
-    <div className="py-4 border-b last:border-b-0">
-        <p className="text-sm text-muted-foreground mb-2">{label}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: string | null; docUrl?: string | null }) => (
+    <div>
+        <p className="text-sm font-medium mb-1">{label}</p>
+        {docName && docUrl ? (
+        <a href={docUrl} target="_blank" rel="noopener noreferrer" className="bg-muted/50 p-3 rounded-md flex items-center gap-3 hover:bg-muted cursor-pointer">
+            <FileText className="h-6 w-6 text-primary flex-shrink-0" />
             <div>
-                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">{t.member_review_old_data || "Old"}</p>
-                <div className="text-sm font-medium text-foreground">
-                    {oldValue || <span className="italic text-muted-foreground">{t.register_review_not_provided || "Not provided"}</span>}
-                </div>
+                <p className="text-sm font-semibold text-foreground">{docName}</p>
             </div>
-            <div>
-                <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-1">{t.member_review_new_data || "New"}</p>
-                <div className="text-sm font-semibold text-primary">
-                    {newValue || <span className="italic text-muted-foreground">{t.register_review_not_provided || "Not provided"}</span>}
-                </div>
-            </div>
-        </div>
+        </a>
+        ) : (
+        <p className="text-sm text-muted-foreground italic">-</p>
+        )}
     </div>
 );
 
 
 export default function DataReviewPage({ params }: DataReviewPageProps) {
   const { memberId, locale } = params;
+  const router = useRouter();
+  const { toast } = useToast();
   const [t, setT] = useState<Record<string, string>>({});
-  const [reviewDecision, setReviewDecision] = useState('approve');
+  
   const [person, setPerson] = useState<Person | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
+  const [reviewDecision, setReviewDecision] = useState('approve');
+  const [justification, setJustification] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
   useEffect(() => {
     setT(getClientTranslations(locale));
     async function fetchPerson() {
         try {
             const fetchedPerson = await getPersonById(memberId);
-            setPerson(fetchedPerson);
+            if (fetchedPerson && fetchedPerson.status === 'pending') {
+                setPerson(fetchedPerson);
+            } else {
+                // Redirect if member not found or not pending review
+                toast({ title: "Review Not Possible", description: "This member is not pending review.", variant: "destructive" });
+                router.replace('/member-overview');
+            }
         } catch (error) {
             console.error("Failed to fetch person data:", error);
-            // Optionally set an error state here
+            toast({ title: "Error", description: "Failed to load member data.", variant: "destructive" });
+            router.replace('/member-overview');
         } finally {
             setIsLoading(false);
         }
     }
     fetchPerson();
-  }, [locale, memberId]);
+  }, [locale, memberId, router, toast]);
+
+  const handleSubmit = async () => {
+    if (!person || !isConfirmed) {
+        if (!isConfirmed) {
+             toast({ title: "Confirmation required", description: "You must confirm that you have checked the data.", variant: "destructive" });
+        }
+        return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+        await reviewPerson(person.id, reviewDecision as any, justification);
+        toast({ title: "Success", description: "The review has been submitted successfully." });
+        router.push('/member-overview');
+    } catch (error) {
+        console.error("Failed to submit review:", error);
+        toast({ title: "Submission Failed", description: "An error occurred while submitting the review.", variant: "destructive" });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
 
   const pageTitle = t.member_review_page_title_review || "Datenänderung prüfen";
 
-  const renderChangeValue = (value: any) => {
-    if (!value) return null;
-    if (typeof value === 'object' && value.name && value.size) {
-        return <FileDisplay name={value.name} size={value.size} />;
-    }
-    return value;
-  };
-
-  if (isLoading) {
+  if (isLoading || !person) {
     return (
         <AppLayout pageTitle="Loading..." locale={locale}>
             <div className="flex-1 space-y-6 p-4 md:p-8 flex justify-center items-center">
@@ -146,24 +131,6 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
         </AppLayout>
     );
   }
-  
-  if (!person) {
-       return (
-        <AppLayout pageTitle="Error" locale={locale}>
-            <div className="flex-1 space-y-6 p-4 md:p-8 text-center">
-                <p>Member not found.</p>
-                <Button asChild><Link href="/member-overview">Go Back</Link></Button>
-            </div>
-        </AppLayout>
-    );
-  }
-  
-  // Replace mock old values with real ones from the person object.
-  const personalChanges = mockChanges.personal.map(change => {
-    if (change.field === 'lastName') return {...change, oldValue: person.lastName };
-    if (change.field === 'idDocument') return {...change, oldValue: person.idDocumentName ? { name: person.idDocumentName, size: 'N/A' } : null };
-    return change;
-  });
 
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
@@ -194,45 +161,69 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                     <CardDescription>{t.member_review_page_subtitle || "Bitte überprüfen Sie die Daten nach Vollständigkeit und Richtigkeit."}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                        <h3 className="font-semibold mb-2">{t.member_review_info_section_title || "Informationen zur Prüfung"}</h3>
-                        <InfoRow label={t.member_review_info_name || "Vor- und Nachname"} value={person.name} href={`/member-overview/${memberId}`} />
-                        <InfoRow label={t.member_review_info_id || "Zahnarzt-ID"} value={person.dentistId || '-'} />
-                        <InfoRow label={t.member_review_info_change_date || "Datum der Datenänderung"} value={new Date().toLocaleDateString()} />
-                        <InfoRow label={t.member_review_info_chamber || "Kammerzugehörigkeit"} value={person.region || '-'} />
+                    <div className="space-y-8">
+                        {/* Personal Data Section */}
+                        <section>
+                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
+                                <DataRow label={t.register_step2_label_title || "Title"} value={person.title} />
+                                <DataRow label={t.register_step2_label_firstName || "First Name"} value={person.firstName} />
+                                <DataRow label={t.register_step2_label_lastName || "Last Name"} value={person.lastName} />
+                                <DataRow label={t.register_step2_label_dateOfBirth || "Date of Birth"} value={person.dateOfBirth} />
+                                <DataRow label={t.register_step2_label_placeOfBirth || "Place of Birth"} value={person.placeOfBirth} />
+                                <DataRow label={t.register_step2_label_nationality || "Nationality"} value={person.nationality} />
+                                <DataRow label={t.register_step2_label_streetAddress || "Street and House Number"} value={person.streetAddress} />
+                                <DataRow label={t.register_step2_label_postalCode || "Postal Code"} value={person.postalCode} />
+                                <DataRow label={t.register_step2_label_city || "City"} value={person.city} />
+                                <DataRow label={t.register_step2_label_stateOrProvince || "State/Province"} value={person.stateOrProvince} />
+                                <DataRow label={t.register_step2_label_phoneNumber || "Phone Number"} value={person.phoneNumber} />
+                                <DataRow label={t.member_review_email_address || "Email Address"} value={person.email} />
+                            </div>
+                        </section>
+
+                        {/* Professional Qualifications Section */}
+                        <section>
+                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_prof_qual_title || "Berufliche Qualifikationen"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
+                                <DataRow label={t.register_step4_label_prof_title || "Current Professional Title"} value={person.currentProfessionalTitle} />
+                                <DataRow label={t.register_step4_label_specializations || "Specializations"} value={person.specializations} />
+                                <DataRow label={t.register_step4_label_languages || "Languages"} value={person.languages} />
+                                <DataRow label={t.register_step4_label_graduation_date || "Graduation Date"} value={person.graduationDate} />
+                                <DataRow label={t.register_step4_label_university || "University"} value={person.university} />
+                                <DataRow label={t.register_step4_label_approbation_number || "Approbation Number"} value={person.approbationNumber} />
+                                <DataRow label={t.register_step4_label_approbation_date || "Approbation Date"} value={person.approbationDate} />
+                            </div>
+                        </section>
+
+                         {/* Practice Information Section */}
+                        <section>
+                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_practice_info_title || "Informationen zur Ordination"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
+                                <DataRow label={t.register_step5_label_practiceName || "Practice Name"} value={person.practiceName} />
+                                <DataRow label={t.register_step5_label_practiceStreetAddress || "Practice Street Address"} value={person.practiceStreetAddress} />
+                                <DataRow label={t.register_step5_label_practicePostalCode || "Practice Postal Code"} value={person.practicePostalCode} />
+                                <DataRow label={t.register_step5_label_practiceCity || "Practice City"} value={person.practiceCity} />
+                                <DataRow label={t.register_step5_label_practicePhoneNumber || "Practice Phone Number"} value={person.practicePhoneNumber} />
+                                <DataRow label={t.register_step5_label_practiceFaxNumber || "Practice Fax Number"} value={person.practiceFaxNumber} />
+                                <DataRow label={t.register_step5_label_practiceEmail || "Practice Email"} value={person.practiceEmail} />
+                                <DataRow label={t.register_step5_label_practiceWebsite || "Practice Website"} value={person.practiceWebsite} />
+                                <DataRow label={t.register_step5_label_healthInsuranceContracts || "Health Insurance Contracts"} value={person.healthInsuranceContracts} />
+                            </div>
+                        </section>
+                        
+                        {/* Documents Section */}
+                        <section>
+                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_documents_title || "Dokumente"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <DocumentRow label={t.register_step2_label_idDocument || "ID Card or Passport"} docName={person.idDocumentName} docUrl={person.idDocumentUrl} />
+                                <DocumentRow label={t.register_step4_label_diploma || "Diploma/Certificate"} docName={person.diplomaName} docUrl={person.diplomaUrl} />
+                                <DocumentRow label={t.register_step4_label_approbation_cert || "Approbation Certificate"} docName={person.approbationCertificateName} docUrl={person.approbationCertificateUrl} />
+                                <DocumentRow label={t.register_step4_label_specialist_recognition || "Specialist Recognition"} docName={person.specialistRecognitionName} docUrl={person.specialistRecognitionUrl} />
+                            </div>
+                        </section>
                     </div>
 
-                    <Separator className="my-6" />
-
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
-                        {personalChanges.map(change => (
-                            <ChangeItem 
-                                key={change.field}
-                                label={t[change.labelKey] || change.field}
-                                oldValue={renderChangeValue(change.oldValue)}
-                                newValue={renderChangeValue(change.newValue)}
-                                t={t}
-                            />
-                        ))}
-                    </div>
-
-                     <Separator className="my-6" />
-
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.member_review_prof_qual_title || "Berufliche Qualifikationen"}</h3>
-                         {mockChanges.professional.map(change => (
-                            <ChangeItem 
-                                key={change.field}
-                                label={t[change.labelKey] || change.field}
-                                oldValue={renderChangeValue(change.oldValue)}
-                                newValue={renderChangeValue(change.newValue)}
-                                t={t}
-                            />
-                        ))}
-                    </div>
-
-                    <Separator className="my-6" />
+                    <Separator className="my-8" />
 
                     <div className="space-y-6">
                         <RadioGroup 
@@ -261,12 +252,15 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                                     id="justification" 
                                     placeholder={t.member_review_justification_placeholder || "z. B. Fortbildungsnachweise fehlen"}
                                     className="mt-2"
+                                    value={justification}
+                                    onChange={(e) => setJustification(e.target.value)}
+                                    required={reviewDecision !== 'approve'}
                                 />
                             </div>
                         )}
 
                         <div className="flex items-center space-x-2">
-                            <Checkbox id="confirm-check" />
+                            <Checkbox id="confirm-check" checked={isConfirmed} onCheckedChange={(checked) => setIsConfirmed(checked as boolean)} />
                             <Label htmlFor="confirm-check" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 {t.member_review_confirm_checkbox || "Ich bestätige die Daten sorgfältig geprüft zu haben."}*
                             </Label>
@@ -274,10 +268,12 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                     </div>
 
                     <div className="flex justify-end gap-4 mt-8">
-                        <Button variant="outline">{t.member_review_cancel_button || "ABBRECHEN"}</Button>
-                        <Button className="bg-primary hover:bg-primary/90">{t.member_review_submit_button || "PRÜFUNG ABSENDEN"}</Button>
+                        <Button variant="outline" asChild><Link href={`/member-overview/${memberId}`}>{t.member_review_cancel_button || "ABBRECHEN"}</Link></Button>
+                        <Button className="bg-primary hover:bg-primary/90" onClick={handleSubmit} disabled={isSubmitting || !isConfirmed}>
+                            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {t.member_review_submit_button || "PRÜFUNG ABSENDEN"}
+                        </Button>
                     </div>
-
                 </CardContent>
             </Card>
         </div>

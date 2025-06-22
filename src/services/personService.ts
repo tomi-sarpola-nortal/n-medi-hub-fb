@@ -108,6 +108,8 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     practiceWebsite: data.practiceWebsite,
     healthInsuranceContracts: data.healthInsuranceContracts,
 
+    rejectionReason: data.rejectionReason,
+
     createdAt: createdAtTimestamp?.toDate().toISOString(),
     updatedAt: updatedAtTimestamp?.toDate().toISOString(),
   };
@@ -228,6 +230,36 @@ export async function getAllPersons(): Promise<Person[]> {
   checkDb();
   const querySnapshot = await getDocs(collection(db, PERSONS_COLLECTION));
   return querySnapshot.docs.map(snapshotToPerson);
+}
+
+/**
+ * Processes a review for a pending person.
+ * @param personId The ID of the person to review.
+ * @param decision The review decision: 'approve', 'reject', or 'deny'.
+ * @param justification An optional reason for rejection/denial.
+ */
+export async function reviewPerson(
+    personId: string, 
+    decision: 'approve' | 'reject' | 'deny', 
+    justification?: string
+): Promise<void> {
+    'use server';
+    checkDb();
+    const updates: Partial<Person> = {};
+
+    if (decision === 'approve') {
+        updates.status = 'active';
+        // Generate a Dentist ID if one doesn't already exist
+        const person = await getPersonById(personId);
+        if (person && !person.dentistId) {
+            updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        }
+    } else {
+        updates.status = 'rejected';
+        updates.rejectionReason = justification;
+    }
+    
+    await updatePerson(personId, updates);
 }
 
 // Ensure PersonCreationData in types/index.ts is updated to include all these fields too.
