@@ -136,7 +136,7 @@
   "register_step4_spec_kinderzahnheilkunde": "Pediatric Dentistry",
   "register_step4_spec_oralchirurgie": "Oral Surgery",
   "register_step4_label_languages": "Languages",
-  "register_step4_placeholder_languages": "e.g., English, German",
+  "register_step4_placeholder_languages": "Add a language...",
   "register_step4_label_graduation_date": "Date of Graduation",
   "register_step4_label_university": "University/College",
   "register_step4_placeholder_university": "Name of University/College",

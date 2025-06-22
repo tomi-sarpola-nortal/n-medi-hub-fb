@@ -83,7 +83,7 @@ export interface RegistrationData {
   // Step 4: Professional Qualifications
   currentProfessionalTitle?: ProfessionalTitleId;
   specializations?: SpecializationId[];
-  languages?: string; 
+  languages?: string[]; 
   graduationDate?: Date; 
   university?: string;
   approbationNumber?: string;

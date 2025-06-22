@@ -24,6 +24,7 @@ import {
 } from '@/lib/registrationStore';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { DatePickerInput } from '@/components/ui/date-picker';
+import { LanguageInput } from '@/components/ui/language-input';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -66,7 +67,7 @@ const optionalFileSchema = z
 const FormSchema = z.object({
   currentProfessionalTitle: z.string().min(1, { message: "Professional title is required." }),
   specializations: z.array(z.string()).min(1, { message: "At least one specialization must be selected." }),
-  languages: z.string().min(1, { message: "Languages are required." }),
+  languages: z.array(z.string()).min(1, { message: "At least one language is required." }),
   graduationDate: z.date({ required_error: "Graduation date is required." }),
   university: z.string().min(1, { message: "University/College is required." }),
   approbationNumber: z.string().optional(),
@@ -97,7 +98,7 @@ export default function RegisterStep4Page() {
     defaultValues: {
       currentProfessionalTitle: "",
       specializations: [],
-      languages: "",
+      languages: [],
       graduationDate: undefined,
       university: "",
       approbationNumber: "",
@@ -126,7 +127,7 @@ export default function RegisterStep4Page() {
       const dataToReset = {
         currentProfessionalTitle: storedData.currentProfessionalTitle || "",
         specializations: storedData.specializations || [],
-        languages: storedData.languages || "",
+        languages: storedData.languages || [],
         graduationDate: storedData.graduationDate ? new Date(storedData.graduationDate) : undefined,
         university: storedData.university || "",
         approbationNumber: storedData.approbationNumber || "",
@@ -264,7 +265,11 @@ export default function RegisterStep4Page() {
                     <FormItem>
                       <FormLabel>{t.register_step4_label_languages || "Languages"}*</FormLabel>
                       <FormControl>
-                        <Input placeholder={t.register_step4_placeholder_languages || "e.g., German, English"} {...field} />
+                        <LanguageInput
+                          placeholder={t.register_step4_placeholder_languages || "Add a language..."}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

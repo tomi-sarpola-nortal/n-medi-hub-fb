@@ -18,12 +18,13 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { DENTAL_SPECIALIZATIONS, PROFESSIONAL_TITLES } from '@/lib/registrationStore';
+import { LanguageInput } from '../ui/language-input';
 
 
 const FormSchema = z.object({
     currentProfessionalTitle: z.string().min(1, { message: "Professional title is required." }),
     specializations: z.array(z.string()).min(1, { message: "At least one specialization must be selected." }),
-    languages: z.string().min(1, { message: "Languages are required." }),
+    languages: z.array(z.string()).min(1, { message: "At least one language is required." }),
     graduationDate: z.union([z.date(), z.string()]).refine(val => val, { message: "Graduation date is required."}),
     university: z.string().min(1, { message: "University/College is required." }),
     approbationNumber: z.string().optional(),
@@ -47,7 +48,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
     defaultValues: {
       currentProfessionalTitle: user.currentProfessionalTitle || "",
       specializations: user.specializations || [],
-      languages: user.languages || "",
+      languages: user.languages || [],
       graduationDate: user.graduationDate ? new Date(user.graduationDate) : undefined,
       university: user.university || "",
       approbationNumber: user.approbationNumber || "",
@@ -148,15 +149,21 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
             </FormItem>
 
             <FormField
-                control={form.control}
-                name="languages"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t.register_step4_label_languages || "Languages"}*</FormLabel>
-                    <FormControl><Input placeholder={t.register_step4_placeholder_languages || "e.g., German, English"} {...field} /></FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
+              control={form.control}
+              name="languages"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t.register_step4_label_languages || "Languages"}*</FormLabel>
+                  <FormControl>
+                    <LanguageInput
+                      placeholder={t.register_step4_placeholder_languages || "Add a language..."}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
             <FormField
