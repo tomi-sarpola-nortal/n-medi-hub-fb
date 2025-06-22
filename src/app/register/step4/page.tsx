@@ -75,7 +75,7 @@ const FormSchema = z.object({
   graduationDate: z.date({ required_error: "Graduation date is required." }),
   university: z.string().min(1, { message: "University/College is required." }),
   approbationNumber: z.string().optional(),
-  approbationDate: z.date().optional(),
+  approbationDate: z.date().optional().nullable(),
   diplomaFile: baseFileSchema,
   approbationCertificateFile: optionalFileSchema,
   specialistRecognitionFile: optionalFileSchema,
@@ -89,6 +89,7 @@ export default function RegisterStep4Page() {
   const potentialLocale = pathname.split('/')[1];
   const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const t = getClientTranslations(currentLocale);
+  const currentYear = new Date().getFullYear();
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -141,7 +142,7 @@ export default function RegisterStep4Page() {
         specialistRecognitionFile: storedData.specialistRecognitionFile || null,
       });
     }
-  }, [router, toast, t]);
+  }, [router, toast, t, form]);
 
 
   const handleFileChange = (
@@ -309,6 +310,9 @@ export default function RegisterStep4Page() {
                               date > new Date() || date < new Date("1950-01-01")
                             }
                             initialFocus
+                            captionLayout="dropdown-buttons"
+                            fromYear={1960}
+                            toYear={currentYear}
                           />
                         </PopoverContent>
                       </Popover>
@@ -379,6 +383,9 @@ export default function RegisterStep4Page() {
                               date > new Date() || date < new Date("1950-01-01")
                             }
                             initialFocus
+                            captionLayout="dropdown-buttons"
+                            fromYear={1960}
+                            toYear={currentYear}
                           />
                         </PopoverContent>
                       </Popover>
