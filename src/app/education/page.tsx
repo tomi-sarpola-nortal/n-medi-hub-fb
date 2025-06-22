@@ -81,7 +81,6 @@ interface EducationPageProps {
 }
 
 export default async function EducationPage({ params }: EducationPageProps) {
-  const user = await getCurrentUser();
   const t = getTranslations(params.locale);
   const pageTitle = t.education_page_title || "My Advanced Trainings";
 
@@ -100,7 +99,7 @@ export default async function EducationPage({ params }: EducationPageProps) {
   ];
 
   return (
-    <AppLayout user={user} pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={params.locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8">
         <div className="flex items-center justify-between space-y-2">
             <div>

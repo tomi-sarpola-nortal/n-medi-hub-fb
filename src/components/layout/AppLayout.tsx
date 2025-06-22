@@ -11,7 +11,6 @@ import {
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  user?: Person; // This prop is mostly for legacy use on server components, client components use context.
   pageTitle: string; 
   locale: string; 
 }
