@@ -55,6 +55,19 @@ export interface SuggestedDocument {
   documentId: string;
 }
 
+export interface DocumentTemplate {
+  id: string;
+  title: string;
+  type: 'vorlage' | 'leitlinie' | 'empfehlung';
+  publisher: string;
+  lastChange: string; // ISO string from Firestore Timestamp
+  fileName: string;
+  fileUrl: string;
+  fileFormat: string; // e.g., 'PDF', 'DOCX'
+}
+
+export type DocumentTemplateCreationData = Omit<DocumentTemplate, 'id' | 'lastChange'>;
+
 
 // Firestore document structure for a person.
 // The document ID for 'persons' collection should be the Firebase Auth UID.

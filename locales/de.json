@@ -348,7 +348,20 @@
   "representations_decline_button": "ABLEHNEN",
   "representations_my_title": "Übersicht meiner Vertretungen",
   "representations_my_desc": "Hier können Sie Vertretungen einsehen, bei denen Sie vertreten wurden.",
-  "representations_footer_note": "Vertretungen können nur von der vertretenen Person bestätigt werden. Auch Ihre Landeskammer hat Zugriff auf diese Daten."
+  "representations_footer_note": "Vertretungen können nur von der vertretenen Person bestätigt werden. Auch Ihre Landeskammer hat Zugriff auf diese Daten.",
+  "documents_upload_dialog_title": "Neues Dokument hochladen",
+  "documents_upload_dialog_desc": "Fügen Sie ein neues Dokument zur Vorlagenbibliothek hinzu. Klicken Sie auf Speichern, wenn Sie fertig sind.",
+  "documents_upload_form_title": "Titel des Dokuments",
+  "documents_upload_form_type": "Dokumententyp",
+  "documents_upload_form_publisher": "Herausgeber",
+  "documents_upload_form_file": "Datei",
+  "documents_upload_form_submit": "Speichern und Hochladen",
+  "documents_upload_success_title": "Hochladen erfolgreich",
+  "documents_upload_success_desc": "Dokument '{title}' wurde hochgeladen.",
+  "documents_upload_error_title": "Hochladen fehlgeschlagen",
+  "documents_upload_error_desc": "Das Dokument konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
+  "documents_delete_dialog_title": "Sind Sie sicher?",
+  "documents_delete_dialog_desc": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird das Dokument dauerhaft gelöscht.",
+  "documents_delete_dialog_confirm": "Löschen",
+  "documents_delete_dialog_cancel": "Abbrechen"
 }
-
-    

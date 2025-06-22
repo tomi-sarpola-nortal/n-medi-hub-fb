@@ -348,7 +348,20 @@
   "representations_decline_button": "DECLINE",
   "representations_my_title": "Overview of my representations",
   "representations_my_desc": "Here you can view representations where you were represented by others.",
-  "representations_footer_note": "Representations can only be confirmed by the represented person. Your state chamber also has access to this data."
+  "representations_footer_note": "Representations can only be confirmed by the represented person. Your state chamber also has access to this data.",
+  "documents_upload_dialog_title": "Upload New Document",
+  "documents_upload_dialog_desc": "Add a new document to the templates library. Click save when you're done.",
+  "documents_upload_form_title": "Document Title",
+  "documents_upload_form_type": "Document Type",
+  "documents_upload_form_publisher": "Publisher",
+  "documents_upload_form_file": "File",
+  "documents_upload_form_submit": "Save and Upload",
+  "documents_upload_success_title": "Upload Successful",
+  "documents_upload_success_desc": "Document '{title}' has been uploaded.",
+  "documents_upload_error_title": "Upload Failed",
+  "documents_upload_error_desc": "Could not upload the document. Please try again.",
+  "documents_delete_dialog_title": "Are you sure?",
+  "documents_delete_dialog_desc": "This action cannot be undone. This will permanently delete the document.",
+  "documents_delete_dialog_confirm": "Delete",
+  "documents_delete_dialog_cancel": "Cancel"
 }
-
-    
