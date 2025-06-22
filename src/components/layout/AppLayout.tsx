@@ -33,9 +33,9 @@ export default function AppLayout({ children, user: propsUser, pageTitle, locale
       <SidebarInset>
         {/* Header no longer needs user prop for avatar/dropdown */}
         <Header pageTitle={pageTitle} currentLocale={locale} /> 
-        <main className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto">
           {children}
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
