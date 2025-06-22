@@ -335,3 +335,5 @@ export default function RegisterStep6Page() {
     </AuthLayout>
   );
 }
+
+    
