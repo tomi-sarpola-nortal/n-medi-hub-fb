@@ -301,6 +301,7 @@
   "member_review_new_data": "Neu",
   "member_review_approve_option": "Datenänderung genehmigen",
   "member_review_deny_option": "Datenänderung ablehnen",
+  "member_review_reject_option": "Datenänderung zurückweisen",
   "member_review_justification_label": "Begründung",
   "member_review_justification_placeholder": "z. B. Fortbildungsnachweise fehlen",
   "member_review_confirm_checkbox": "Ich bestätige die Daten sorgfältig geprüft zu haben.",

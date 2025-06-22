@@ -1,4 +1,3 @@
-
 "use client";
 
 import AppLayout from '@/components/layout/AppLayout';
@@ -108,7 +107,7 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
     
     setIsSubmitting(true);
     try {
-        await reviewPerson(person.id, reviewDecision as 'approve' | 'deny', justification);
+        await reviewPerson(person.id, reviewDecision as 'approve' | 'deny' | 'reject', justification);
         toast({ title: "Success", description: "The review has been submitted successfully." });
         router.push('/member-overview');
     } catch (error) {
@@ -234,6 +233,10 @@ export default function DataReviewPage({ params }: DataReviewPageProps) {
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="approve" id="r-approve" />
                                 <Label htmlFor="r-approve">{t.member_review_approve_option || "Approve data change"}</Label>
+                            </div>
+                             <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="reject" id="r-reject" />
+                                <Label htmlFor="r-reject">{t.member_review_reject_option || "Reject data change"}</Label>
                             </div>
                              <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="deny" id="r-deny" />
