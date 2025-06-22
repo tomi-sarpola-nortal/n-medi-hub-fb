@@ -1,22 +1,20 @@
-
 "use client";
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { updatePerson } from '@/services/personService';
 import type { Person } from '@/lib/types';
-import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
+import { Loader2, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { uploadFile } from '@/services/storageService';
+import { uploadFile, deleteFileByUrl } from '@/services/storageService';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -88,6 +86,11 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
       
       const fileToUpload = idDocument?.[0];
       if (fileToUpload) {
+        // If there's an old file URL, try to delete it first.
+        if (user.idDocumentUrl) {
+          await deleteFileByUrl(user.idDocumentUrl);
+        }
+
         const uploadPath = `users/${user.id}/id_documents`;
         const downloadURL = await uploadFile(fileToUpload, uploadPath);
         updateData.idDocumentUrl = downloadURL;

@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -13,12 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { updatePerson } from '@/services/personService';
 import type { Person } from '@/lib/types';
-import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react';
+import { Loader2, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { DENTAL_SPECIALIZATIONS, PROFESSIONAL_TITLES } from '@/lib/registrationStore';
 import { LanguageInput } from '../ui/language-input';
-import { uploadFile } from '@/services/storageService';
+import { uploadFile, deleteFileByUrl } from '@/services/storageService';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -107,6 +106,9 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
       };
 
       if (diplomaFile?.[0]) {
+        if (user.diplomaUrl) {
+            await deleteFileByUrl(user.diplomaUrl);
+        }
         const file = diplomaFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.diplomaUrl = url;
@@ -114,6 +116,9 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
         setSelectedDiplomaName(file.name);
       }
       if (approbationCertificateFile?.[0]) {
+        if (user.approbationCertificateUrl) {
+            await deleteFileByUrl(user.approbationCertificateUrl);
+        }
         const file = approbationCertificateFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.approbationCertificateUrl = url;
@@ -121,6 +126,9 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
         setSelectedApprobationCertificateName(file.name);
       }
       if (specialistRecognitionFile?.[0]) {
+        if (user.specialistRecognitionUrl) {
+            await deleteFileByUrl(user.specialistRecognitionUrl);
+        }
         const file = specialistRecognitionFile[0];
         const url = await uploadFile(file, uploadPath);
         updateData.specialistRecognitionUrl = url;
