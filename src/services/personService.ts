@@ -17,6 +17,8 @@ import {
   type Timestamp,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
+  orderBy,
+  limit,
 } from 'firebase/firestore';
 
 const PERSONS_COLLECTION = 'persons';
@@ -271,6 +273,31 @@ export async function reviewPerson(
     
     await updatePerson(personId, updates);
 }
+
+/**
+ * Retrieves persons with a 'pending' status.
+ * @param limitValue - The maximum number of pending persons to retrieve.
+ * @returns An array of Person objects.
+ */
+export async function getPendingPersons(limitValue?: number): Promise<Person[]> {
+    'use server';
+    checkDb();
+    const personsCollection = collection(db, PERSONS_COLLECTION);
+    
+    let q = query(
+        personsCollection, 
+        where('status', '==', 'pending'),
+        orderBy('updatedAt', 'desc') // Get the most recently updated ones first
+    );
+
+    if (limitValue) {
+        q = query(q, limit(limitValue));
+    }
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(snapshotToPerson);
+}
+
 
 // Ensure PersonCreationData in types/index.ts is updated to include all these fields too.
 // The createPerson function now expects a more comprehensive personData object.

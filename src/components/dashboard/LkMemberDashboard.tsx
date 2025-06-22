@@ -5,31 +5,37 @@ import * as React from 'react';
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { getPendingPersons } from '@/services/personService';
+import Link from 'next/link';
+import { format } from 'date-fns';
 
 interface LkMemberDashboardProps {
     user: Person;
     t: Record<string, string>;
 }
 
-const mockMembersToReview = [
-    {
-        id: '1',
-        name: 'Dr. Anna Huber',
-        date: '21.05.2025',
-        changeType: 'Datenänderung',
-    },
-    {
-        id: '2',
-        name: 'Dr. Mehmet Yilmaz',
-        date: '21.05.2025',
-        changeType: 'Datenänderung',
-    }
-];
-
 export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
-    const fullName = user.name || `${user.firstName} ${user.lastName}`;
+    const [membersToReview, setMembersToReview] = React.useState<Person[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchPendingMembers = async () => {
+            try {
+                const pendingMembers = await getPendingPersons(5);
+                setMembersToReview(pendingMembers);
+            } catch (error) {
+                console.error("Failed to fetch pending members:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPendingMembers();
+    }, []);
+
+    const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
     const welcomeMessage = t.welcome_back?.replace('{userName}', fullName) || `Welcome, ${fullName}!`;
 
     return (
@@ -47,22 +53,36 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                             <CardDescription>{t.lk_dashboard_review_members_desc || 'Hier können Sie Datenänderungen von Mitgliedern überprüfen.'}</CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="space-y-0">
-                                {mockMembersToReview.map((member, index) => (
-                                    <React.Fragment key={member.id}>
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-                                            <div>
-                                                <p className="font-semibold text-base">{member.name}</p>
-                                                <p className="text-sm text-muted-foreground">{member.date} | {member.changeType}</p>
+                             {isLoading ? (
+                                <div className="flex justify-center items-center h-48">
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                </div>
+                            ) : membersToReview.length > 0 ? (
+                                <div className="space-y-0">
+                                    {membersToReview.map((member, index) => (
+                                        <React.Fragment key={member.id}>
+                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
+                                                <div>
+                                                    <p className="font-semibold text-base">{member.name}</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : ''} | {t.data_change_label || 'Datenänderung'}
+                                                    </p>
+                                                </div>
+                                                <Button asChild className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                    <Link href={`/member-overview/${member.id}/review`}>
+                                                        {t.lk_dashboard_perform_review_button || 'PRÜFUNG VORNEHMEN'}
+                                                    </Link>
+                                                </Button>
                                             </div>
-                                            <Button className="w-full sm:w-auto mt-2 sm:mt-0">
-                                                {t.lk_dashboard_perform_review_button || 'PRÜFUNG VORNEHMEN'}
-                                            </Button>
-                                        </div>
-                                        {index < mockMembersToReview.length - 1 && <Separator />}
-                                    </React.Fragment>
-                                ))}
-                            </div>
+                                            {index < membersToReview.length - 1 && <Separator />}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                             ) : (
+                                <div className="p-6 text-center text-muted-foreground">
+                                    <p>{t.member_review_no_pending || "No pending member reviews at the moment."}</p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
