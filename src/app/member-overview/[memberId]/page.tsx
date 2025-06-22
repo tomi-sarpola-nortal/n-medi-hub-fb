@@ -51,7 +51,7 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
   
   const statusKeyMap: Record<Person['status'], string> = {
       'active': 'member_list_status_active',
-      'pending_approval': 'member_list_status_in_review',
+      'pending': 'member_list_status_pending',
       'inactive': 'member_list_status_inactive',
       'rejected': 'member_list_status_inactive',
   };
@@ -109,7 +109,7 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
                         </CardContent>
                     </Card>
 
-                    {person.status === 'pending_approval' && (
+                    {person.status === 'pending' && (
                         <div className="mt-6 p-4 bg-amber-50 border border-amber-300 rounded-md flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <AlertTriangle className="h-8 w-8 text-amber-500 flex-shrink-0"/>
                             <div className="flex-grow">

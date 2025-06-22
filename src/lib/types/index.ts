@@ -23,7 +23,7 @@ export interface User {
   dentistId?: string; // Unique for dentists, assigned by LK
   avatarUrl?: string; // Standardized from profileImage
   
-  status?: 'pending_approval' | 'active' | 'inactive' | 'rejected';
+  status?: 'pending' | 'active' | 'inactive' | 'rejected';
   
   otpEnabled?: boolean; 
   otpSecret?: string; // For 2FA, if implemented beyond Firebase Auth's MFA
@@ -79,7 +79,7 @@ export interface Person {
   region: string; // e.g. "Bayern", "Wien"
   dentistId?: string; 
   avatarUrl?: string; 
-  status: 'pending_approval' | 'active' | 'inactive' | 'rejected';
+  status: 'pending' | 'active' | 'inactive' | 'rejected';
   otpEnabled: boolean; 
   otpSecret?: string; 
   
@@ -147,7 +147,7 @@ export interface RegistrationFormData {
   region: string;
   dentistId?: string;
   avatarUrl?: string; 
-  status?: 'pending_approval' | 'active' | 'inactive' | 'rejected'; 
+  status?: 'pending' | 'active' | 'inactive' | 'rejected'; 
   otpEnabled?: boolean; 
   
   // Step 3

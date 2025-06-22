@@ -24,11 +24,11 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
   
   const allPersons = await getAllPersons();
 
-  const membersToReview = allPersons.filter(p => p.status === 'pending_approval');
+  const membersToReview = allPersons.filter(p => p.status === 'pending');
 
   const statusKeyMap: Record<Person['status'], string> = {
       active: 'member_list_status_active',
-      pending_approval: 'member_list_status_in_review',
+      pending: 'member_list_status_pending',
       inactive: 'member_list_status_inactive',
       rejected: 'member_list_status_inactive',
   };
@@ -97,7 +97,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                 <SelectContent>
                                     <SelectItem value="all">{t.member_list_filter_all || "All"}</SelectItem>
                                     <SelectItem value="active">{t.member_list_status_active || "Active"}</SelectItem>
-                                    <SelectItem value="in-review">{t.member_list_status_in_review || "In Review"}</SelectItem>
+                                    <SelectItem value="pending">{t.member_list_status_pending || "Pending"}</SelectItem>
                                     <SelectItem value="inactive">{t.member_list_status_inactive || "Inactive"}</SelectItem>
                                 </SelectContent>
                             </Select>

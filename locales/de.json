@@ -265,7 +265,7 @@
   "member_list_table_header_action": "Aktion",
   "member_list_table_action_button": "ANZEIGEN",
   "member_list_status_active": "Aktiv",
-  "member_list_status_in_review": "In Prüfung",
+  "member_list_status_pending": "Ausstehend",
   "member_list_status_inactive": "Ausgeschieden",
   "member_list_pagination_showing": "Zeige {start} bis {end} von {total} Mitgliedern",
   "member_list_pagination_back": "Zurück",
