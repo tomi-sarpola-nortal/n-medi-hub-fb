@@ -91,7 +91,7 @@ export async function getDocumentTemplates(): Promise<DocumentTemplate[]> {
             title: data.title,
             type: data.type,
             publisher: data.publisher,
-            lastChange: lastChangeTimestamp ? format(lastChangeTimestamp.toDate(), 'dd.MM.yyyy') : 'N/A',
+            lastChange: lastChangeTimestamp ? lastChangeTimestamp.toDate().toISOString() : new Date(0).toISOString(),
             fileName: data.fileName,
             fileUrl: data.fileUrl,
             fileFormat: data.fileFormat,

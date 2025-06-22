@@ -5,7 +5,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileUp, Download, Trash2, ArrowLeft, Loader2, File } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FileUp, Download, Trash2, ArrowLeft, ArrowUp, ArrowDown, Loader2, File } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
@@ -16,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import UploadDocumentDialog from '@/components/documents/UploadDocumentDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { DocumentTemplate } from '@/lib/types';
+import { format } from 'date-fns';
 
 
 // Helper for client-side translations
@@ -38,6 +40,10 @@ const documentTypeMap = {
 };
 
 type FilterType = 'all' | 'vorlage' | 'leitlinie' | 'empfehlung';
+type SortDescriptor = {
+    id: keyof DocumentTemplate;
+    desc: boolean;
+};
 
 interface DocumentsPageProps {
   params: { locale: string };
@@ -74,6 +80,9 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<DocumentTemplate | null>(null);
 
+  const [sorting, setSorting] = useState<SortDescriptor>({ id: 'lastChange', desc: true });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+
   const fetchDocuments = async () => {
     setIsLoading(true);
     try {
@@ -92,10 +101,33 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
     fetchDocuments();
   }, [params.locale]);
 
-  const filteredDocuments = useMemo(() => {
-    if (filter === 'all') return documents;
-    return documents.filter(doc => doc.type === filter);
-  }, [documents, filter]);
+  const handleSort = (columnId: keyof DocumentTemplate) => {
+    setSorting(current => ({
+      id: columnId,
+      desc: current.id === columnId ? !current.desc : false,
+    }));
+  };
+
+  const displayedDocuments = useMemo(() => {
+    const filtered = filter === 'all' ? documents : documents.filter(doc => doc.type === filter);
+    
+    const sorted = [...filtered].sort((a, b) => {
+      const valA = a[sorting.id];
+      const valB = b[sorting.id];
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+      if (valA < valB) return sorting.desc ? 1 : -1;
+      if (valA > valB) return sorting.desc ? -1 : 1;
+      return 0;
+    });
+
+    const start = pagination.pageIndex * pagination.pageSize;
+    const end = start + pagination.pageSize;
+    return sorted.slice(start, end);
+
+  }, [documents, filter, sorting, pagination]);
+
+  const totalPages = Math.ceil((filter === 'all' ? documents.length : documents.filter(doc => doc.type === filter).length) / pagination.pageSize);
 
   const handleDeleteClick = (doc: DocumentTemplate) => {
     setDocumentToDelete(doc);
@@ -116,6 +148,17 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
       setDocumentToDelete(null);
     }
   };
+  
+  const SortableHeader = ({ columnId, label }: { columnId: keyof DocumentTemplate, label: string }) => (
+    <TableHead>
+        <Button variant="ghost" onClick={() => handleSort(columnId)} className="px-0 hover:bg-transparent">
+            {label}
+            {sorting.id === columnId && (
+                sorting.desc ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUp className="ml-2 h-4 w-4" />
+            )}
+        </Button>
+    </TableHead>
+  );
 
   const pageLoading = authLoading || Object.keys(t).length === 0;
 
@@ -174,21 +217,22 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
+              <>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-2/5">{t.documents_table_header_title || "Title"}</TableHead>
-                    <TableHead>{t.documents_table_header_type || "Type"}</TableHead>
-                    <TableHead>{t.documents_table_header_publisher || "Publisher"}</TableHead>
-                    <TableHead>{t.documents_table_header_last_change || "Last Change"}</TableHead>
-                    <TableHead>{t.documents_table_header_format || "Format"}</TableHead>
+                    <SortableHeader columnId="title" label={t.documents_table_header_title || "Title"} />
+                    <SortableHeader columnId="type" label={t.documents_table_header_type || "Type"} />
+                    <SortableHeader columnId="publisher" label={t.documents_table_header_publisher || "Publisher"} />
+                    <SortableHeader columnId="lastChange" label={t.documents_table_header_last_change || "Last Change"} />
+                    <SortableHeader columnId="fileFormat" label={t.documents_table_header_format || "Format"} />
                     <TableHead className="text-right">
                       {isLkMember ? (t.documents_table_header_action || "Action") : (t.documents_table_header_download || "Download")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredDocuments.map((doc) => (
+                  {displayedDocuments.length > 0 ? displayedDocuments.map((doc) => (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.title}</TableCell>
                       <TableCell>
@@ -197,7 +241,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                         </TypeBadge>
                       </TableCell>
                       <TableCell>{doc.publisher}</TableCell>
-                      <TableCell>{doc.lastChange}</TableCell>
+                      <TableCell>{format(new Date(doc.lastChange), 'dd.MM.yyyy')}</TableCell>
                       <TableCell>
                         {doc.fileFormat === 'PDF' ? (
                           <PdfFileIcon />
@@ -222,9 +266,62 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center">
+                            {t.documents_table_no_results || "No results found."}
+                        </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
+              <div className="flex items-center justify-between space-x-2 p-4 border-t">
+                    <div className="flex items-center space-x-2">
+                        <p className="text-sm font-medium">{t.documents_pagination_rows_per_page || "Rows per page"}</p>
+                        <Select
+                            value={`${pagination.pageSize}`}
+                            onValueChange={(value) => {
+                                setPagination(p => ({ ...p, pageSize: Number(value), pageIndex: 0 }));
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[70px]">
+                                <SelectValue placeholder={pagination.pageSize} />
+                            </SelectTrigger>
+                            <SelectContent side="top">
+                                {[10, 20, 50].map((pageSize) => (
+                                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                                        {pageSize}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm font-medium">
+                       <span>
+                         {(t.documents_pagination_page_info || "Page {currentPage} of {totalPages}")
+                            .replace('{currentPage}', (pagination.pageIndex + 1).toString())
+                            .replace('{totalPages}', totalPages.toString())
+                         }
+                       </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPagination(p => ({...p, pageIndex: p.pageIndex - 1}))}
+                            disabled={pagination.pageIndex === 0}
+                        >
+                            {t.documents_pagination_previous || "Previous"}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPagination(p => ({...p, pageIndex: p.pageIndex + 1}))}
+                            disabled={pagination.pageIndex >= totalPages - 1}
+                        >
+                            {t.documents_pagination_next || "Next"}
+                        </Button>
+                    </div>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

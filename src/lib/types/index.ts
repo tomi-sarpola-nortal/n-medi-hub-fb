@@ -63,7 +63,7 @@ export interface DocumentTemplate {
   lastChange: string; // ISO string from Firestore Timestamp
   fileName: string;
   fileUrl: string;
-  fileFormat: string; // e.g., 'PDF', 'DOCX'
+  fileFormat: string; // e.g., 'PDF', 'Word'
 }
 
 export type DocumentTemplateCreationData = Omit<DocumentTemplate, 'id' | 'lastChange'>;
