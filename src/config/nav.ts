@@ -6,6 +6,7 @@ import {
   Settings,
   GraduationCap,
   CalendarDays,
+  Users,
 } from "lucide-react";
 
 export const navConfig: Record<UserRole, NavItem[]> = {
@@ -37,7 +38,26 @@ export const navConfig: Record<UserRole, NavItem[]> = {
     },
   ],
   lk_member: [
-    // Add LK-specific navigation here
+    {
+      title: "sidebar_dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "sidebar_member_overview",
+      href: "/member-overview",
+      icon: Users,
+    },
+    {
+      title: "sidebar_document_templates",
+      href: "/documents",
+      icon: FileText,
+    },
+    {
+      title: "sidebar_settings",
+      href: "/settings",
+      icon: Settings,
+    },
   ],
   ozak_employee: [
     // Add ÖZÄK-specific navigation here
