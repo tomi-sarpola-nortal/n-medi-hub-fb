@@ -1,8 +1,7 @@
 
 import type React from 'react';
-import type { Person } from '@/types'; // Changed from User to Person
 import Header from './Header';
-import { AppSidebar } from './SidebarNav'; // Corrected import name
+import { AppSidebar } from './SidebarNav';
 import {
   SidebarProvider,
   Sidebar,
