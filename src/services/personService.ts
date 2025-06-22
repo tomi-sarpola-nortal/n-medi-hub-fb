@@ -35,6 +35,21 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     throw new Error(`Document data is undefined for snapshot ID: ${snapshot.id}`);
   }
 
+  // Helper to safely convert Firestore Timestamps or date strings to YYYY-MM-DD strings
+  const toDateString = (dateValue: any): string | undefined => {
+      if (!dateValue) return undefined;
+      // If it's a Firestore Timestamp, convert it
+      if (typeof dateValue.toDate === 'function') {
+          return dateValue.toDate().toISOString().split('T')[0];
+      }
+      // If it's already a string, return it
+      if (typeof dateValue === 'string') {
+          return dateValue;
+      }
+      // Otherwise, it's an unknown format
+      return undefined;
+  }
+
   const createdAtTimestamp = data.createdAt as Timestamp;
   const updatedAtTimestamp = data.updatedAt as Timestamp;
 
@@ -56,7 +71,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     title: data.title,
     firstName: data.firstName,
     lastName: data.lastName,
-    dateOfBirth: data.dateOfBirth, // Stored as string 'YYYY-MM-DD'
+    dateOfBirth: toDateString(data.dateOfBirth),
     placeOfBirth: data.placeOfBirth,
     nationality: data.nationality,
     streetAddress: data.streetAddress,
@@ -71,10 +86,10 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     currentProfessionalTitle: data.currentProfessionalTitle,
     specializations: data.specializations,
     languages: data.languages,
-    graduationDate: data.graduationDate,
+    graduationDate: toDateString(data.graduationDate),
     university: data.university,
     approbationNumber: data.approbationNumber,
-    approbationDate: data.approbationDate,
+    approbationDate: toDateString(data.approbationDate),
     diplomaUrl: data.diplomaUrl,
     diplomaName: data.diplomaName,
     approbationCertificateUrl: data.approbationCertificateUrl,
