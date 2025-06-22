@@ -64,10 +64,12 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     status: data.status,
     otpEnabled: data.otpEnabled,
     otpSecret: data.otpSecret,
+    
+    // Add missing fields to make it a complete user representation
     approved: data.approved,
     educationPoints: data.educationPoints,
-    
-    // Personal Data
+
+    // Personal Data from Step 3
     title: data.title,
     firstName: data.firstName,
     lastName: data.lastName,
@@ -82,7 +84,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     idDocumentUrl: data.idDocumentUrl,
     idDocumentName: data.idDocumentName,
 
-    // Professional Qualifications
+    // Professional Qualifications from Step 4
     currentProfessionalTitle: data.currentProfessionalTitle,
     specializations: data.specializations,
     languages: data.languages,
@@ -97,7 +99,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     specialistRecognitionUrl: data.specialistRecognitionUrl,
     specialistRecognitionName: data.specialistRecognitionName,
     
-    // Practice Information
+    // Practice Information from Step 5
     practiceName: data.practiceName,
     practiceStreetAddress: data.practiceStreetAddress,
     practicePostalCode: data.practicePostalCode,
@@ -235,28 +237,36 @@ export async function getAllPersons(): Promise<Person[]> {
 /**
  * Processes a review for a pending person.
  * @param personId The ID of the person to review.
- * @param decision The review decision: 'approve' or 'deny'.
- * @param justification An optional reason for denial.
+ * @param decision The review decision: 'approve', 'deny', or 'reject'.
+ * @param justification An optional reason for denial or rejection.
  */
 export async function reviewPerson(
     personId: string, 
-    decision: 'approve' | 'deny', 
+    decision: 'approve' | 'deny' | 'reject', 
     justification?: string
 ): Promise<void> {
     'use server';
     checkDb();
     const updates: Partial<Person> = {};
 
-    if (decision === 'approve') {
-        updates.status = 'active';
-        // Generate a Dentist ID if one doesn't already exist
-        const person = await getPersonById(personId);
-        if (person && !person.dentistId) {
-            updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-        }
-    } else {
-        updates.status = 'rejected';
-        updates.rejectionReason = justification;
+    switch (decision) {
+        case 'approve':
+            updates.status = 'active';
+            const person = await getPersonById(personId);
+            if (person && !person.dentistId) {
+                updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            }
+            updates.rejectionReason = ''; // Clear any previous rejection reason
+            break;
+        case 'deny':
+            updates.status = 'inactive';
+            updates.rejectionReason = justification;
+            break;
+        case 'reject':
+            // Status remains 'pending', but we update the justification for feedback.
+            updates.status = 'pending'; 
+            updates.rejectionReason = justification;
+            break;
     }
     
     await updatePerson(personId, updates);

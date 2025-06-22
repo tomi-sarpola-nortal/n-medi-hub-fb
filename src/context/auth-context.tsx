@@ -83,6 +83,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Return a specific error key to be translated by the login page
           return { success: false, error: "login_error_pending_approval" };
       }
+      
+      if (personProfile?.status === 'inactive') {
+          await signOut(auth); // Log out the user
+          return { success: false, error: "login_error_inactive" };
+      }
 
       // If active or no profile found (onAuthStateChanged will handle the no profile case), proceed.
       return { success: true };
@@ -197,5 +202,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-    
