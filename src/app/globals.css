@@ -35,6 +35,15 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
 
+    /* Status Badge Colors */
+    --status-success-background: 140 80% 96%;
+    --status-success-foreground: 140 60% 30%;
+    --status-warning-background: 45 100% 96%;
+    --status-warning-foreground: 45 80% 25%;
+    --status-destructive-background: 0 100% 97%;
+    --status-destructive-foreground: 0 70% 40%;
+
+
     /* Sidebar specific colors */
     --sidebar-background: 0 0% 100%; /* White */
     --sidebar-foreground: 210 10% 23%; /* Dark Blue Grey */
@@ -71,6 +80,14 @@ body {
     --border: 210 10% 25%;
     --input: 210 10% 25%;
     --ring: 195 35% 55%;
+
+    /* Status Badge Colors */
+    --status-success-background: 140 40% 20%;
+    --status-success-foreground: 140 70% 70%;
+    --status-warning-background: 45 40% 20%;
+    --status-warning-foreground: 45 80% 70%;
+    --status-destructive-background: 0 40% 20%;
+    --status-destructive-foreground: 0 80% 70%;
 
     --sidebar-background: 210 10% 15%; 
     --sidebar-foreground: 210 20% 94%; 
