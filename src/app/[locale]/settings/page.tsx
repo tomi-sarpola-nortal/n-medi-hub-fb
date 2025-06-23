@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/context/auth-context';
 import AppLayout from '@/components/layout/AppLayout';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import PersonalDataForm from '@/components/settings/PersonalDataForm';
 import ProfessionalQualificationsForm from '@/components/settings/ProfessionalQualificationsForm';
@@ -11,6 +11,7 @@ import PracticeInformationForm from '@/components/settings/PracticeInformationFo
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -48,6 +49,7 @@ export default function SettingsPage() {
   }
 
   const pageTitle = t.settings_page_title || "Settings";
+  const isPending = user.status === 'pending';
 
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
@@ -55,12 +57,22 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
         <p className="text-muted-foreground">{t.settings_page_description || "Update your personal and professional information."}</p>
 
+        {isPending && (
+          <Alert variant="default" className="bg-amber-50 border-amber-300 text-amber-800 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-200">
+            <AlertTriangle className="h-4 w-4 !text-amber-600 dark:!text-amber-400" />
+            <AlertTitle>{t.settings_pending_approval_title || "Account Pending Approval"}</AlertTitle>
+            <AlertDescription>
+              {t.settings_pending_approval_alert || "Your registration is waiting for approval. You can review your submitted data below, but no changes can be made."}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
           <AccordionItem value="item-1">
             <AccordionTrigger className="font-headline text-lg">{t.settings_personal_data_title || "Personal Data"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_personal_data_desc || "Update your personal details and contact information."}</p>
-              <PersonalDataForm user={user} t={t} />
+              <PersonalDataForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
           
@@ -68,7 +80,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_prof_qual_title || "Professional Qualifications"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_prof_qual_desc || "Manage your professional titles, specializations, and qualifications."}</p>
-              <ProfessionalQualificationsForm user={user} t={t} />
+              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
           
@@ -76,12 +88,12 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_practice_info_title || "Practice Information"}</AccordionTrigger>
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
-                <PracticeInformationForm user={user} t={t} />
+                <PracticeInformationForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
 
-        <DeleteAccountSection user={user} t={t} />
+        <DeleteAccountSection user={user} t={t} isDisabled={isPending} />
       </div>
     </AppLayout>
   );

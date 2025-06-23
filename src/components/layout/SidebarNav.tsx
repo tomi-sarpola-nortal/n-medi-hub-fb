@@ -77,6 +77,7 @@ export function AppSidebar() {
   if (!user) return null;
   
   const userNavItems = navConfig[user.role] || [];
+  const isPending = user.status === 'pending';
 
   return (
     <Sidebar collapsible="none">
@@ -92,7 +93,7 @@ export function AppSidebar() {
           <User className="h-10 w-10 text-primary flex-shrink-0" />
           <div className="text-sm overflow-hidden text-left">
             <p className="font-semibold truncate">{user.name}</p>
-            <p className="text-xs text-muted-foreground truncate">ID: {user.dentistId}</p>
+            <p className="text-xs text-muted-foreground truncate">ID: {user.dentistId || "N/A"}</p>
             <p className="text-xs text-muted-foreground capitalize truncate">{t[user.role] || user.role}</p>
           </div>
         </div>
@@ -105,7 +106,11 @@ export function AppSidebar() {
             <SidebarMenuItem key={item.href}>
               <Link href={item.href} legacyBehavior={false} passHref={false}>
                 <SidebarMenuButton
-                  isActive={pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))}
+                  disabled={isPending && item.href !== '/settings'}
+                  isActive={
+                    (isPending && item.href === '/settings') ||
+                    (!isPending && (pathname.endsWith(item.href) || (item.href !== "/dashboard" && pathname.includes(item.href))))
+                  }
                   tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
                   aria-label={t[item.title] || item.title}
                   className="font-medium"
@@ -140,5 +145,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-    

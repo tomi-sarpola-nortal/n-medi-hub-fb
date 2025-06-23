@@ -25,9 +25,10 @@ import type { Person } from '@/lib/types';
 interface DeleteAccountSectionProps {
   user: Person;
   t: Record<string, string>;
+  isDisabled?: boolean;
 }
 
-export default function DeleteAccountSection({ t }: DeleteAccountSectionProps) {
+export default function DeleteAccountSection({ t, isDisabled }: DeleteAccountSectionProps) {
   const { deleteUserAccount } = useAuth();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -105,7 +106,7 @@ export default function DeleteAccountSection({ t }: DeleteAccountSectionProps) {
       <CardContent>
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive">{t.settings_delete_account_button || "Delete My Account"}</Button>
+            <Button variant="destructive" disabled={isDisabled}>{t.settings_delete_account_button || "Delete My Account"}</Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

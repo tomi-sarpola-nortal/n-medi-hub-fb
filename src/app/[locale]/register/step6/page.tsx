@@ -156,7 +156,7 @@ export default function RegisterStep6Page() {
         region: registrationData.stateOrProvince || 'N/A', 
         dentistId: registrationData.dentistId || undefined, 
         avatarUrl: `https://avatar.vercel.sh/${registrationData.email}.png?size=100`, 
-        status: 'active',
+        status: 'pending',
         otpEnabled: false,
         stateChamberId: 'wien', // Default to Vienna Dental Chamber
         title: registrationData.title,

@@ -77,19 +77,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // After successful authentication, fetch the user profile to check status
       const personProfile = await getPersonById(firebaseUser.uid);
-
-      if (personProfile?.status === 'pending') {
-          await signOut(auth); // Log out the user
-          // Return a specific error key to be translated by the login page
-          return { success: false, error: "login_error_pending_approval" };
-      }
       
       if (personProfile?.status === 'inactive') {
           await signOut(auth); // Log out the user
           return { success: false, error: "login_error_inactive" };
       }
 
-      // If active or no profile found (onAuthStateChanged will handle the no profile case), proceed.
+      // Pending users are allowed to log in. The redirect logic is handled on the client-side (e.g., in DashboardPage).
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);

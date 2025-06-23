@@ -373,5 +373,7 @@
   "documents_delete_dialog_desc": "This action cannot be undone. This will permanently delete the document.",
   "documents_delete_dialog_confirm": "Delete",
   "documents_delete_dialog_cancel": "Cancel",
-  "member_review_no_pending": "No pending member reviews at the moment."
+  "member_review_no_pending": "No pending member reviews at the moment.",
+  "settings_pending_approval_title": "Account Pending Approval",
+  "settings_pending_approval_alert": "Your registration is waiting for approval. You can review your submitted data below, but no changes can be made until your account is approved."
 }

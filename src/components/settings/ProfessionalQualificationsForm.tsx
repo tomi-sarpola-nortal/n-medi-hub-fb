@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { DENTAL_SPECIALIZATIONS, PROFESSIONAL_TITLES } from '@/lib/registrationStore';
 import { LanguageInput } from '../ui/language-input';
 import { uploadFile, deleteFileByUrl } from '@/services/storageService';
+import { cn } from '@/lib/utils';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -50,9 +52,10 @@ type FormInputs = z.infer<typeof FormSchema>;
 interface ProfessionalQualificationsFormProps {
   user: Person;
   t: Record<string, string>;
+  isDisabled?: boolean;
 }
 
-export default function ProfessionalQualificationsForm({ user, t }: ProfessionalQualificationsFormProps) {
+export default function ProfessionalQualificationsForm({ user, t, isDisabled = false }: ProfessionalQualificationsFormProps) {
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -164,7 +167,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_prof_title || "Current Professional Title"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
                         <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
@@ -206,9 +209,10 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                                         )
                                     );
                                 }}
+                                disabled={isDisabled}
                             />
                             </FormControl>
-                            <FormLabel className="font-normal text-sm">
+                            <FormLabel className={cn("font-normal text-sm", isDisabled && "cursor-not-allowed opacity-70")}>
                             {t[item.labelKey] || item.id.replace(/_/g, ' ')}
                             </FormLabel>
                         </FormItem>
@@ -230,6 +234,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                       placeholder={t.register_step4_placeholder_languages || "Add a language..."}
                       value={field.value || []}
                       onChange={field.onChange}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -247,7 +252,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                         <DatePickerInput
                           value={field.value ? new Date(field.value) : undefined}
                           onChange={field.onChange}
-                          disabled={(date) => date > new Date() || date < new Date("1950-01-01")}
+                          disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isDisabled}
                         />
                         </FormControl>
                         <FormMessage />
@@ -261,7 +266,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_university || "University/College"}*</FormLabel>
-                    <FormControl><Input placeholder={t.register_step4_placeholder_university || "Name of University/College"} {...field} /></FormControl>
+                    <FormControl><Input placeholder={t.register_step4_placeholder_university || "Name of University/College"} {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -273,7 +278,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_approbation_number || "Approbation Number (if available)"}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -289,7 +294,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                         <DatePickerInput
                             value={field.value ? new Date(field.value) : undefined}
                             onChange={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1950-01-01")}
+                            disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isDisabled}
                         />
                     </FormControl>
                     <FormMessage />
@@ -307,7 +312,10 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                     <div className="flex items-center space-x-2 mt-1">
                         <label
                             htmlFor="diplomaFile-input"
-                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                            className={cn(
+                                "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
+                                !isDisabled && "hover:bg-accent cursor-pointer"
+                            )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {selectedDiplomaName || (t.register_step2_button_selectFile || "Select File")}
@@ -318,6 +326,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaName)}
+                            disabled={isDisabled}
                         />
                     </div>
                     </FormControl>
@@ -336,7 +345,10 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                     <div className="flex items-center space-x-2 mt-1">
                         <label
                             htmlFor="approbationCertificateFile-input"
-                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                            className={cn(
+                                "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
+                                !isDisabled && "hover:bg-accent cursor-pointer"
+                            )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {selectedApprobationCertificateName || (t.register_step2_button_selectFile || "Select File")}
@@ -347,6 +359,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateName)}
+                            disabled={isDisabled}
                         />
                     </div>
                     </FormControl>
@@ -365,7 +378,10 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                     <div className="flex items-center space-x-2 mt-1">
                         <label
                             htmlFor="specialistRecognitionFile-input"
-                            className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                            className={cn(
+                                "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
+                                !isDisabled && "hover:bg-accent cursor-pointer"
+                            )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
                             {selectedSpecialistRecognitionName || (t.register_step2_button_selectFile || "Select File")}
@@ -376,6 +392,7 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionName)}
+                            disabled={isDisabled}
                         />
                     </div>
                     </FormControl>
@@ -384,12 +401,14 @@ export default function ProfessionalQualificationsForm({ user, t }: Professional
               )}
             />
 
-            <div className="flex justify-end pt-4">
-            <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {t.settings_button_save || "Save Changes"}
-            </Button>
-            </div>
+            {!isDisabled && (
+                <div className="flex justify-end pt-4">
+                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {t.settings_button_save || "Save Changes"}
+                    </Button>
+                </div>
+            )}
         </form>
     </Form>
   );

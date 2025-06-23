@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -47,9 +48,10 @@ type PersonalDataFormInputs = z.infer<typeof FormSchema>;
 interface PersonalDataFormProps {
   user: Person;
   t: Record<string, string>;
+  isDisabled?: boolean;
 }
 
-export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
+export default function PersonalDataForm({ user, t, isDisabled = false }: PersonalDataFormProps) {
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -136,7 +138,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                   render={({ field }) => (
                     <FormItem className="md:col-span-1">
                       <FormLabel>{t.register_step2_label_title || "Title"}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
                             <FormControl>
                                 <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                             </FormControl>
@@ -157,7 +159,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
                       <FormLabel>{t.register_step2_label_firstName || "First Name"}*</FormLabel>
-                      <FormControl><Input {...field} /></FormControl>
+                      <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -170,7 +172,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_lastName || "Last Name"}*</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -187,7 +189,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                                 <DatePickerInput
                                     value={field.value ? new Date(field.value) : undefined}
                                     onChange={field.onChange}
-                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01") || isDisabled}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -200,7 +202,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_placeOfBirth || "Place of Birth"}*</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -213,7 +215,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_nationality || "Nationality"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
                         <FormControl>
                         <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                         </FormControl>
@@ -235,7 +237,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_streetAddress || "Street and House Number"}*</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -248,7 +250,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_postalCode || "Postal Code"}*</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -259,7 +261,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_city || "City"}*</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -272,7 +274,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step2_label_stateOrProvince || "State/Province"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
                         <FormControl>
                         <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                         </FormControl>
@@ -295,7 +297,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_phoneNumber || "Phone Number"}</FormLabel>
-                    <FormControl><Input type="tel" {...field} /></FormControl>
+                    <FormControl><Input type="tel" {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -311,7 +313,10 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                         <div className="flex items-center space-x-2 mt-1">
                             <label
                                 htmlFor="idDocument-file"
-                                className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer"
+                                className={cn(
+                                    "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
+                                    !isDisabled && "hover:bg-accent cursor-pointer"
+                                )}
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
                                 {selectedFileName || (t.register_step2_button_selectFile || "Select File")}
@@ -322,6 +327,7 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                                 className="hidden"
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 onChange={handleFileChange}
+                                disabled={isDisabled}
                             />
                         </div>
                     </FormControl>
@@ -330,12 +336,14 @@ export default function PersonalDataForm({ user, t }: PersonalDataFormProps) {
                 )}
             />
 
-            <div className="flex justify-end pt-4">
-            <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {t.settings_button_save || "Save Changes"}
-            </Button>
-            </div>
+            {!isDisabled && (
+                <div className="flex justify-end pt-4">
+                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {t.settings_button_save || "Save Changes"}
+                    </Button>
+                </div>
+            )}
         </form>
     </Form>
   );

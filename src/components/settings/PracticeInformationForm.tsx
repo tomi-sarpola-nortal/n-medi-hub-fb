@@ -15,6 +15,7 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { HEALTH_INSURANCE_CONTRACTS } from '@/lib/registrationStore';
+import { cn } from '@/lib/utils';
 
 const phoneRegex = new RegExp(
     /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?[\d\s-]{5,}$/
@@ -37,9 +38,10 @@ type FormInputs = z.infer<typeof FormSchema>;
 interface PracticeInformationFormProps {
   user: Person;
   t: Record<string, string>;
+  isDisabled?: boolean;
 }
 
-export default function PracticeInformationForm({ user, t }: PracticeInformationFormProps) {
+export default function PracticeInformationForm({ user, t, isDisabled = false }: PracticeInformationFormProps) {
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +92,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceName || "Name of Practice/Clinic"}*</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -101,7 +103,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceStreetAddress || "Street and House Number"}*</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -113,7 +115,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>{t.register_step5_label_practicePostalCode || "Postal Code"}*</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -124,7 +126,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>{t.register_step5_label_practiceCity || "City"}*</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -136,7 +138,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practicePhoneNumber || "Practice Phone Number"}*</FormLabel>
-                    <FormControl><Input placeholder="+43" {...field} /></FormControl>
+                    <FormControl><Input placeholder="+43" {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -147,7 +149,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceFaxNumber || "Practice Fax Number"}</FormLabel>
-                    <FormControl><Input placeholder="+43" {...field} /></FormControl>
+                    <FormControl><Input placeholder="+43" {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -158,7 +160,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceEmail || "Practice Email"}</FormLabel>
-                    <FormControl><Input type="email" placeholder={t.register_step5_placeholder_practiceEmail || "practice@example.com"} {...field} /></FormControl>
+                    <FormControl><Input type="email" placeholder={t.register_step5_placeholder_practiceEmail || "practice@example.com"} {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -169,7 +171,7 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceWebsite || "Practice Website"}</FormLabel>
-                    <FormControl><Input type="url" placeholder={t.register_step5_placeholder_practiceWebsite || "https://example.com"} {...field} /></FormControl>
+                    <FormControl><Input type="url" placeholder={t.register_step5_placeholder_practiceWebsite || "https://example.com"} {...field} disabled={isDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -197,10 +199,11 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                                         )
                                     );
                                 }}
+                                disabled={isDisabled}
                             />
                             </FormControl>
-                            <FormLabel className="font-normal text-sm">
-                            {t[item.labelKey] || item.id.toUpperCase()}
+                            <FormLabel className={cn("font-normal text-sm", isDisabled && "cursor-not-allowed opacity-70")}>
+                                {t[item.labelKey] || item.id.toUpperCase()}
                             </FormLabel>
                         </FormItem>
                         )}
@@ -210,12 +213,14 @@ export default function PracticeInformationForm({ user, t }: PracticeInformation
                 <FormMessage className="pt-2">{form.formState.errors.healthInsuranceContracts?.message}</FormMessage>
             </FormItem>
 
-            <div className="flex justify-end pt-4">
-                <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {t.settings_button_save || "Save Changes"}
-                </Button>
-            </div>
+            {!isDisabled && (
+                <div className="flex justify-end pt-4">
+                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {t.settings_button_save || "Save Changes"}
+                    </Button>
+                </div>
+            )}
         </form>
     </Form>
   );

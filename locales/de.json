@@ -373,5 +373,7 @@
   "documents_delete_dialog_desc": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird das Dokument dauerhaft gelöscht.",
   "documents_delete_dialog_confirm": "Löschen",
   "documents_delete_dialog_cancel": "Abbrechen",
-  "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen."
+  "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen.",
+  "settings_pending_approval_title": "Konto wartet auf Genehmigung",
+  "settings_pending_approval_alert": "Ihre Registrierung wartet auf Genehmigung. Sie können Ihre übermittelten Daten unten einsehen, aber es können keine Änderungen vorgenommen werden, bis Ihr Konto genehmigt ist."
 }

@@ -36,14 +36,17 @@ export default function DashboardPage() {
   }, [locale]);
   
   useEffect(() => {
-    // If auth state is resolved and there's no user, redirect to login
-    if (!loading && !user) {
-      router.replace(`/${locale}/login`);
+    if (!loading) {
+      if (!user) {
+        router.replace(`/${locale}/login`);
+      } else if (user.status === 'pending') {
+        router.replace(`/${locale}/settings`);
+      }
     }
   }, [user, loading, router, locale]);
 
 
-  if (loading || !user || !t) {
+  if (loading || !user || !t || user.status === 'pending') {
     return (
       <AppLayout pageTitle="Dashboard" locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
