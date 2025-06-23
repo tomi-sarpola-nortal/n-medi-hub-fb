@@ -31,26 +31,73 @@ const mockRepresentationRequests = [
 ];
 
 const LoadingSkeleton = () => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, i) => (
-            <Card key={i} className="shadow-lg">
-                <CardHeader>
-                    <Skeleton className="h-5 w-3/4" />
-                </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                    <div>
-                        <Skeleton className="h-10 w-24 mb-2" />
-                        <Skeleton className="h-4 w-32" />
+    <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
+      <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-6 md:grid-cols-2">
+            {[...Array(2)].map((_, i) => (
+                <Card key={i}>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-3/4" />
+                    </CardHeader>
+                    <CardContent className="flex items-center justify-between">
+                        <div>
+                            <Skeleton className="h-10 w-24 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                        <Skeleton className="h-14 w-14 rounded-full" />
+                    </CardContent>
+                    <CardFooter>
+                        <Skeleton className="h-10 w-full" />
+                    </CardFooter>
+                </Card>
+            ))}
+        </div>
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-5 w-1/2" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+            </CardContent>
+        </Card>
+      </div>
+      <div className="lg:col-span-1">
+        <Card>
+             <CardHeader>
+                <Skeleton className="h-5 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <Skeleton className="h-5 w-3/4" />
+                 <div className="flex items-start gap-3">
+                    <Skeleton className="h-4 w-4 mt-1" />
+                    <div className='space-y-1 w-full'>
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-1/2" />
                     </div>
-                    <Skeleton className="h-14 w-14 rounded-full" />
-                </CardContent>
-                <CardFooter>
-                    <Skeleton className="h-10 w-full" />
-                </CardFooter>
-            </Card>
-        ))}
+                </div>
+                 <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-2/3" />
+                </div>
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-4/5" />
+                </div>
+                <div className="flex items-start gap-3">
+                    <Skeleton className="h-4 w-4 mt-1" />
+                    <div className='space-y-1 w-full'>
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+      </div>
     </div>
 );
+
 
 export default function DentistDashboard({ user, t }: DentistDashboardProps) {
     const [stats, setStats] = useState({ trainingPoints: 0, representationHours: 0 });
@@ -95,78 +142,83 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
             </h2>
             
             {isLoading ? <LoadingSkeleton /> : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Training Status Card */}
-                    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-between">
-                            <div>
-                                <p className="text-4xl font-bold">{stats.trainingPoints} / {TRAINING_TARGET_POINTS}</p>
-                                <p className="text-sm text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
-                            </div>
-                            <div className="p-3 bg-accent rounded-full">
-                                <GraduationCap className="h-8 w-8 text-primary"/>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="outline" className="w-full" asChild>
-                                <Link href="/education">{t.dashboard_training_status_button || "MEINE FORTBILDUNGEN ANSEHEN"}</Link>
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            {/* Training Status Card */}
+                            <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-4xl font-bold">{stats.trainingPoints} / {TRAINING_TARGET_POINTS}</p>
+                                        <p className="text-sm text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
+                                    </div>
+                                    <div className="p-3 bg-accent rounded-full">
+                                        <GraduationCap className="h-8 w-8 text-primary"/>
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button variant="outline" className="w-full" asChild>
+                                        <Link href="/education">{t.dashboard_training_status_button || "MEINE FORTBILDUNGEN ANSEHEN"}</Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
 
-                    {/* Representation Status Card */}
-                    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_representation_status_title || "Ihre Vertretungen"}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-between">
-                            <div>
-                                <p className="text-4xl font-bold">{stats.representationHours}</p>
-                                <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
-                            </div>
-                             <div className="p-3 bg-accent rounded-full">
-                                <CalendarCheck className="h-8 w-8 text-primary"/>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="outline" className="w-full" asChild>
-                                <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                            {/* Representation Status Card */}
+                            <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-medium font-headline">{t.dashboard_representation_status_title || "Ihre Vertretungen"}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-4xl font-bold">{stats.representationHours}</p>
+                                        <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
+                                    </div>
+                                    <div className="p-3 bg-accent rounded-full">
+                                        <CalendarCheck className="h-8 w-8 text-primary"/>
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button variant="outline" className="w-full" asChild>
+                                        <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
+                        
+                        {/* Representation Requests Card */}
+                        <Card className="shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="text-xl font-medium font-headline">{t.dashboard_confirm_reps_title || "Vertretungen bestätigen"}</CardTitle>
+                                <CardDescription>{t.dashboard_confirm_reps_description || "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden."}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {mockRepresentationRequests.map((req) => (
+                                    <div key={req.id} className="p-4 border rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div>
+                                            <p className="font-semibold">{req.name}</p>
+                                            <div className="text-sm text-muted-foreground">
+                                                {req.details.map((line, index) => <p key={index}>{line}</p>)}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+                                            <Button>{t.dashboard_confirm_reps_confirm_button || "BESTÄTIGEN"}</Button>
+                                            <Button variant="outline">{t.dashboard_confirm_reps_decline_button || "ABLEHNEN"}</Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                    {/* Chamber Info Card */}
-                    <StateChamberInfo chamberId={user.stateChamberId} t={t} />
-
+                    <div className="lg:col-span-1">
+                        {/* Chamber Info Card */}
+                        <StateChamberInfo chamberId={user.stateChamberId} t={t} />
+                    </div>
                 </div>
             )}
-
-            {/* Representation Requests Card */}
-            <Card className="shadow-lg col-span-1 lg:col-span-3">
-                <CardHeader>
-                    <CardTitle className="text-xl font-medium font-headline">{t.dashboard_confirm_reps_title || "Vertretungen bestätigen"}</CardTitle>
-                    <CardDescription>{t.dashboard_confirm_reps_description || "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden."}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {mockRepresentationRequests.map((req) => (
-                        <div key={req.id} className="p-4 border rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div>
-                                <p className="font-semibold">{req.name}</p>
-                                <div className="text-sm text-muted-foreground">
-                                    {req.details.map((line, index) => <p key={index}>{line}</p>)}
-                                </div>
-                            </div>
-                            <div className="flex gap-2 flex-shrink-0">
-                                <Button>{t.dashboard_confirm_reps_confirm_button || "BESTÄTIGEN"}</Button>
-                                <Button variant="outline">{t.dashboard_confirm_reps_decline_button || "ABLEHNEN"}</Button>
-                            </div>
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
         </div>
     );
 }
