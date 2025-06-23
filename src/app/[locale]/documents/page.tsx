@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileUp, Download, Trash2, ArrowLeft, ArrowUp, ArrowDown, Loader2, File } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
 import { useAuth } from '@/context/auth-context';
 import { useEffect, useState, useMemo } from 'react';
@@ -45,10 +45,6 @@ type SortDescriptor = {
     desc: boolean;
 };
 
-interface DocumentsPageProps {
-  params: { locale: string };
-}
-
 // Icon Components for File Types
 const PdfFileIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="h-6 w-6">
@@ -67,8 +63,10 @@ const WordFileIcon = () => (
 );
 
 
-export default function DocumentsPage({ params }: DocumentsPageProps) {
+export default function DocumentsPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const { user, loading: authLoading } = useAuth();
   const [t, setT] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -97,9 +95,9 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
   };
 
   useEffect(() => {
-    setT(getClientTranslations(params.locale));
+    setT(getClientTranslations(locale));
     fetchDocuments();
-  }, [params.locale]);
+  }, [locale]);
 
   const handleSort = (columnId: keyof DocumentTemplate) => {
     setSorting(current => ({
@@ -164,7 +162,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
 
   if (pageLoading || !user) {
     return (
-      <AppLayout pageTitle={t?.documents_page_title || "Document Templates"} locale={params.locale}>
+      <AppLayout pageTitle={t?.documents_page_title || "Document Templates"} locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -176,7 +174,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
   const isLkMember = user.role === 'lk_member';
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

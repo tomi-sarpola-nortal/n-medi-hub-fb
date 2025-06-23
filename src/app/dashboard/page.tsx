@@ -5,7 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import AppLayout from '@/components/layout/AppLayout';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 import DentistDashboard from '@/components/dashboard/DentistDashboard';
 import LkMemberDashboard from '@/components/dashboard/LkMemberDashboard';
@@ -23,18 +23,17 @@ const getClientTranslations = (locale: string) => {
   }
 };
 
-interface DashboardPageProps {
-  params: { locale: string };
-}
-
-export default function DashboardPage({ params }: DashboardPageProps) {
+export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
+
   const [t, setT] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
-    setT(getClientTranslations(params.locale));
-  }, [params.locale]);
+    setT(getClientTranslations(locale));
+  }, [locale]);
   
   useEffect(() => {
     // If auth state is resolved and there's no user, redirect to login
@@ -46,7 +45,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
 
   if (loading || !user || !t) {
     return (
-      <AppLayout pageTitle="Dashboard" locale={params.locale}>
+      <AppLayout pageTitle="Dashboard" locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -70,7 +69,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
   };
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
       {renderDashboardByRole()}
     </AppLayout>
   );

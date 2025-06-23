@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { Loader2, Database } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 const getClientTranslations = (locale: string) => {
   try {
@@ -20,23 +21,21 @@ const getClientTranslations = (locale: string) => {
   }
 };
 
-interface DeveloperPageProps {
-  params: { locale: string };
-}
-
-export default function DeveloperPage({ params }: DeveloperPageProps) {
+export default function DeveloperPage() {
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const [t, setT] = useState<Record<string, string>>({});
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    setT(getClientTranslations(params.locale));
-  }, [params.locale]);
+    setT(getClientTranslations(locale));
+  }, [locale]);
 
   const pageTitle = t.developer_module_page_title || "Developer Module";
 
   if (loading || !user) {
     return (
-      <AppLayout pageTitle={pageTitle} locale={params.locale}>
+      <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -45,7 +44,7 @@ export default function DeveloperPage({ params }: DeveloperPageProps) {
   }
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
         <p className="text-muted-foreground">{t.developer_module_page_description || "Actions for development and testing."}</p>

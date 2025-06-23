@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useParams } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -39,12 +40,10 @@ interface SpecialDiplomaItem {
 
 const ITEMS_PER_PAGE = 7;
 
-interface EducationPageProps {
-  params: { locale: string };
-}
-
-export default function EducationPage({ params }: EducationPageProps) {
+export default function EducationPage() {
     const { user, loading: authLoading } = useAuth();
+    const params = useParams();
+    const locale = typeof params.locale === 'string' ? params.locale : 'en';
     const [t, setT] = useState<Record<string, string>>({});
 
     const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
@@ -53,8 +52,8 @@ export default function EducationPage({ params }: EducationPageProps) {
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        setT(getClientTranslations(params.locale));
-    }, [params.locale]);
+        setT(getClientTranslations(locale));
+    }, [locale]);
     
     useEffect(() => {
         if (user) {
@@ -173,7 +172,7 @@ export default function EducationPage({ params }: EducationPageProps) {
 
     if (pageIsLoading) {
         return (
-            <AppLayout pageTitle={pageTitle} locale={params.locale}>
+            <AppLayout pageTitle={pageTitle} locale={locale}>
                 <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
                 </div>
@@ -182,7 +181,7 @@ export default function EducationPage({ params }: EducationPageProps) {
     }
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8">
         <div className="flex items-center justify-between space-y-2">
             <div>

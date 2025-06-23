@@ -10,6 +10,7 @@ import ProfessionalQualificationsForm from '@/components/settings/ProfessionalQu
 import PracticeInformationForm from '@/components/settings/PracticeInformationForm';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -24,22 +25,20 @@ const getClientTranslations = (locale: string) => {
   }
 };
 
-interface SettingsPageProps {
-  params: { locale: string };
-}
-
-export default function SettingsPage({ params }: SettingsPageProps) {
+export default function SettingsPage() {
   const { user, loading } = useAuth();
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const [t, setT] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
-    setT(getClientTranslations(params.locale));
-  }, [params.locale]);
+    setT(getClientTranslations(locale));
+  }, [locale]);
 
 
   if (loading || !user || !t) {
     return (
-      <AppLayout pageTitle={t?.settings_page_title || "Settings"} locale={params.locale}>
+      <AppLayout pageTitle={t?.settings_page_title || "Settings"} locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -50,7 +49,7 @@ export default function SettingsPage({ params }: SettingsPageProps) {
   const pageTitle = t.settings_page_title || "Settings";
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
       <div className="flex-1 space-y-6 p-4 md:p-8 max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
         <p className="text-muted-foreground">{t.settings_page_description || "Update your personal and professional information."}</p>
