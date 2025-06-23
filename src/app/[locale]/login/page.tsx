@@ -77,12 +77,15 @@ export default function LoginPage() {
     <AuthLayout
       pageTitle={t.login_page_main_title || "Portal Login"}
     >
-      <div className="w-full max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+      <div className="w-full max-w-screen-xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
           
-          {/* Column 1: Login Form */}
-          <div className="w-full max-w-md lg:justify-self-end">
-            <Card className="shadow-xl">
+          {/* Column 1: Empty Spacer */}
+          <div className="hidden lg:block"></div>
+
+          {/* Column 2: Login and Register Cards */}
+          <div className="space-y-8">
+            <Card className="shadow-xl w-full max-w-md mx-auto lg:mx-0">
               <CardHeader className="text-center">
                 <CardTitle className="font-headline text-2xl">{t.login_form_title || "Anmeldung ins Portal"}</CardTitle>
               </CardHeader>
@@ -135,33 +138,8 @@ export default function LoginPage() {
                 </p>
               </CardFooter>
             </Card>
-          </div>
-          
-          {/* Column 2: Demo Mode */}
-          <div className="w-full max-w-md lg:justify-self-start">
-            <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Demo Mode</AlertTitle>
-                <AlertDescription>
-                    <p className="mb-2">You can use the following credentials to explore the application:</p>
-                    <div className="space-y-1">
-                        <p className="font-semibold">Dentist Role:</p>
-                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
-                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
-                    </div>
-                    <div className="space-y-1 mt-2">
-                        <p className="font-semibold">Chamber Member Role:</p>
-                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
-                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
-                    </div>
-                </AlertDescription>
-            </Alert>
-          </div>
 
-        </div>
-
-        <div className="w-full max-w-lg mx-auto mt-12">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg w-full max-w-md mx-auto lg:mx-0">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
                   <PlusCircle className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
@@ -181,6 +159,29 @@ export default function LoginPage() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* Column 3: Demo Mode */}
+          <div className="w-full max-w-md mx-auto lg:mx-0">
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Demo Mode</AlertTitle>
+                <AlertDescription>
+                    <p className="mb-2">You can use the following credentials to explore the application:</p>
+                    <div className="space-y-1">
+                        <p className="font-semibold">Dentist Role:</p>
+                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
+                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                    </div>
+                    <div className="space-y-1 mt-2">
+                        <p className="font-semibold">Chamber Member Role:</p>
+                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
+                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                    </div>
+                </AlertDescription>
+            </Alert>
+          </div>
+
         </div>
       </div>
     </AuthLayout>
