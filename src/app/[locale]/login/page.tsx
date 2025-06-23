@@ -185,8 +185,8 @@ export default function LoginPage() {
                     <p className="mb-2">You can use the following credentials to explore the application:</p>
                     <div className="space-y-1">
                         <p className="font-semibold">Dentist Role:</p>
-                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
-                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sabine.mueller@example.com</code></p>
+                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">TestTest24</code></p>
                     </div>
                     <div className="space-y-1 mt-2">
                         <p className="font-semibold">Chamber Member Role:</p>
