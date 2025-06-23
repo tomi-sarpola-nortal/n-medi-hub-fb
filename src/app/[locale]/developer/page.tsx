@@ -6,8 +6,10 @@ import SeedButton from '@/components/dashboard/SeedButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, Database } from 'lucide-react';
+import { Loader2, Database, BookMarked } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const getClientTranslations = (locale: string) => {
   try {
@@ -49,18 +51,37 @@ export default function DeveloperPage() {
         <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
         <p className="text-muted-foreground">{t.developer_module_page_description || "Actions for development and testing."}</p>
         
-        <Card className="mt-6 border-destructive/50 bg-destructive/5">
-            <CardHeader>
-                <div className="flex items-center gap-2">
-                    <Database className="h-5 w-5 text-destructive" />
-                    <CardTitle className="text-destructive">Database Seeding</CardTitle>
-                </div>
-                <CardDescription className="text-destructive/80">Populate Firestore collections with initial data. This only needs to be done once per collection. After successful seeding, this module can be removed.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <SeedButton />
-            </CardContent>
-        </Card>
+        <div className="space-y-6">
+            <Card className="border-destructive/50 bg-destructive/5">
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <Database className="h-5 w-5 text-destructive" />
+                        <CardTitle className="text-destructive">Database Seeding</CardTitle>
+                    </div>
+                    <CardDescription className="text-destructive/80">Populate Firestore collections with initial data. This only needs to be done once per collection. After successful seeding, this module can be removed.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <SeedButton />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <BookMarked className="h-5 w-5 text-primary" />
+                        <CardTitle>{t.developer_module_project_history_title || "Project History"}</CardTitle>
+                    </div>
+                    <CardDescription>{t.developer_module_project_history_desc || "View a summary of implemented features and project history."}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild variant="outline">
+                        <Link href="/project-history.md" target="_blank">
+                            {t.developer_module_show_markup_button || "Show Markup File"}
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
 
       </div>
     </AppLayout>
