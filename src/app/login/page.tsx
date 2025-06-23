@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -145,15 +144,25 @@ export default function LoginPage() {
                 <AlertTitle>Demo Mode</AlertTitle>
                 <AlertDescription>
                     <p className="mb-2">You can use the following credentials to explore the application:</p>
-                    <div className="space-y-1">
-                        <p className="font-semibold">Dentist Role:</p>
-                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
-                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
-                    </div>
-                    <div className="space-y-1 mt-2">
-                        <p className="font-semibold">Chamber Member Role:</p>
-                        <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
-                        <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                    <div className="space-y-2">
+                        <div>
+                            <p className="font-semibold">Dentist Role:</p>
+                            <div className="pl-2 mt-1 space-y-1">
+                                <div>
+                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
+                                    <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                                </div>
+                                <div className="pt-1">
+                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sabine.mueller@example.com</code></p>
+                                    <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">TestTest24</code></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="font-semibold">Chamber Member Role:</p>
+                            <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
+                            <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                        </div>
                     </div>
                 </AlertDescription>
             </Alert>
