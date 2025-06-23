@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation"; 
+import { usePathname } from "next/navigation"; 
 import {
   Sidebar,
   SidebarHeader,
@@ -14,22 +14,12 @@ import {
   SidebarMenuSkeleton,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useAuth } from "@/context/auth-context";
 import { navConfig } from "@/config/nav";
-import { Button } from "@/components/ui/button";
-import { User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard, LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -86,8 +76,6 @@ export function AppSidebar() {
 
   if (!user) return null;
   
-  const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-
   const userNavItems = navConfig[user.role] || [];
 
   return (
@@ -133,15 +121,6 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-4 border-t border-sidebar-border mt-auto">
          <SidebarMenu>
-             <SidebarMenuItem>
-                <div className="px-2"> {/* To align with button padding */}
-                    <Select defaultValue="dentist" disabled>
-                        <SelectTrigger>
-                            <SelectValue>{t.dentist || 'Zahnarzt'}</SelectValue>
-                        </SelectTrigger>
-                    </Select>
-                </div>
-            </SidebarMenuItem>
             <SidebarMenuItem>
                <div className="px-2">
                  <LanguageSwitcher />
@@ -152,9 +131,7 @@ export function AppSidebar() {
                     onClick={logout}
                     className="text-sidebar-foreground font-medium"
                 >
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback className="text-xs bg-destructive text-destructive-foreground">{initials}</AvatarFallback>
-                    </Avatar>
+                    <LogOut className="h-5 w-5"/>
                     <span>{t.sidebar_logout || "Abmelden"}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
