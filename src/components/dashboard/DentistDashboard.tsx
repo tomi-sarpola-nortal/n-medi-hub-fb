@@ -1,12 +1,16 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
 import StateChamberInfo from './StateChamberInfo';
+import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
+import { getConfirmedRepresentationHours } from '@/services/representationService';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DentistDashboardProps {
     user: Person;
@@ -26,9 +30,63 @@ const mockRepresentationRequests = [
     }
 ];
 
+const LoadingSkeleton = () => (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
+            <Card key={i} className="shadow-lg">
+                <CardHeader>
+                    <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="flex items-center justify-between">
+                    <div>
+                        <Skeleton className="h-10 w-24 mb-2" />
+                        <Skeleton className="h-4 w-32" />
+                    </div>
+                    <Skeleton className="h-14 w-14 rounded-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                </CardFooter>
+            </Card>
+        ))}
+    </div>
+);
+
 export default function DentistDashboard({ user, t }: DentistDashboardProps) {
+    const [stats, setStats] = useState({ trainingPoints: 0, representationHours: 0 });
+    const [isLoading, setIsLoading] = useState(true);
+    
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            if (!user) return;
+
+            setIsLoading(true);
+            try {
+                const [trainingHistory, confirmedHours] = await Promise.all([
+                    getTrainingHistoryForUser(user.id),
+                    getConfirmedRepresentationHours(user.id)
+                ]);
+
+                const totalPoints = trainingHistory.reduce((sum, record) => sum + record.points, 0);
+
+                setStats({
+                    trainingPoints: totalPoints,
+                    representationHours: confirmedHours,
+                });
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+                setStats({ trainingPoints: 0, representationHours: 0 });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, [user]);
+
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
     const welcomeMessage = t.welcome_back.replace('{userName}', fullName);
+    const TRAINING_TARGET_POINTS = 120;
 
     return (
         <div className="flex-1 space-y-8 p-4 md:p-8">
@@ -36,53 +94,55 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                 {welcomeMessage}
             </h2>
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {/* Training Status Card */}
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardHeader>
-                        <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex items-center justify-between">
-                        <div>
-                            <p className="text-4xl font-bold">97 / 120</p>
-                            <p className="text-sm text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
-                        </div>
-                        <div className="p-3 bg-accent rounded-full">
-                            <GraduationCap className="h-8 w-8 text-primary"/>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button variant="outline" className="w-full" asChild>
-                            <Link href="/education">{t.dashboard_training_status_button || "MEINE FORTBILDUNGEN ANSEHEN"}</Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
+            {isLoading ? <LoadingSkeleton /> : (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {/* Training Status Card */}
+                    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <CardHeader>
+                            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex items-center justify-between">
+                            <div>
+                                <p className="text-4xl font-bold">{stats.trainingPoints} / {TRAINING_TARGET_POINTS}</p>
+                                <p className="text-sm text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
+                            </div>
+                            <div className="p-3 bg-accent rounded-full">
+                                <GraduationCap className="h-8 w-8 text-primary"/>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button variant="outline" className="w-full" asChild>
+                                <Link href="/education">{t.dashboard_training_status_button || "MEINE FORTBILDUNGEN ANSEHEN"}</Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
 
-                {/* Representation Status Card */}
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardHeader>
-                        <CardTitle className="text-lg font-medium font-headline">{t.dashboard_representation_status_title || "Ihre Vertretungen"}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex items-center justify-between">
-                        <div>
-                            <p className="text-4xl font-bold">34</p>
-                            <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
-                        </div>
-                         <div className="p-3 bg-accent rounded-full">
-                            <CalendarCheck className="h-8 w-8 text-primary"/>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button variant="outline" className="w-full" asChild>
-                            <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
+                    {/* Representation Status Card */}
+                    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <CardHeader>
+                            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_representation_status_title || "Ihre Vertretungen"}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex items-center justify-between">
+                            <div>
+                                <p className="text-4xl font-bold">{stats.representationHours}</p>
+                                <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
+                            </div>
+                             <div className="p-3 bg-accent rounded-full">
+                                <CalendarCheck className="h-8 w-8 text-primary"/>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button variant="outline" className="w-full" asChild>
+                                <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
 
-                {/* Chamber Info Card */}
-                <StateChamberInfo chamberId={user.stateChamberId} t={t} />
+                    {/* Chamber Info Card */}
+                    <StateChamberInfo chamberId={user.stateChamberId} t={t} />
 
-            </div>
+                </div>
+            )}
 
             {/* Representation Requests Card */}
             <Card className="shadow-lg col-span-1 lg:col-span-3">

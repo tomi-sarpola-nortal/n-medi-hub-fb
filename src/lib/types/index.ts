@@ -245,3 +245,20 @@ export interface StateChamber {
 }
 
 export type StateChamberCreationData = Omit<StateChamber, 'id'>;
+
+
+export interface Representation {
+  id: string;
+  representingPersonId: string;
+  representedPersonId: string;
+  representingPersonName: string; 
+  representedPersonName: string;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  durationHours: number;
+  status: 'pending' | 'confirmed' | 'declined';
+  createdAt: string; // ISO date string
+  confirmedAt?: string; // ISO date string
+}
+
+export type RepresentationCreationData = Omit<Representation, 'id' | 'createdAt'>;
