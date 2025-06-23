@@ -210,3 +210,11 @@ export interface TrainingCategory {
 }
 
 export type TrainingCategoryCreationData = Omit<TrainingCategory, 'id'>;
+
+export interface TrainingOrganizer {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
+export type TrainingOrganizerCreationData = Omit<TrainingOrganizer, 'id'>;

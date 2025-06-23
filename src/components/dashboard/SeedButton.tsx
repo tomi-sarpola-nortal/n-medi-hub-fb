@@ -2,21 +2,22 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Database } from 'lucide-react';
 
 export default function SeedButton() {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+  const [isOrganizersLoading, setIsOrganizersLoading] = useState(false);
 
-  const handleSeed = async () => {
-    setIsLoading(true);
+  const handleSeedCategories = async () => {
+    setIsCategoriesLoading(true);
     try {
       const result = await seedTrainingCategories();
       toast({
-        title: "Seeding Report",
+        title: "Seeding Report (Categories)",
         description: result.message,
       });
     } catch (error) {
@@ -27,7 +28,26 @@ export default function SeedButton() {
         variant: "destructive",
       });
     }
-    setIsLoading(false);
+    setIsCategoriesLoading(false);
+  };
+  
+  const handleSeedOrganizers = async () => {
+    setIsOrganizersLoading(true);
+    try {
+      const result = await seedTrainingOrganizers();
+      toast({
+        title: "Seeding Report (Organizers)",
+        description: result.message,
+      });
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute seed action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsOrganizersLoading(false);
   };
 
   return (
@@ -37,13 +57,18 @@ export default function SeedButton() {
         <h3 className="font-semibold text-destructive">Temporary Data Seeding</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-3">
-        Click this button to populate the 'training_categories' collection in your Firestore database. This only needs to be done once.
+        Click these buttons to populate collections in your Firestore database. This only needs to be done once per collection.
       </p>
-      <Button onClick={handleSeed} disabled={isLoading} variant="destructive" className="w-full sm:w-auto">
-        {isLoading ? "Seeding..." : "Seed Training Categories"}
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Button onClick={handleSeedCategories} disabled={isCategoriesLoading} variant="destructive" className="w-full sm:w-auto">
+          {isCategoriesLoading ? "Seeding..." : "Seed Training Categories"}
+        </Button>
+        <Button onClick={handleSeedOrganizers} disabled={isOrganizersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isOrganizersLoading ? "Seeding..." : "Seed Training Organizers"}
+        </Button>
+      </div>
        <p className="text-xs text-muted-foreground mt-2">
-        After successful seeding, you may remove this button and its related files.
+        After successful seeding, you may remove this component and its related files.
       </p>
     </div>
   );
