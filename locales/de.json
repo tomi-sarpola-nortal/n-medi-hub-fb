@@ -150,7 +150,7 @@
   "register_step4_data_saved_title": "Berufliche Qualifikationen gespeichert",
   "register_step4_data_saved_desc": "Ihre beruflichen Qualifikationen wurden temporär gespeichert. Fahren Sie mit dem nächsten Schritt fort.",
   "register_step4_prof_title_zahnarzt": "Zahnarzt/Zahnärztin",
-  "dentist": "Zahnarzt/Zahnärztin",
+  "dentist": "Zahnarzt",
   "lk_member": "Landeskammer-Mitglied",
   "ozak_employee": "ÖZÄK-Mitarbeiter",
   "register_step4_prof_title_fachzahnarzt_kfo": "Fachzahnarzt/Fachzahnärztin für Kieferorthopädie",
@@ -372,3 +372,5 @@
   "documents_delete_dialog_cancel": "Abbrechen",
   "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen."
 }
+
+    

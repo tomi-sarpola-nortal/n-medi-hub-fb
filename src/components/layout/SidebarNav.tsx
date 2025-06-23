@@ -14,14 +14,22 @@ import {
   SidebarMenuSkeleton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuth } from "@/context/auth-context";
 import { navConfig } from "@/config/nav";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
+import { User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -50,19 +58,15 @@ export function AppSidebar() {
   if (authLoading) {
     return (
        <Sidebar collapsible="none">
-        <SidebarHeader className="p-3 flex items-center justify-between">
+        <SidebarHeader className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden">
-             <Skeleton className="h-8 w-8 rounded-md" />
-            <div className="space-y-1">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-24" />
-            </div>
+             <Skeleton className="h-10 w-24 rounded-md" />
           </div>
         </SidebarHeader>
-        <SidebarContent className="p-2 flex-grow">
-          <div className="bg-sidebar-user-info-background p-3 rounded-md m-2 space-y-2">
+        <SidebarContent className="p-4 flex-grow">
+          <div className="bg-muted p-4 rounded-lg space-y-2">
             <div className="flex items-center gap-3">
-              <Skeleton className="h-10 w-10 rounded-md" />
+              <Skeleton className="h-10 w-10 rounded-full" />
               <div className="space-y-1">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-3 w-24" />
@@ -73,7 +77,7 @@ export function AppSidebar() {
             <SidebarMenuSkeleton key={i} showIcon={true} />
           ))}
         </SidebarContent>
-        <SidebarFooter className="p-2">
+        <SidebarFooter className="p-4">
             <SidebarMenuSkeleton showIcon={true}/>
         </SidebarFooter>
       </Sidebar>
@@ -81,20 +85,22 @@ export function AppSidebar() {
   }
 
   if (!user) return null;
+  
+  const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
   const userNavItems = navConfig[user.role] || [];
 
   return (
     <Sidebar collapsible="none">
-      <SidebarHeader className="flex items-center justify-between p-3">
+      <SidebarHeader className="flex items-center justify-between p-4">
         <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
-          <Logo portalText={t.login_logo_text_portal || "Portal"} />
+          <Logo iconSize={50} portalText={t.login_logo_text_portal || "Portal"} />
         </Link>
       </SidebarHeader>
 
       {/* User Profile Section */}
-      <div className="p-3 mx-2 my-1 rounded-md bg-muted text-sidebar-foreground">
-        <div className="w-full h-auto p-0 justify-start items-center gap-3 flex">
+      <div className="p-4">
+        <div className="w-full h-auto p-4 justify-start items-center gap-3 flex bg-muted rounded-lg">
           <User className="h-10 w-10 text-primary flex-shrink-0" />
           <div className="text-sm overflow-hidden text-left">
             <p className="font-semibold truncate">{user.name}</p>
@@ -104,7 +110,8 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <SidebarContent className="flex-grow p-2">
+
+      <SidebarContent className="flex-grow p-4">
         <SidebarMenu>
           {userNavItems.map((item) => (
             <SidebarMenuItem key={item.href}>
@@ -124,8 +131,17 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-2 border-t border-sidebar-border mt-auto">
+      <SidebarFooter className="p-4 border-t border-sidebar-border mt-auto">
          <SidebarMenu>
+             <SidebarMenuItem>
+                <div className="px-2"> {/* To align with button padding */}
+                    <Select defaultValue="dentist" disabled>
+                        <SelectTrigger>
+                            <SelectValue>{t.dentist || 'Zahnarzt'}</SelectValue>
+                        </SelectTrigger>
+                    </Select>
+                </div>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                <div className="px-2">
                  <LanguageSwitcher />
@@ -134,9 +150,11 @@ export function AppSidebar() {
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={logout}
-                    className="text-sidebar-foreground font-medium hover:bg-sidebar-accent hover:text-primary"
+                    className="text-sidebar-foreground font-medium"
                 >
-                    <LogOut className="h-5 w-5"/>
+                    <Avatar className="h-6 w-6">
+                      <AvatarFallback className="text-xs bg-destructive text-destructive-foreground">{initials}</AvatarFallback>
+                    </Avatar>
                     <span>{t.sidebar_logout || "Abmelden"}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -145,3 +163,5 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+    

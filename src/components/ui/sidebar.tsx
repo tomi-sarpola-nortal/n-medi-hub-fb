@@ -363,7 +363,7 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-4", className)}
       {...props}
     />
   )
@@ -378,7 +378,7 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-4", className)}
       {...props}
     />
   )
@@ -409,7 +409,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden p-4",
         className
       )}
       {...props}
@@ -517,13 +517,13 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding,color,background-color,border-color] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground focus-visible:ring-2 active:bg-sidebar-item-hover-background active:text-sidebar-item-hover-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[state=open]:hover:bg-sidebar-item-hover-background data-[state=open]:hover:text-sidebar-item-hover-foreground group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-2.5 group-data-[collapsible=icon]:justify-center [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md px-3 py-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding,color,background-color,border-color] focus-visible:ring-2 active:bg-sidebar-item-hover-background active:text-sidebar-item-hover-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[state=open]:hover:bg-sidebar-item-hover-background data-[state=open]:hover:text-sidebar-item-hover-foreground group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-2.5 group-data-[collapsible=icon]:justify-center [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "text-sidebar-foreground data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary data-[active=true]:pl-[calc(0.5rem_-_1px)]",
+        default: "text-sidebar-foreground justify-start hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-primary data-[active=true]:text-primary-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-item-hover-background))] data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary data-[active=true]:pl-[calc(0.5rem_-_1px)] data-[active=true]:shadow-none",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-item-hover-background))] data-[active=true]:bg-primary data-[active=true]:text-primary-foreground data-[active=true]:shadow-none",
       },
       size: {
         default: "h-9 text-sm",
@@ -756,3 +756,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    

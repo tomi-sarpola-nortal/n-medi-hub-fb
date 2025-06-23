@@ -10,9 +10,9 @@ interface LogoProps {
   hidePortalText?: boolean;
 }
 
-export default function Logo({ className, iconSize = 40, portalText, hidePortalText = false }: LogoProps) {
+export default function Logo({ className, iconSize = 80, portalText, hidePortalText = false }: LogoProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex flex-col items-start", className)}>
       <Image
         src="https://firebasestorage.googleapis.com/v0/b/zahn-aerzte-kammer-v6.firebasestorage.app/o/logos%2Flogo-oezaek.svg?alt=media&token=09df57b3-78e7-41fd-bbfe-8ce54d339c88"
         alt="ÖZÄK Logo"
@@ -22,10 +22,12 @@ export default function Logo({ className, iconSize = 40, portalText, hidePortalT
         priority
       />
       {!hidePortalText && (
-        <span className="font-headline text-lg font-medium text-primary" style={{ paddingLeft: '1px' }}>
+        <p className="text-sm text-muted-foreground mt-2">
             {portalText}
-        </span>
+        </p>
       )}
     </div>
   );
 }
+
+    
