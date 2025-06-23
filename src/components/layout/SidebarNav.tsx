@@ -108,25 +108,36 @@ export function AppSidebar() {
 
       <SidebarContent className="flex-grow p-4">
         <SidebarMenu>
-          {userNavItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <Link href={item.href} legacyBehavior={false} passHref={false}>
-                <SidebarMenuButton
-                  disabled={isPending && item.href !== '/settings'}
-                  isActive={
-                    (isPending && item.href === '/settings') ||
-                    (!isPending && (pathname.endsWith(item.href) || (item.href !== "/dashboard" && pathname.includes(item.href))))
-                  }
-                  tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
-                  aria-label={t[item.title] || item.title}
-                  className="font-medium"
+          {userNavItems.map((item) => {
+            const isNavItemDisabled = isPending && item.href !== '/settings';
+            return (
+              <SidebarMenuItem key={item.href}>
+                <Link 
+                  href={item.href}
+                  legacyBehavior={false}
+                  passHref={false}
+                  className={isNavItemDisabled ? "pointer-events-none" : ""}
+                  onClick={(e) => {
+                      if (isNavItemDisabled) e.preventDefault();
+                  }}
                 >
-                  {item.icon && <item.icon className="h-5 w-5"/>}
-                  <span>{t[item.title] || item.title}</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          ))}
+                  <SidebarMenuButton
+                    disabled={isNavItemDisabled}
+                    isActive={
+                      (isPending && item.href === '/settings') ||
+                      (!isPending && (pathname.endsWith(item.href) || (item.href !== "/dashboard" && pathname.includes(item.href))))
+                    }
+                    tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
+                    aria-label={t[item.title] || item.title}
+                    className="font-medium"
+                  >
+                    {item.icon && <item.icon className="h-5 w-5"/>}
+                    <span>{t[item.title] || item.title}</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
 

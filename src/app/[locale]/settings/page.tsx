@@ -62,7 +62,7 @@ export default function SettingsPage() {
             <AlertTriangle className="h-4 w-4 !text-amber-600 dark:!text-amber-400" />
             <AlertTitle>{t.settings_pending_approval_title || "Account Pending Approval"}</AlertTitle>
             <AlertDescription>
-              {t.settings_pending_approval_alert || "Your registration is waiting for approval. You can review your submitted data below, but no changes can be made."}
+              {t.settings_pending_approval_alert || "Your registration is waiting for approval. You can review your submitted data below, but no changes can be made until your account is approved."}
             </AlertDescription>
           </Alert>
         )}
@@ -72,7 +72,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_personal_data_title || "Personal Data"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_personal_data_desc || "Update your personal details and contact information."}</p>
-              <PersonalDataForm user={user} t={t} isDisabled={isPending} />
+              <PersonalDataForm user={user} t={t} />
             </AccordionContent>
           </AccordionItem>
           
@@ -80,7 +80,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_prof_qual_title || "Professional Qualifications"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_prof_qual_desc || "Manage your professional titles, specializations, and qualifications."}</p>
-              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isPending} />
+              <ProfessionalQualificationsForm user={user} t={t} />
             </AccordionContent>
           </AccordionItem>
           
@@ -88,12 +88,12 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_practice_info_title || "Practice Information"}</AccordionTrigger>
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
-                <PracticeInformationForm user={user} t={t} isDisabled={isPending} />
+                <PracticeInformationForm user={user} t={t} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
 
-        <DeleteAccountSection user={user} t={t} isDisabled={isPending} />
+        <DeleteAccountSection user={user} t={t} />
       </div>
     </AppLayout>
   );
