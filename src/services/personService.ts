@@ -2,7 +2,7 @@
 'use server';
 
 import { db } from '@/lib/firebaseConfig';
-import type { Person, PersonCreationData } from '@/types';
+import type { Person, PersonCreationData } from '@/lib/types';
 import {
   collection,
   doc,
@@ -66,7 +66,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     status: data.status,
     otpEnabled: data.otpEnabled,
     otpSecret: data.otpSecret,
-    stateChamberId: data.stateChamberId,
+    stateChamberId: data.stateChamberId || 'wien',
     
     // Add missing fields to make it a complete user representation
     approved: data.approved,
