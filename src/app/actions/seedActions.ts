@@ -29,11 +29,16 @@ const organizersToSeed: TrainingOrganizerCreationData[] = [
 const historyToSeed: TrainingHistoryCreationData[] = [
   { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 8, organizer: "Universitätsklinik Wien" },
   { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 6, organizer: "ÖZÄK" },
-  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "ZMK", points: 4, organizer: "Medizinische Universität Graz" },
-  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "ZMK", points: 5, organizer: "Österreichische Gesellschaft für KFO" },
+  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 4, organizer: "Medizinische Universität Graz" },
+  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 5, organizer: "Österreichische Gesellschaft für KFO" },
   { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 3, organizer: "DentEd Online" },
   { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 4, organizer: "Zahnärztekammer Wien" },
   { date: "2025-03-15", title: "Schmerzmanagement in der Zahnmedizin", category: "ZMK", points: 6, organizer: "Medizinische Universität Wien" },
+  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 12, organizer: "Universitätsklinik Wien" },
+  { date: "2025-02-18", title: "Notfälle in der Zahnarztpraxis", category: "ZMK", points: 8, organizer: "Zahnärztekammer Wien" },
+  { date: "2025-01-30", title: "Fachzeitschrift: Parodontologie Update", category: "Literatur", points: 2, organizer: "DentEd Online" },
+  { date: "2025-01-15", title: "Workshop: Abrechnung und Recht", category: "Frei", points: 5, organizer: "ÖZÄK" },
+  { date: "2024-12-10", title: "Grundkurs Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO" },
 ];
 
 

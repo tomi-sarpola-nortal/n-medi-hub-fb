@@ -28,14 +28,6 @@ const getClientTranslations = (locale: string) => {
     }
 };
 
-
-interface ZfdProgressItem {
-  label: string;
-  current: number;
-  total: number;
-  color?: string;
-}
-
 interface SpecialDiplomaItem {
   id: string;
   title: string;
@@ -44,9 +36,19 @@ interface SpecialDiplomaItem {
   percentage: number;
 }
 
-const mockZfdTotal = { current: 97, total: 120 };
-
 const ITEMS_PER_PAGE = 7;
+
+const ZFD_CATEGORY_MAP = {
+    jobRelated: ['ZMK', 'KFO', 'PARO', 'IMPL'],
+    freeChoice: ['Frei'],
+    literature: ['Literatur']
+};
+
+const ZFD_TOTALS = {
+    jobRelated: 60,
+    freeChoice: 15,
+    literature: 45
+};
 
 interface EducationPageProps {
   params: { locale: string };
@@ -85,6 +87,44 @@ export default function EducationPage({ params }: EducationPageProps) {
             setIsLoading(false);
         }
     }, [user, authLoading]);
+
+    // Calculate ZFD progress dynamically
+    const zfdProgressData = useMemo(() => {
+        if (!trainingHistory || trainingHistory.length === 0 || Object.keys(t).length === 0) {
+            return {
+                categories: [
+                    { label: t.zfd_category_berufsbezogen || "Job-related", current: 0, total: ZFD_TOTALS.jobRelated },
+                    { label: t.zfd_category_frei || "Free Choice", current: 0, total: ZFD_TOTALS.freeChoice },
+                    { label: t.zfd_category_literatur || "Literature/Webinars", current: 0, total: ZFD_TOTALS.literature },
+                ],
+                total: { current: 0, total: ZFD_TOTALS.jobRelated + ZFD_TOTALS.freeChoice + ZFD_TOTALS.literature }
+            };
+        }
+
+        const points = { jobRelated: 0, freeChoice: 0, literature: 0 };
+
+        trainingHistory.forEach(record => {
+            if (ZFD_CATEGORY_MAP.jobRelated.includes(record.category)) {
+                points.jobRelated += record.points;
+            } else if (ZFD_CATEGORY_MAP.freeChoice.includes(record.category)) {
+                points.freeChoice += record.points;
+            } else if (ZFD_CATEGORY_MAP.literature.includes(record.category)) {
+                points.literature += record.points;
+            }
+        });
+
+        const totalCurrent = points.jobRelated + points.freeChoice + points.literature;
+        const totalMax = ZFD_TOTALS.jobRelated + ZFD_TOTALS.freeChoice + ZFD_TOTALS.literature;
+        
+        return {
+            categories: [
+                { label: t.zfd_category_berufsbezogen || "Job-related", current: points.jobRelated, total: ZFD_TOTALS.jobRelated },
+                { label: t.zfd_category_frei || "Free Choice", current: points.freeChoice, total: ZFD_TOTALS.freeChoice },
+                { label: t.zfd_category_literatur || "Literature/Webinars", current: points.literature, total: ZFD_TOTALS.literature },
+            ],
+            total: { current: totalCurrent, total: totalMax }
+        };
+    }, [trainingHistory, t]);
 
     // Calculate specialist diplomas dynamically
     const specialistDiplomas = useMemo(() => {
@@ -142,12 +182,6 @@ export default function EducationPage({ params }: EducationPageProps) {
             </AppLayout>
         );
     }
-  
-    const mockZfdCategories: ZfdProgressItem[] = [
-        { label: t.zfd_category_berufsbezogen || "Job-related", current: 45, total: 60 },
-        { label: t.zfd_category_frei || "Free Choice", current: 12, total: 15 },
-        { label: t.zfd_category_literatur || "Literature/Webinars", current: 40, total: 45 },
-    ];
 
   return (
     <AppLayout pageTitle={pageTitle} locale={params.locale}>
@@ -169,15 +203,15 @@ export default function EducationPage({ params }: EducationPageProps) {
           <CardContent className="grid md:grid-cols-3 gap-6 items-center">
             <div className="md:col-span-1 flex justify-center">
               <CircularProgress 
-                value={(mockZfdTotal.current / mockZfdTotal.total) * 100} 
+                value={(zfdProgressData.total.current / zfdProgressData.total.total) * 100} 
                 radius={70} 
                 strokeWidth={12}
-                valueText={t.zfd_total_progress?.replace('{current}', mockZfdTotal.current.toString()).replace('{total}', mockZfdTotal.total.toString()) || ''}
+                valueText={t.zfd_total_progress?.replace('{current}', zfdProgressData.total.current.toString()).replace('{total}', zfdProgressData.total.total.toString()) || ''}
                 textClassName="font-headline"
               />
             </div>
             <div className="md:col-span-2 space-y-4">
-              {mockZfdCategories.map(category => (
+              {zfdProgressData.categories.map(category => (
                 <div key={category.label}>
                   <div className="mb-1 flex justify-between">
                     <span className="text-sm font-medium">{category.label}</span>
