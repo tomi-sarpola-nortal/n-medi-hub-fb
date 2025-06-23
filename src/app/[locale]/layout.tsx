@@ -1,25 +1,12 @@
 
-import type {Metadata} from 'next';
-import '../globals.css';
-import { Providers } from '@/context/providers';
+import type { ReactNode } from 'react';
 
-export const metadata: Metadata = {
-  title: 'Zahn Aerzte Kammer V6',
-  description: 'Dental Chamber Management Portal',
-};
-
-export default function RootLayout({
+// The root layout at `src/app/layout.tsx` now handles the <html>, <body>, and Providers.
+// This layout is now just a pass-through for its children.
+export default function LocaleLayout({
   children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: { locale: string };
-}>) {
-  return (
-      <body className="font-body antialiased">
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-  );
+}: {
+  children: ReactNode;
+}) {
+  return <>{children}</>;
 }
