@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
 import Logo from '../layout/Logo';
+import { ThemeToggle } from '../layout/ThemeToggle';
 
 // Helper for client-side translations (consistent with login page)
 const getClientTranslations = (locale: string) => {
@@ -74,8 +75,9 @@ export default function AuthLayout({
                 {translatedBackButtonText}
                 </Button>
             )}
-            <div>
+            <div className="flex items-center gap-2">
                 <LanguageSwitcher />
+                <ThemeToggle />
             </div>
           </div>
         </div>
