@@ -46,12 +46,6 @@ interface SpecialDiplomaItem {
 
 const mockZfdTotal = { current: 97, total: 120 };
 
-const mockSpecialDiplomas: SpecialDiplomaItem[] = [
-  { id: 'implant', title: "Implantologie", currentPoints: 45, totalPoints: 50, percentage: 90 },
-  { id: 'kfo', title: "Kieferorthopädie", currentPoints: 30, totalPoints: 50, percentage: 60 },
-  { id: 'paro', title: "Parodontologie", currentPoints: 15, totalPoints: 50, percentage: 30 },
-];
-
 const ITEMS_PER_PAGE = 7;
 
 interface EducationPageProps {
@@ -91,6 +85,45 @@ export default function EducationPage({ params }: EducationPageProps) {
             setIsLoading(false);
         }
     }, [user, authLoading]);
+
+    // Calculate specialist diplomas dynamically
+    const specialistDiplomas = useMemo(() => {
+        if (!trainingHistory || Object.keys(t).length === 0) return [];
+
+        const categoryPoints: { [key: string]: number } = {};
+        
+        // Define categories that contribute to diplomas and their full names from translations
+        const diplomaCategoryMap: { [key: string]: string } = {
+            'IMPL': t.register_step4_spec_implantologie || 'Implantology',
+            'KFO': t.register_step4_spec_kieferorthopaedie || 'Orthodontics',
+            'PARO': t.register_step4_spec_parodontologie || 'Periodontology',
+            'ZMK': t.register_step4_spec_allgemeine_zahnheilkunde || 'General Dentistry',
+        };
+        const diplomaCategoryAbbrs = Object.keys(diplomaCategoryMap);
+
+        trainingHistory.forEach(record => {
+            if (diplomaCategoryAbbrs.includes(record.category)) {
+                if (!categoryPoints[record.category]) {
+                    categoryPoints[record.category] = 0;
+                }
+                categoryPoints[record.category] += record.points;
+            }
+        });
+
+        const totalPointsForDiploma = 50;
+
+        const diplomas: SpecialDiplomaItem[] = Object.entries(categoryPoints).map(([categoryAbbr, currentPoints]) => ({
+            id: categoryAbbr,
+            title: diplomaCategoryMap[categoryAbbr] || categoryAbbr,
+            currentPoints,
+            totalPoints: totalPointsForDiploma,
+            percentage: (currentPoints / totalPointsForDiploma) * 100,
+        }));
+
+        // Sort by points descending and take top 3
+        return diplomas.sort((a, b) => b.currentPoints - a.currentPoints).slice(0, 3);
+
+    }, [trainingHistory, t]);
 
     const totalPages = Math.ceil(trainingHistory.length / ITEMS_PER_PAGE);
     const paginatedTrainingHistory = useMemo(() => {
@@ -139,7 +172,7 @@ export default function EducationPage({ params }: EducationPageProps) {
                 value={(mockZfdTotal.current / mockZfdTotal.total) * 100} 
                 radius={70} 
                 strokeWidth={12}
-                valueText={t.zfd_total_progress.replace('{current}', mockZfdTotal.current.toString()).replace('{total}', mockZfdTotal.total.toString())}
+                valueText={t.zfd_total_progress?.replace('{current}', mockZfdTotal.current.toString()).replace('{total}', mockZfdTotal.total.toString()) || ''}
                 textClassName="font-headline"
               />
             </div>
@@ -149,7 +182,7 @@ export default function EducationPage({ params }: EducationPageProps) {
                   <div className="mb-1 flex justify-between">
                     <span className="text-sm font-medium">{category.label}</span>
                     <span className="text-sm text-muted-foreground">
-                      {t.zfd_total_progress.replace('{current}', category.current.toString()).replace('{total}', category.total.toString())}
+                      {t.zfd_total_progress?.replace('{current}', category.current.toString()).replace('{total}', category.total.toString())}
                     </span>
                   </div>
                   <Progress value={(category.current / category.total) * 100} className="h-3" />
@@ -162,7 +195,7 @@ export default function EducationPage({ params }: EducationPageProps) {
         <div>
           <h2 className="text-2xl font-semibold font-headline tracking-tight mb-4">{t.spezialdiplome_title || "Specialist Diplomas"}</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {mockSpecialDiplomas.map(diploma => (
+            {specialistDiplomas.map(diploma => (
               <Card key={diploma.id} className="shadow-md hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
                    <CircularProgress 
@@ -173,7 +206,7 @@ export default function EducationPage({ params }: EducationPageProps) {
                   />
                   <CardTitle className="text-lg font-medium font-headline mt-4">{diploma.title}</CardTitle>
                   <CardDescription>
-                    {t.spezialdiplome_points.replace('{currentPoints}', diploma.currentPoints.toString()).replace('{totalPoints}', diploma.totalPoints.toString())}
+                    {t.spezialdiplome_points?.replace('{currentPoints}', diploma.currentPoints.toString()).replace('{totalPoints}', diploma.totalPoints.toString())}
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -217,7 +250,7 @@ export default function EducationPage({ params }: EducationPageProps) {
                 <div className="mt-6 flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                         {t.fortbildungshistorie_pagination_showing
-                        .replace('{start}', (ITEMS_PER_PAGE * (currentPage - 1) + 1).toString())
+                        ?.replace('{start}', (ITEMS_PER_PAGE * (currentPage - 1) + 1).toString())
                         .replace('{end}', Math.min(ITEMS_PER_PAGE * currentPage, trainingHistory.length).toString())
                         .replace('{total}', trainingHistory.length.toString())
                         }
