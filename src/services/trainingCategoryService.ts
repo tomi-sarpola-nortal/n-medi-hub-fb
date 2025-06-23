@@ -33,6 +33,8 @@ const snapshotToCategory = (snapshot: DocumentSnapshot<any> | QueryDocumentSnaps
     name: data.name,
     abbreviation: data.abbreviation,
     isActive: data.isActive,
+    zfdGroupName: data.zfdGroupName,
+    zfdGroupPoints: data.zfdGroupPoints,
   } as TrainingCategory;
 }
 
@@ -59,4 +61,14 @@ export async function createTrainingCategory(categoryData: TrainingCategoryCreat
   checkDb();
   const categoryDocRef = doc(db, TRAINING_CATEGORIES_COLLECTION, categoryData.abbreviation);
   await setDoc(categoryDocRef, categoryData);
+}
+
+/**
+ * Retrieves all training categories from Firestore.
+ * @returns An array of TrainingCategory objects.
+ */
+export async function getAllTrainingCategories(): Promise<TrainingCategory[]> {
+    checkDb();
+    const querySnapshot = await getDocs(collection(db, TRAINING_CATEGORIES_COLLECTION));
+    return querySnapshot.docs.map(snapshotToCategory);
 }

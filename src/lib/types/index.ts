@@ -207,6 +207,8 @@ export interface TrainingCategory {
   name: string;
   abbreviation: string;
   isActive: boolean;
+  zfdGroupName?: string; // Translation key for the ZFD parent group, e.g., 'zfd_category_berufsbezogen'
+  zfdGroupPoints?: number; // Total points for that ZFD parent group, e.g., 60
 }
 
 export type TrainingCategoryCreationData = Omit<TrainingCategory, 'id'>;

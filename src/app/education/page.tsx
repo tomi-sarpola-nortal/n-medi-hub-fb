@@ -4,7 +4,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { TrainingHistory } from '@/lib/types';
+import { getAllTrainingCategories } from '@/services/trainingCategoryService';
+import type { TrainingHistory, TrainingCategory } from '@/lib/types';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -38,18 +39,6 @@ interface SpecialDiplomaItem {
 
 const ITEMS_PER_PAGE = 7;
 
-const ZFD_CATEGORY_MAP = {
-    jobRelated: ['ZMK', 'KFO', 'PARO', 'IMPL'],
-    freeChoice: ['Frei'],
-    literature: ['Literatur']
-};
-
-const ZFD_TOTALS = {
-    jobRelated: 60,
-    freeChoice: 15,
-    literature: 45
-};
-
 interface EducationPageProps {
   params: { locale: string };
 }
@@ -59,6 +48,7 @@ export default function EducationPage({ params }: EducationPageProps) {
     const [t, setT] = useState<Record<string, string>>({});
 
     const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
+    const [allCategories, setAllCategories] = useState<TrainingCategory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -68,63 +58,70 @@ export default function EducationPage({ params }: EducationPageProps) {
     
     useEffect(() => {
         if (user) {
-            const fetchHistory = async () => {
+            const fetchData = async () => {
                 setIsLoading(true);
                 try {
-                    const history = await getTrainingHistoryForUser(user.id);
+                    const [history, categories] = await Promise.all([
+                        getTrainingHistoryForUser(user.id),
+                        getAllTrainingCategories()
+                    ]);
                     setTrainingHistory(history);
+                    setAllCategories(categories);
                 } catch (error) {
-                    console.error("Failed to fetch training history:", error);
-                    // Optionally, show a toast notification
+                    console.error("Failed to fetch education data:", error);
                 } finally {
                     setIsLoading(false);
                 }
             };
-            fetchHistory();
+            fetchData();
         } else if (!authLoading) {
-            // If user is not logged in and auth is resolved, maybe redirect
-            // For now, it will just show a loader or empty state
             setIsLoading(false);
         }
     }, [user, authLoading]);
 
     // Calculate ZFD progress dynamically
     const zfdProgressData = useMemo(() => {
-        if (!trainingHistory || trainingHistory.length === 0 || Object.keys(t).length === 0) {
-            return {
-                categories: [
-                    { label: t.zfd_category_berufsbezogen || "Job-related", current: 0, total: ZFD_TOTALS.jobRelated },
-                    { label: t.zfd_category_frei || "Free Choice", current: 0, total: ZFD_TOTALS.freeChoice },
-                    { label: t.zfd_category_literatur || "Literature/Webinars", current: 0, total: ZFD_TOTALS.literature },
-                ],
-                total: { current: 0, total: ZFD_TOTALS.jobRelated + ZFD_TOTALS.freeChoice + ZFD_TOTALS.literature }
-            };
+        if (!trainingHistory || allCategories.length === 0 || Object.keys(t).length === 0) {
+            return { categories: [], total: { current: 0, total: 0 }};
         }
 
-        const points = { jobRelated: 0, freeChoice: 0, literature: 0 };
+        // 1. Build ZFD group definitions from the fetched categories
+        const zfdGroups: { [key: string]: { label: string; total: number; current: number; childAbbrs: string[] } } = {};
+        const categoryToZfdGroupMap: { [key: string]: string } = {};
 
-        trainingHistory.forEach(record => {
-            if (ZFD_CATEGORY_MAP.jobRelated.includes(record.category)) {
-                points.jobRelated += record.points;
-            } else if (ZFD_CATEGORY_MAP.freeChoice.includes(record.category)) {
-                points.freeChoice += record.points;
-            } else if (ZFD_CATEGORY_MAP.literature.includes(record.category)) {
-                points.literature += record.points;
+        allCategories.forEach(cat => {
+            if (cat.zfdGroupName && cat.zfdGroupPoints) {
+                if (!zfdGroups[cat.zfdGroupName]) {
+                    zfdGroups[cat.zfdGroupName] = {
+                        label: t[cat.zfdGroupName] || cat.zfdGroupName,
+                        total: cat.zfdGroupPoints,
+                        current: 0,
+                        childAbbrs: []
+                    };
+                }
+                zfdGroups[cat.zfdGroupName].childAbbrs.push(cat.abbreviation);
+                categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupName;
             }
         });
 
-        const totalCurrent = points.jobRelated + points.freeChoice + points.literature;
-        const totalMax = ZFD_TOTALS.jobRelated + ZFD_TOTALS.freeChoice + ZFD_TOTALS.literature;
+        // 2. Calculate points for each group
+        trainingHistory.forEach(record => {
+            const zfdGroupName = categoryToZfdGroupMap[record.category];
+            if (zfdGroupName && zfdGroups[zfdGroupName]) {
+                zfdGroups[zfdGroupName].current += record.points;
+            }
+        });
+
+        // 3. Format for rendering
+        const categories = Object.values(zfdGroups);
+        const totalCurrent = categories.reduce((sum, cat) => sum + cat.current, 0);
+        const totalMax = categories.reduce((sum, cat) => sum + cat.total, 0);
         
         return {
-            categories: [
-                { label: t.zfd_category_berufsbezogen || "Job-related", current: points.jobRelated, total: ZFD_TOTALS.jobRelated },
-                { label: t.zfd_category_frei || "Free Choice", current: points.freeChoice, total: ZFD_TOTALS.freeChoice },
-                { label: t.zfd_category_literatur || "Literature/Webinars", current: points.literature, total: ZFD_TOTALS.literature },
-            ],
+            categories,
             total: { current: totalCurrent, total: totalMax }
         };
-    }, [trainingHistory, t]);
+    }, [trainingHistory, allCategories, t]);
 
     // Calculate specialist diplomas dynamically
     const specialistDiplomas = useMemo(() => {
@@ -132,7 +129,6 @@ export default function EducationPage({ params }: EducationPageProps) {
 
         const categoryPoints: { [key: string]: number } = {};
         
-        // Define categories that contribute to diplomas and their full names from translations
         const diplomaCategoryMap: { [key: string]: string } = {
             'IMPL': t.register_step4_spec_implantologie || 'Implantology',
             'KFO': t.register_step4_spec_kieferorthopaedie || 'Orthodontics',
@@ -173,7 +169,9 @@ export default function EducationPage({ params }: EducationPageProps) {
   
     const pageTitle = t.education_page_title || "My Advanced Trainings";
 
-    if (authLoading || Object.keys(t).length === 0) {
+    const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
+
+    if (pageIsLoading) {
         return (
             <AppLayout pageTitle={pageTitle} locale={params.locale}>
                 <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
@@ -203,7 +201,7 @@ export default function EducationPage({ params }: EducationPageProps) {
           <CardContent className="grid md:grid-cols-3 gap-6 items-center">
             <div className="md:col-span-1 flex justify-center">
               <CircularProgress 
-                value={(zfdProgressData.total.current / zfdProgressData.total.total) * 100} 
+                value={zfdProgressData.total.total > 0 ? (zfdProgressData.total.current / zfdProgressData.total.total) * 100 : 0} 
                 radius={70} 
                 strokeWidth={12}
                 valueText={t.zfd_total_progress?.replace('{current}', zfdProgressData.total.current.toString()).replace('{total}', zfdProgressData.total.total.toString()) || ''}
@@ -219,7 +217,7 @@ export default function EducationPage({ params }: EducationPageProps) {
                       {t.zfd_total_progress?.replace('{current}', category.current.toString()).replace('{total}', category.total.toString())}
                     </span>
                   </div>
-                  <Progress value={(category.current / category.total) * 100} className="h-3" />
+                  <Progress value={category.total > 0 ? (category.current / category.total) * 100 : 0} className="h-3" />
                 </div>
               ))}
             </div>

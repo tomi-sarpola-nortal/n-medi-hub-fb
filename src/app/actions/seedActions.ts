@@ -8,12 +8,12 @@ import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, Train
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
 
 const categoriesToSeed: TrainingCategoryCreationData[] = [
-  { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true },
-  { name: 'Literatur', abbreviation: 'Literatur', isActive: true },
-  { name: 'Kieferorthopädie', abbreviation: 'KFO', isActive: true },
-  { name: 'Parodontologie', abbreviation: 'PARO', isActive: true },
-  { name: 'Implantologie', abbreviation: 'IMPL', isActive: true },
-  { name: 'Frei wählbare Fortbildung', abbreviation: 'Frei', isActive: true }
+  { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
+  { name: 'Literatur', abbreviation: 'Literatur', isActive: true, zfdGroupName: 'zfd_category_literatur', zfdGroupPoints: 45 },
+  { name: 'Kieferorthopädie', abbreviation: 'KFO', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
+  { name: 'Parodontologie', abbreviation: 'PARO', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
+  { name: 'Implantologie', abbreviation: 'IMPL', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
+  { name: 'Frei wählbare Fortbildung', abbreviation: 'Frei', isActive: true, zfdGroupName: 'zfd_category_frei', zfdGroupPoints: 15 }
 ];
 
 const organizersToSeed: TrainingOrganizerCreationData[] = [
