@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Landmark, User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -129,6 +130,11 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-2 border-t border-sidebar-border mt-auto">
          <SidebarMenu>
+            <SidebarMenuItem>
+               <div className="px-2">
+                 <LanguageSwitcher />
+               </div>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={logout}

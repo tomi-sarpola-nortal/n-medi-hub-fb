@@ -1,5 +1,5 @@
 
-'use client';
+"use client";
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import {
@@ -9,10 +9,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Globe } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { cn } from '@/lib/utils'; // Import cn
+import { cn } from '@/lib/utils';
+
+// Using inline SVGs for flags to avoid adding new image files.
+const AustriaFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" {...props}>
+        <rect width="9" height="6" fill="#ed2939"/>
+        <rect width="9" height="2" y="2" fill="#fff"/>
+    </svg>
+);
+
+const UKFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3" {...props}>
+        <rect width="5" height="3" fill="#012169"/>
+        <path d="M0,0 L5,3 M5,0 L0,3" stroke="#FFF" strokeWidth=".6"/>
+        <path d="M0,0 L5,3 M5,0 L0,3" stroke="#C8102E" strokeWidth=".4"/>
+        <path d="M0,1.5 H5 M2.5,0 V3" stroke="#FFF" strokeWidth="1"/>
+        <path d="M0,1.5 H5 M2.5,0 V3" stroke="#C8102E" strokeWidth=".6"/>
+    </svg>
+);
+
 
 const getClientTranslations = (locale: string) => {
   try {
@@ -29,6 +46,11 @@ type LanguageSwitcherProps = ComponentProps<'div'> & {
   initialLocale?: string;
 };
 
+const languages = [
+    { value: 'en', label: 'English', Flag: (props: any) => <UKFlagIcon {...props} /> },
+    { value: 'de', label: 'Deutsch', Flag: (props: any) => <AustriaFlagIcon {...props} /> },
+];
+
 export default function LanguageSwitcher({ initialLocale, className, ...props }: LanguageSwitcherProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -41,35 +63,42 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const t = getClientTranslations(currentLocale);
 
   const handleChange = (newLocale: string) => {
-    // This logic correctly rebuilds the URL without the old locale prefix
     const pathSegments = pathname.split('/');
     const currentPathIsLocalePrefixed = ['en', 'de'].includes(pathSegments[1]);
     const basePath = currentPathIsLocalePrefixed ? pathSegments.slice(2).join('/') : pathSegments.slice(1).join('/');
     
-    // Construct the new path without adding an extra slash at the beginning if basePath is empty
-    const newPath = `/${basePath}${basePath ? '?' : ''}${searchParams.toString()}`;
+    const query = searchParams.toString();
+    const newPath = `/${basePath}${query ? `?${query}` : ''}`;
     
     router.push(newPath, { locale: newLocale });
   };
+  
+  const CurrentFlag = languages.find(lang => lang.value === currentLocale)?.Flag;
+  const currentLabel = languages.find(lang => lang.value === currentLocale)?.label;
 
   return (
-    // Use cn to merge classes, allowing 'className' prop to override or extend
-    <div className={cn("flex items-center space-x-2", className)} {...props}>
-      <Globe className="h-5 w-5 text-muted-foreground group-data-[state=collapsed]:hidden" />
-      <Label htmlFor="language-select" className="sr-only text-sm font-medium group-data-[state=collapsed]:hidden">
-        {t.language_switcher_label || "Language"}
-      </Label>
+    <div className={cn("w-full", className)} {...props}>
       <Select value={currentLocale} onValueChange={handleChange}>
         <SelectTrigger 
-          id="language-select" 
-          className="w-full min-w-[100px] h-9 text-xs group-data-[state=collapsed]:hidden" // Ensure it takes full width in its container
+          className="w-full h-10 text-sm"
           aria-label={t.language_switcher_label || "Language"}
         >
-          <SelectValue placeholder={t.language_switcher_label || "Language"} />
+            <div className="flex items-center gap-2">
+                {CurrentFlag && <CurrentFlag className="h-4 w-6 rounded-sm" />}
+                <SelectValue asChild>
+                    <span>{currentLabel}</span>
+                </SelectValue>
+            </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="en">English</SelectItem>
-          <SelectItem value="de">Deutsch</SelectItem>
+            {languages.map(({ value, label, Flag }) => (
+                 <SelectItem key={value} value={value}>
+                    <div className="flex items-center gap-2">
+                        <Flag className="h-4 w-6 rounded-sm" />
+                        <span>{label}</span>
+                    </div>
+                </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>

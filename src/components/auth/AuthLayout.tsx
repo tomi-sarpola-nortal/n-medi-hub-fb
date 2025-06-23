@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Landmark, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LanguageSwitcher from '../layout/LanguageSwitcher';
 
 // Helper for client-side translations (consistent with login page)
 const getClientTranslations = (locale: string) => {
@@ -59,12 +60,17 @@ export default function AuthLayout({
               </p>
             </div>
           </Link>
-          {showBackButton && (
-            <Button variant="outline" onClick={() => router.push(backButtonHref)} className="text-sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {translatedBackButtonText}
-            </Button>
-          )}
+          <div className="flex items-center gap-4">
+            {showBackButton && (
+                <Button variant="outline" onClick={() => router.push(backButtonHref)} className="text-sm">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {translatedBackButtonText}
+                </Button>
+            )}
+            <div className="w-40">
+                <LanguageSwitcher />
+            </div>
+          </div>
         </div>
       </header>
 
