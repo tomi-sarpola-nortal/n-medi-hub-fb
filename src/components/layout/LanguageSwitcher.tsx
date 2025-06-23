@@ -63,14 +63,23 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const t = getClientTranslations(currentLocale);
 
   const handleChange = (newLocale: string) => {
-    const pathSegments = pathname.split('/');
-    const currentPathIsLocalePrefixed = ['en', 'de'].includes(pathSegments[1]);
-    const basePath = currentPathIsLocalePrefixed ? pathSegments.slice(2).join('/') : pathSegments.slice(1).join('/');
+    // pathname will now be /en/dashboard or /de/settings etc.
+    // We want to replace the first path segment with the new locale.
+    const pathWithoutLocale = pathname.replace(/^\/(en|de)/, '');
+    let newPath = `/${newLocale}${pathWithoutLocale}`;
+    
+    // Ensure the root path is handled correctly
+    if (newPath === `/${newLocale}`) {
+        newPath = `/${newLocale}/`;
+    }
     
     const query = searchParams.toString();
-    const newPath = `/${basePath}${query ? `?${query}` : ''}`;
-    
-    router.push(newPath, { locale: newLocale });
+    if (query) {
+      newPath += `?${query}`;
+    }
+
+    // Use router.push for client-side navigation without a full page reload.
+    router.push(newPath);
   };
   
   const CurrentFlag = languages.find(lang => lang.value === currentLocale)?.Flag;

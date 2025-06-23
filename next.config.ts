@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -26,10 +27,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
-  },
-  i18n: {
-    locales: ['en', 'de'],
-    defaultLocale: 'en',
   },
 };
 
