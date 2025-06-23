@@ -201,3 +201,12 @@ export interface RegistrationFormData {
   // Step 6
   agreedToTerms?: boolean;
 }
+
+export interface TrainingCategory {
+  id: string;
+  name: string;
+  abbreviation: string;
+  isActive: boolean;
+}
+
+export type TrainingCategoryCreationData = Omit<TrainingCategory, 'id'>;
