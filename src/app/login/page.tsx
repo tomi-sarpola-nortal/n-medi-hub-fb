@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -13,8 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle } from 'lucide-react';
-import AuthLayout from '@/components/auth/AuthLayout'; // Import AuthLayout
+import { Loader2, PlusCircle, Info } from 'lucide-react';
+import AuthLayout from '@/components/auth/AuthLayout';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -78,7 +78,25 @@ export default function LoginPage() {
       pageTitle={t.login_page_main_title || "Portal Login"} // Assuming a general title for auth pages
       // pageSubtitle could be added if needed for login
     >
-      <div className="w-full max-w-md space-y-8"> {/* This div ensures content is centered within AuthLayout's main area */}
+      <div className="w-full max-w-md space-y-8">
+        <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Demo Mode</AlertTitle>
+            <AlertDescription>
+                <p className="mb-2">You can use the following credentials to explore the application:</p>
+                <div className="space-y-1">
+                    <p className="font-semibold">Dentist Role:</p>
+                    <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
+                    <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                </div>
+                <div className="space-y-1 mt-2">
+                    <p className="font-semibold">Chamber Member Role:</p>
+                    <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
+                    <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                </div>
+            </AlertDescription>
+        </Alert>
+        
         <Card className="shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">{t.login_form_title || "Anmeldung ins Portal"}</CardTitle>
@@ -126,7 +144,7 @@ export default function LoginPage() {
             </Link>
             <p className="text-xs text-muted-foreground">
               {t.login_support_text_prefix || "Probleme bei der Anmeldung?"}{" "}
-              <Link href="#" className="text-primary hover:underline">
+              <Link href="#" className="hover:underline">
                 {t.login_support_link || "Kontaktieren Sie unseren Support"}
               </Link>
             </p>
@@ -158,5 +176,3 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
-
-    
