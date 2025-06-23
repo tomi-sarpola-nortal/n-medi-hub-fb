@@ -17,6 +17,9 @@
   "sidebar_my_representations": "My Representations",
   "sidebar_document_templates": "Document Templates",
   "sidebar_member_overview": "Member Overview",
+  "sidebar_developer_module": "Developer Module",
+  "developer_module_page_title": "Developer Module",
+  "developer_module_page_description": "This page contains tools and actions for development and testing purposes.",
   "header_my_account": "My Account",
   "header_settings": "Settings",
   "header_profile": "Profile",
@@ -372,5 +375,3 @@
   "documents_delete_dialog_cancel": "Cancel",
   "member_review_no_pending": "No pending member reviews at the moment."
 }
-
-    

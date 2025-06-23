@@ -17,6 +17,9 @@
   "sidebar_my_representations": "Meine Vertretungen",
   "sidebar_document_templates": "Dokumentvorlagen",
   "sidebar_member_overview": "Mitgliederübersicht",
+  "sidebar_developer_module": "Entwicklermodul",
+  "developer_module_page_title": "Entwicklermodul",
+  "developer_module_page_description": "Diese Seite enthält Werkzeuge und Aktionen für Entwicklungs- und Testzwecke.",
   "header_my_account": "Mein Konto",
   "header_settings": "Einstellungen",
   "header_profile": "Profil",
@@ -372,5 +375,3 @@
   "documents_delete_dialog_cancel": "Abbrechen",
   "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen."
 }
-
-    
