@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -40,7 +40,12 @@ export default function LoginPage() {
   const router = useRouter();
   const params = useParams();
   const currentLocale = typeof params.locale === 'string' ? params.locale : 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+      setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
 
   const { login } = useAuth();
   const { toast } = useToast();
@@ -63,15 +68,25 @@ export default function LoginPage() {
       router.push('/dashboard'); // Explicit redirect on success
     } else {
       // Check if the error is a translation key or a raw message
-      const errorMessage = t[result.error as string] || result.error || t.login_error_description;
+      const errorMessage = t![result.error as string] || result.error || t!.login_error_description;
 
       toast({
-        title: t.login_error_title || "Login Failed",
+        title: t!.login_error_title || "Login Failed",
         description: errorMessage,
         variant: "destructive",
       });
     }
   };
+  
+  if (!t) {
+    return (
+        <AuthLayout pageTitle="Loading...">
+             <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AuthLayout>
+    )
+  }
 
   return (
     <AuthLayout

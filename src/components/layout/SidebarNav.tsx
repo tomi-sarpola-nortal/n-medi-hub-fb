@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; 
 import {
@@ -42,10 +43,15 @@ export function AppSidebar() {
   
   const potentialLocale = pathname.split('/')[1];
   const locale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
-  const t = getClientTranslations(locale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(locale));
+  }, [locale]);
 
 
-  if (authLoading) {
+  if (authLoading || !t) {
     return (
        <Sidebar collapsible="none">
         <SidebarHeader className="p-4 flex items-center justify-between">

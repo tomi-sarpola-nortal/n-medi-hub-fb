@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import {
   Select,
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import type { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '../ui/skeleton';
 
 // Using inline SVGs for flags to avoid adding new image files.
 const AustriaFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -60,7 +62,12 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const calculatedLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const currentLocale = initialLocale || calculatedLocale;
   
-  const t = getClientTranslations(currentLocale);
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
+
 
   const handleChange = (newLocale: string) => {
     // pathname will now be /en/dashboard or /de/settings etc.
@@ -81,6 +88,10 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
     // Use router.push for client-side navigation without a full page reload.
     router.push(newPath);
   };
+  
+  if (!t) {
+    return <Skeleton className="w-full h-10" />;
+  }
   
   const CurrentFlag = languages.find(lang => lang.value === currentLocale)?.Flag;
   const currentLabel = languages.find(lang => lang.value === currentLocale)?.label;

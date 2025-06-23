@@ -57,7 +57,12 @@ export default function RegisterStep5Page() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +85,7 @@ export default function RegisterStep5Page() {
   useEffect(() => {
     const storedData = getRegistrationData();
     // Check for essential data from previous steps
-    if (!storedData.email || !storedData.password || !storedData.firstName || !storedData.currentProfessionalTitle) { 
+    if ((!storedData.email || !storedData.password || !storedData.firstName || !storedData.currentProfessionalTitle) && t) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
         description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
@@ -108,6 +113,16 @@ export default function RegisterStep5Page() {
     router.push('/register/step6'); 
     setIsLoading(false);
   };
+
+  if (isLoading || !t) {
+    return (
+        <AuthLayout pageTitle="Loading...">
+             <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AuthLayout>
+    )
+  }
 
   return (
     <AuthLayout

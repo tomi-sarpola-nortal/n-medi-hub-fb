@@ -1,11 +1,12 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AuthLayout from '@/components/auth/AuthLayout';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -24,7 +25,23 @@ export default function RegistrationSuccessPage() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
+
+
+  if (!t) {
+    return (
+        <AuthLayout pageTitle="Loading...">
+             <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AuthLayout>
+    )
+  }
 
   return (
     <AuthLayout

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,7 +40,12 @@ export default function RegisterStep1Page() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,8 +64,8 @@ export default function RegisterStep1Page() {
       const existingUser = await findPersonByEmail(data.email);
       if (existingUser) {
         toast({
-          title: t.register_email_exists_title || "Email Already Registered",
-          description: t.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
+          title: t!.register_email_exists_title || "Email Already Registered",
+          description: t!.register_email_exists_description || "This email address is already in use. Please use a different email or try logging in.",
           variant: "destructive",
         });
         return; // Stop the process
@@ -79,14 +84,24 @@ export default function RegisterStep1Page() {
     } catch (error: any) {
       console.error("Email check error:", error);
       toast({
-        title: t.register_email_check_error_title || "Verification Error",
-        description: t.register_email_check_error_description || "Could not verify email address. Please try again.",
+        title: t!.register_email_check_error_title || "Verification Error",
+        description: t!.register_email_check_error_description || "Could not verify email address. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!t) {
+    return (
+        <AuthLayout pageTitle="Loading...">
+             <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AuthLayout>
+    )
+  }
 
   return (
     <AuthLayout

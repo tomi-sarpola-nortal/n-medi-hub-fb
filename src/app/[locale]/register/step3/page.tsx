@@ -65,7 +65,12 @@ export default function RegisterStep3PersonalDataPage() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +99,7 @@ export default function RegisterStep3PersonalDataPage() {
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email || !storedData.password || !storedData.sessionId) { 
+    if ((!storedData.email || !storedData.password || !storedData.sessionId) && t) { 
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
         description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
@@ -102,7 +107,7 @@ export default function RegisterStep3PersonalDataPage() {
       });
       router.replace('/register/step1');
     } else {
-      setStoredEmail(storedData.email);
+      setStoredEmail(storedData.email || '');
       const dataToReset = {
         email: storedData.email,
         title: storedData.title || '',
@@ -140,7 +145,7 @@ export default function RegisterStep3PersonalDataPage() {
             fileUpdate.idDocumentName = fileToUpload.name;
         } else if (!storedData.idDocumentUrl) {
             toast({
-                title: t.register_step2_label_idDocument || "ID Document Required",
+                title: t!.register_step2_label_idDocument || "ID Document Required",
                 description: "Please select your ID card or passport to continue.",
                 variant: "destructive",
             });
@@ -176,7 +181,7 @@ export default function RegisterStep3PersonalDataPage() {
   };
 
 
-  if (!storedEmail && !isLoading) { 
+  if (!storedEmail || isLoading || !t) { 
     return (
         <AuthLayout pageTitle="Loading..." pageSubtitle="Verifying registration step...">
             <div className="flex justify-center items-center h-32">

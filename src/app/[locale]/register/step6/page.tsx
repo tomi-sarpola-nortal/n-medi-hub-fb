@@ -105,7 +105,13 @@ export default function RegisterStep6Page() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
+
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +120,7 @@ export default function RegisterStep6Page() {
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email || !storedData.password || !storedData.firstName || !storedData.currentProfessionalTitle || !storedData.practiceName) {
+    if ((!storedData.email || !storedData.password || !storedData.firstName || !storedData.currentProfessionalTitle || !storedData.practiceName) && t) {
       toast({
         title: t.register_step2_missing_data_title || "Missing Information",
         description: t.register_step2_missing_data_desc || "Essential information from previous steps is missing. Please start over.",
@@ -133,7 +139,7 @@ export default function RegisterStep6Page() {
       return;
     }
     if (!agreedToTerms) {
-        toast({ title: t.register_step6_terms_error_title || "Terms not agreed", description: t.register_step6_terms_error_desc || "Please agree to the terms and conditions.", variant: "destructive" });
+        toast({ title: t!.register_step6_terms_error_title || "Terms not agreed", description: t!.register_step6_terms_error_desc || "Please agree to the terms and conditions.", variant: "destructive" });
         return;
     }
 
@@ -237,16 +243,16 @@ export default function RegisterStep6Page() {
       console.log("REGISTRATION_SUBMIT: Registration complete. Cleaning up session and redirecting...");
       clearRegistrationData();
       toast({
-        title: t.register_step6_success_title || "Registration Submitted",
-        description: t.register_step6_success_desc || "Your application has been successfully submitted for review.",
+        title: t!.register_step6_success_title || "Registration Submitted",
+        description: t!.register_step6_success_desc || "Your application has been successfully submitted for review.",
       });
       router.push('/register/success'); 
 
     } catch (error: any) {
       console.error("REGISTRATION_SUBMIT: Process failed.", error);
       toast({
-        title: t.register_step6_submit_error_title || "Submission Failed",
-        description: error.message || t.register_step6_submit_error_desc || "An error occurred while submitting your application. Please try again.",
+        title: t!.register_step6_submit_error_title || "Submission Failed",
+        description: error.message || t!.register_step6_submit_error_desc || "An error occurred while submitting your application. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -254,9 +260,9 @@ export default function RegisterStep6Page() {
     }
   };
 
-  if (!registrationData) {
+  if (!registrationData || !t) {
     return (
-      <AuthLayout pageTitle={t.register_page_main_title || "Registration"} pageSubtitle={t.register_step6_loading_subtitle || "Loading review data..."}>
+      <AuthLayout pageTitle="Loading..." pageSubtitle="Loading review data...">
         <div className="flex justify-center items-center h-32">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>

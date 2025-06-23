@@ -1,9 +1,10 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
 import Logo from '../layout/Logo';
@@ -42,7 +43,20 @@ export default function AuthLayout({
   const pathname = usePathname();
   const potentialLocale = pathname.split('/')[1];
   const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
-  const t = getClientTranslations(currentLocale);
+
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
+
+  if (!t) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground font-body items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const translatedBackButtonText = t[backButtonTextKey] || "Back";
 

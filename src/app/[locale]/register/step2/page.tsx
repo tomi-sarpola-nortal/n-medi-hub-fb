@@ -57,7 +57,12 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
-  const t = getClientTranslations(currentLocale);
+  
+  const [t, setT] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    setT(getClientTranslations(currentLocale));
+  }, [currentLocale]);
 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -117,7 +122,7 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
     setIsLoading(false);
   };
 
-  if (!email && !isLoading) {
+  if (!email || isLoading || !t) {
     return (
         <AuthLayout pageTitle="Loading..." pageSubtitle="Verifying registration step...">
             <div className="flex justify-center items-center h-32">
