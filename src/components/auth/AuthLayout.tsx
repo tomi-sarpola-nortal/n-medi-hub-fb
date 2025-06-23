@@ -78,9 +78,6 @@ export default function AuthLayout({
       </main>
 
       <footer className="py-8 text-center text-xs text-muted-foreground border-t border-border">
-         <div className="inline-flex items-center justify-center mb-2">
-            <Logo portalText={t.login_logo_text_portal || "Portal"} iconSize={20} />
-        </div>
         <p className="mb-2">{t.login_footer_copyright || "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten."}</p>
         <div className="space-x-4">
           <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_privacy || "Datenschutz"}</Link>
