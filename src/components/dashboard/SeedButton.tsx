@@ -1,7 +1,8 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -10,6 +11,7 @@ export default function SeedButton() {
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
   const [isOrganizersLoading, setIsOrganizersLoading] = useState(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [isChambersLoading, setIsChambersLoading] = useState(false);
 
 
   const handleSeedCategories = async () => {
@@ -69,8 +71,27 @@ export default function SeedButton() {
     setIsHistoryLoading(false);
   };
 
+  const handleSeedStateChambers = async () => {
+    setIsChambersLoading(true);
+    try {
+      const result = await seedStateChambers();
+      toast({
+        title: "Seeding Report (State Chambers)",
+        description: result.message,
+      });
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute seed action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsChambersLoading(false);
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-wrap gap-4">
         <Button onClick={handleSeedCategories} disabled={isCategoriesLoading} variant="destructive" className="w-full sm:w-auto">
           {isCategoriesLoading ? "Seeding..." : "Seed Training Categories"}
         </Button>
@@ -79,6 +100,9 @@ export default function SeedButton() {
         </Button>
         <Button onClick={handleSeedHistory} disabled={isHistoryLoading} variant="destructive" className="w-full sm:w-auto">
           {isHistoryLoading ? "Seeding..." : "Seed Training History"}
+        </Button>
+        <Button onClick={handleSeedStateChambers} disabled={isChambersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isChambersLoading ? "Seeding..." : "Seed State Chambers"}
         </Button>
     </div>
   );

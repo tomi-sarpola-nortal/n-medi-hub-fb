@@ -66,6 +66,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     status: data.status,
     otpEnabled: data.otpEnabled,
     otpSecret: data.otpSecret,
+    stateChamberId: data.stateChamberId,
     
     // Add missing fields to make it a complete user representation
     approved: data.approved,

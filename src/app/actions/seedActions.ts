@@ -4,8 +4,9 @@
 import { findPersonByEmail } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData } from '@/lib/types';
+import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData } from '@/lib/types';
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
+import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
 
 const categoriesToSeed: TrainingCategoryCreationData[] = [
   { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
@@ -39,6 +40,18 @@ const historyToSeed: TrainingHistoryCreationData[] = [
   { date: "2025-01-30", title: "Fachzeitschrift: Parodontologie Update", category: "Literatur", points: 2, organizer: "DentEd Online" },
   { date: "2025-01-15", title: "Workshop: Abrechnung und Recht", category: "Frei", points: 5, organizer: "ÖZÄK" },
   { date: "2024-12-10", title: "Grundkurs Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO" },
+];
+
+const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
+    { id: 'wien', data: { name: 'Zahnärztekammer Wien', address: 'Kohlmarkt 11/6\n1010 Wien', phone: '+43 1 513 37 31', email: 'office@wr.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr' } },
+    { id: 'noe', data: { name: 'Zahnärztekammer Niederösterreich', address: 'Kremser Gasse 20\n3100 St. Pölten', phone: '+43 2742 35 35 70', email: 'office@noe.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
+    { id: 'ooe', data: { name: 'Zahnärztekammer Oberösterreich', address: 'Europaplatz 7\n4020 Linz', phone: '+43 505 11 40 20', email: 'office@ooe.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 12:00 Uhr' } },
+    { id: 'bgld', data: { name: 'Zahnärztekammer Burgenland', address: 'Esterházyplatz 1\n7000 Eisenstadt', phone: '+43 2682 66 5 66', email: 'office@bgld.zahnaerztekammer.at', officeHours: 'Mo, Di, Do: 8:00 - 16:00 Uhr\nMi, Fr: 8:00 - 12:00 Uhr' } },
+    { id: 'ktn', data: { name: 'Zahnärztekammer Kärnten', address: 'St. Veiter Straße 34/2\n9020 Klagenfurt', phone: '+43 463 56 3 99', email: 'office@ktn.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
+    { id: 'sbg', data: { name: 'Zahnärztekammer Salzburg', address: 'Glockengasse 4\n5020 Salzburg', phone: '+43 662 87 34 88', email: 'office@sbg.zahnaerztekammer.at', officeHours: 'Mo-Fr: 8:00 - 12:00 Uhr' } },
+    { id: 'stmk', data: { name: 'Zahnärztekammer Steiermark', address: 'Marburger Kai 51/2\n8010 Graz', phone: '+43 316 82 82 02', email: 'office@stmk.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
+    { id: 'tirol', data: { name: 'Zahnärztekammer Tirol', address: 'Anichstraße 7/4\n6020 Innsbruck', phone: '+43 512 58 75 75', email: 'office@tirol.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
+    { id: 'vbg', data: { name: 'Zahnärztekammer Vorarlberg', address: 'Rheinstraße 61\n6900 Bregenz', phone: '+43 5574 45 5 15', email: 'office@vbg.zahnaerztekammer.at', officeHours: 'Mo, Mi, Fr: 8:00 - 12:00 Uhr' } },
 ];
 
 
@@ -118,5 +131,31 @@ export async function seedTrainingHistory(): Promise<{ success: boolean; message
         console.error('Error seeding training history:', error);
         const errorMessage = error instanceof Error ? error.message : String(error);
         return { success: false, message: `Error seeding history: ${errorMessage}` };
+    }
+}
+
+export async function seedStateChambers(): Promise<{ success: boolean; message: string }> {
+    try {
+        let createdCount = 0;
+        let skippedCount = 0;
+
+        for (const chamber of chambersToSeed) {
+            const existing = await getStateChamberById(chamber.id);
+            if (existing) {
+                skippedCount++;
+            } else {
+                await createStateChamber(chamber.id, chamber.data);
+                createdCount++;
+            }
+        }
+        
+        return { 
+        success: true, 
+        message: `Seeding complete. Created: ${createdCount} new state chambers. Skipped: ${skippedCount} existing chambers.` 
+        };
+    } catch (error) {
+        console.error('Error seeding state chambers:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return { success: false, message: `Error seeding chambers: ${errorMessage}` };
     }
 }

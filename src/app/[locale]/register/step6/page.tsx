@@ -29,7 +29,7 @@ import { auth } from '@/lib/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { createPerson } from '@/services/personService';
 import { copyFileToNewLocation, deleteFileByUrl } from '@/services/storageService';
-import type { PersonCreationData } from '@/types';
+import type { PersonCreationData } from '@/lib/types';
 import { format } from 'date-fns';
 
 // Helper for client-side translations
@@ -158,6 +158,7 @@ export default function RegisterStep6Page() {
         avatarUrl: `https://avatar.vercel.sh/${registrationData.email}.png?size=100`, 
         status: 'active',
         otpEnabled: false,
+        stateChamberId: 'wien', // Default to Vienna Dental Chamber
         title: registrationData.title,
         firstName: registrationData.firstName,
         lastName: registrationData.lastName,

@@ -4,8 +4,9 @@
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, CalendarCheck, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { GraduationCap, CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
+import StateChamberInfo from './StateChamberInfo';
 
 interface DentistDashboardProps {
     user: Person;
@@ -79,30 +80,8 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                 </Card>
 
                 {/* Chamber Info Card */}
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardHeader>
-                        <CardTitle className="text-lg font-medium font-headline">{t.dashboard_chamber_info_title || "Ihre Landeskammer"}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 text-sm">
-                        <p className="font-semibold">{t.dashboard_chamber_name || "Zahnärztekammer Wien"}</p>
-                        <div className="flex items-start gap-3">
-                            <MapPin className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                            <span>Kohlmarkt 11/6<br/>1010 Wien</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                            <span>+43 1 513 37 31</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                            <span>office@zahnaerztekammer.at</span>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <Clock className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                            <span className="whitespace-pre-line">{t.dashboard_chamber_office_hours || "Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr"}</span>
-                        </div>
-                    </CardContent>
-                </Card>
+                <StateChamberInfo chamberId={user.stateChamberId} t={t} />
+
             </div>
 
             {/* Representation Requests Card */}

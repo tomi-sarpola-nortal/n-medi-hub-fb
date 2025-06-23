@@ -5,11 +5,12 @@ import * as React from 'react';
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Mail, Clock, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { getPendingPersons } from '@/services/personService';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import StateChamberInfo from './StateChamberInfo';
 
 interface LkMemberDashboardProps {
     user: Person;
@@ -89,30 +90,7 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                 
                 {/* Sidebar: Chamber Info */}
                 <div className="lg:col-span-1">
-                    <Card className="shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="font-headline text-xl">{t.dashboard_chamber_info_title || 'Ihre Landeskammer'}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 text-sm pt-6">
-                            <p className="font-semibold text-base">{t.dashboard_chamber_name || 'Zahnärztekammer Wien'}</p>
-                            <div className="flex items-start gap-3">
-                                <MapPin className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                                <span>Kohlmarkt 11/6<br/>1010 Wien</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                                <span>+43 1 513 37 31</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                                <span>office@zahnaerztekammer.at</span>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <Clock className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                                <span className="whitespace-pre-line">{t.dashboard_chamber_office_hours || "Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr"}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <StateChamberInfo chamberId={user.stateChamberId} t={t} />
                 </div>
             </div>
         </div>

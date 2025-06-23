@@ -30,6 +30,7 @@ export interface User {
   
   approved?: boolean; 
   educationPoints?: number; 
+  stateChamberId?: string;
 
   createdAt?: string; 
   updatedAt?: string; 
@@ -82,6 +83,7 @@ export interface Person {
   status: 'pending' | 'active' | 'inactive' | 'rejected';
   otpEnabled: boolean; 
   otpSecret?: string; 
+  stateChamberId?: string;
   
   // Add missing fields to make it a complete user representation
   approved?: boolean;
@@ -232,3 +234,14 @@ export interface TrainingHistory {
 }
 
 export type TrainingHistoryCreationData = Omit<TrainingHistory, 'id'>;
+
+export interface StateChamber {
+    id: string;
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    officeHours: string;
+}
+
+export type StateChamberCreationData = Omit<StateChamber, 'id'>;
