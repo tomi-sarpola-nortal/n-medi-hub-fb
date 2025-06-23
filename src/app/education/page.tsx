@@ -1,4 +1,10 @@
 
+"use client";
+
+import { useEffect, useState, useMemo } from 'react';
+import { useAuth } from '@/context/auth-context';
+import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
+import type { TrainingHistory } from '@/lib/types';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -6,8 +12,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CircularProgress } from '@/components/ui/circular-progress';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getTranslations } from '@/lib/translations';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+
+// Helper for client-side translations
+const getClientTranslations = (locale: string) => {
+    try {
+        if (locale === 'de') {
+            return require('../../../locales/de.json');
+        }
+        return require('../../../locales/en.json');
+    } catch (e) {
+        console.warn("Translation file not found for education page, falling back to en");
+        return require('../../../locales/en.json');
+    }
+};
+
 
 interface ZfdProgressItem {
   label: string;
@@ -24,15 +44,6 @@ interface SpecialDiplomaItem {
   percentage: number;
 }
 
-interface TrainingHistoryItem {
-  id: string;
-  date: string;
-  title: string;
-  category: string;
-  points: number;
-  organizer: string;
-}
-
 const mockZfdTotal = { current: 97, total: 120 };
 
 const mockSpecialDiplomas: SpecialDiplomaItem[] = [
@@ -41,40 +52,69 @@ const mockSpecialDiplomas: SpecialDiplomaItem[] = [
   { id: 'paro', title: "Parodontologie", currentPoints: 15, totalPoints: 50, percentage: 30 },
 ];
 
-const mockTrainingHistory: TrainingHistoryItem[] = [
-  { id: '1', date: "22.05.2025", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 8, organizer: "Universitätsklinik Wien" },
-  { id: '2', date: "15.05.2025", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 6, organizer: "ÖZÄK" },
-  { id: '3', date: "03.05.2025", title: "Fortschritte in der Parodontologie", category: "ZMK", points: 4, organizer: "Medizinische Universität Graz" },
-  { id: '4', date: "20.04.2025", title: "Aktuelle Trends in der Kieferorthopädie", category: "ZMK", points: 5, organizer: "Österreichische Gesellschaft für KFO" },
-  { id: '5', date: "10.04.2025", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 3, organizer: "DentEd Online" },
-  { id: '6', date: "28.03.2025", title: "Praxismanagement und Kommunikation", category: "Frei", points: 4, organizer: "Zahnärztekammer Wien" },
-  { id: '7', date: "15.03.2025", title: "Schmerzmanagement in der Zahnmedizin", category: "ZMK", points: 6, organizer: "Medizinische Universität Wien" },
-];
-
 const ITEMS_PER_PAGE = 7;
-const TOTAL_MOCK_ITEMS = 42; // Total items for pagination example
 
 interface EducationPageProps {
   params: { locale: string };
 }
 
-export default async function EducationPage({ params }: EducationPageProps) {
-  const t = getTranslations(params.locale);
-  const pageTitle = t.education_page_title || "My Advanced Trainings";
+export default function EducationPage({ params }: EducationPageProps) {
+    const { user, loading: authLoading } = useAuth();
+    const [t, setT] = useState<Record<string, string>>({});
 
-  const currentPage = 1; 
-  const totalPages = Math.ceil(TOTAL_MOCK_ITEMS / ITEMS_PER_PAGE);
+    const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
 
-  const paginatedTrainingHistory = mockTrainingHistory.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+    useEffect(() => {
+        setT(getClientTranslations(params.locale));
+    }, [params.locale]);
+    
+    useEffect(() => {
+        if (user) {
+            const fetchHistory = async () => {
+                setIsLoading(true);
+                try {
+                    const history = await getTrainingHistoryForUser(user.id);
+                    setTrainingHistory(history);
+                } catch (error) {
+                    console.error("Failed to fetch training history:", error);
+                    // Optionally, show a toast notification
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchHistory();
+        } else if (!authLoading) {
+            // If user is not logged in and auth is resolved, maybe redirect
+            // For now, it will just show a loader or empty state
+            setIsLoading(false);
+        }
+    }, [user, authLoading]);
+
+    const totalPages = Math.ceil(trainingHistory.length / ITEMS_PER_PAGE);
+    const paginatedTrainingHistory = useMemo(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        return trainingHistory.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    }, [trainingHistory, currentPage]);
   
-  const mockZfdCategories: ZfdProgressItem[] = [
-    { label: t.zfd_category_berufsbezogen || "Job-related", current: 45, total: 60 },
-    { label: t.zfd_category_frei || "Free Choice", current: 12, total: 15 },
-    { label: t.zfd_category_literatur || "Literature/Webinars", current: 40, total: 45 },
-  ];
+    const pageTitle = t.education_page_title || "My Advanced Trainings";
+
+    if (authLoading || Object.keys(t).length === 0) {
+        return (
+            <AppLayout pageTitle={pageTitle} locale={params.locale}>
+                <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+            </AppLayout>
+        );
+    }
+  
+    const mockZfdCategories: ZfdProgressItem[] = [
+        { label: t.zfd_category_berufsbezogen || "Job-related", current: 45, total: 60 },
+        { label: t.zfd_category_frei || "Free Choice", current: 12, total: 15 },
+        { label: t.zfd_category_literatur || "Literature/Webinars", current: 40, total: 45 },
+    ];
 
   return (
     <AppLayout pageTitle={pageTitle} locale={params.locale}>
@@ -146,58 +186,55 @@ export default async function EducationPage({ params }: EducationPageProps) {
             <CardTitle className="text-xl font-medium font-headline">{t.fortbildungshistorie_title || "Training History"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">{t.fortbildungshistorie_table_date || "Date"}</TableHead>
-                  <TableHead>{t.fortbildungshistorie_table_title || "Training Title"}</TableHead>
-                  <TableHead>{t.fortbildungshistorie_table_category || "Category"}</TableHead>
-                  <TableHead className="text-right">{t.fortbildungshistorie_table_points || "Points"}</TableHead>
-                  <TableHead>{t.fortbildungshistorie_table_organizer || "Organizer"}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedTrainingHistory.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.date}</TableCell>
-                    <TableCell>{item.title}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className="text-right">{item.points}</TableCell>
-                    <TableCell>{item.organizer}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="mt-6 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {t.fortbildungshistorie_pagination_showing
-                  .replace('{start}', (ITEMS_PER_PAGE * (currentPage -1) + 1).toString())
-                  .replace('{end}', Math.min(ITEMS_PER_PAGE * currentPage, TOTAL_MOCK_ITEMS).toString())
-                  .replace('{total}', TOTAL_MOCK_ITEMS.toString())
-                }
-              </p>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm" disabled={currentPage === 1}>
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  {t.fortbildungshistorie_pagination_back || "Back"}
-                </Button>
-                {[1, 2, 3].map(page => (
-                   <Button 
-                    key={page} 
-                    variant={currentPage === page ? "default" : "outline"} 
-                    size="sm"
-                    className="w-9"
-                    disabled={page > totalPages}
-                  >
-                    {page}
-                  </Button>
-                ))}
-                <Button variant="outline" size="sm" disabled={currentPage === totalPages}>
-                  {t.fortbildungshistorie_pagination_next || "Next"}
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            {isLoading ? (
+                <div className="flex justify-center items-center h-48">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            ) : (
+                <>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead className="w-[100px]">{t.fortbildungshistorie_table_date || "Date"}</TableHead>
+                        <TableHead>{t.fortbildungshistorie_table_title || "Training Title"}</TableHead>
+                        <TableHead>{t.fortbildungshistorie_table_category || "Category"}</TableHead>
+                        <TableHead className="text-right">{t.fortbildungshistorie_table_points || "Points"}</TableHead>
+                        <TableHead>{t.fortbildungshistorie_table_organizer || "Organizer"}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedTrainingHistory.map((item) => (
+                        <TableRow key={item.id}>
+                            <TableCell className="font-medium">{format(new Date(item.date), 'dd.MM.yyyy')}</TableCell>
+                            <TableCell>{item.title}</TableCell>
+                            <TableCell>{item.category}</TableCell>
+                            <TableCell className="text-right">{item.points}</TableCell>
+                            <TableCell>{item.organizer}</TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <div className="mt-6 flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                        {t.fortbildungshistorie_pagination_showing
+                        .replace('{start}', (ITEMS_PER_PAGE * (currentPage - 1) + 1).toString())
+                        .replace('{end}', Math.min(ITEMS_PER_PAGE * currentPage, trainingHistory.length).toString())
+                        .replace('{total}', trainingHistory.length.toString())
+                        }
+                    </p>
+                    <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>
+                        <ChevronLeft className="mr-2 h-4 w-4" />
+                        {t.fortbildungshistorie_pagination_back || "Back"}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages}>
+                        {t.fortbildungshistorie_pagination_next || "Next"}
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+                </>
+            )}
           </CardContent>
         </Card>
 

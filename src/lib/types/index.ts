@@ -218,3 +218,15 @@ export interface TrainingOrganizer {
 }
 
 export type TrainingOrganizerCreationData = Omit<TrainingOrganizer, 'id'>;
+
+
+export interface TrainingHistory {
+  id: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  points: number;
+  category: string; // The abbreviation like 'ZMK' or 'IMPL'
+  organizer: string;
+}
+
+export type TrainingHistoryCreationData = Omit<TrainingHistory, 'id'>;
