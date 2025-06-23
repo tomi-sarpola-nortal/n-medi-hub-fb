@@ -68,48 +68,47 @@ body {
   }
 
   .dark {
-    /* Keeping dark mode defaults for now, can be updated later if needed */
-    --background: 210 10% 12%;
-    --foreground: 210 20% 94%;
-    --card: 210 10% 15%;
-    --card-foreground: 210 20% 94%;
-    --popover: 210 10% 12%;
-    --popover-foreground: 210 20% 94%;
-    --primary: 195 35% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 20%;
-    --secondary-foreground: 210 20% 94%;
-    --muted: 210 10% 20%;
-    --muted-foreground: 210 20% 60%;
-    --accent: 210 10% 25%;
-    --accent-foreground: 195 35% 55%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 210 10% 25%;
-    --input: 210 10% 25%;
-    --ring: 195 35% 55%;
+    --background: 231 15% 18%; /* Dracula Background */
+    --foreground: 60 30% 96%; /* Dracula Foreground */
+    --card: 232 14% 31%; /* Dracula Current Line */
+    --card-foreground: 60 30% 96%;
+    --popover: 232 14% 31%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 265 89% 78%; /* Dracula Purple */
+    --primary-foreground: 231 15% 18%; /* Dracula Background for contrast on buttons */
+    --secondary: 232 14% 25%; /* Darker version of card bg */
+    --secondary-foreground: 60 30% 96%;
+    --muted: 232 14% 25%;
+    --muted-foreground: 225 27% 51%; /* Dracula Comment */
+    --accent: 232 14% 25%;
+    --accent-foreground: 60 30% 96%;
+    --destructive: 0 100% 66%; /* Dracula Red */
+    --destructive-foreground: 60 30% 96%;
+    --border: 232 14% 25%;
+    --input: 232 14% 31%;
+    --ring: 265 89% 78%; /* Dracula Purple */
 
     /* Status Badge Colors */
-    --status-success-background: 140 40% 20%;
-    --status-success-foreground: 140 70% 70%;
-    --status-warning-background: 45 40% 20%;
-    --status-warning-foreground: 45 80% 70%;
-    --status-destructive-background: 0 40% 20%;
-    --status-destructive-foreground: 0 80% 70%;
+    --status-success-background: 122 83% 20%;
+    --status-success-foreground: 122 83% 85%;
+    --status-warning-background: 48 83% 25%;
+    --status-warning-foreground: 48 96% 77%;
+    --status-destructive-background: 0 70% 25%;
+    --status-destructive-foreground: 0 100% 80%;
     
     /* Document Type Badge Colors */
-    --badge-vorlage-background: 212 40% 20%;
-    --badge-vorlage-foreground: 212 80% 80%;
-    --badge-leitlinie-background: 45 40% 20%;
-    --badge-leitlinie-foreground: 45 80% 70%;
-    --badge-empfehlung-background: 140 40% 20%;
-    --badge-empfehlung-foreground: 140 70% 70%;
+    --badge-vorlage-background: 231 60% 25%;
+    --badge-vorlage-foreground: 231 80% 85%;
+    --badge-leitlinie-background: 60 80% 25%;
+    --badge-leitlinie-foreground: 60 95% 77%;
+    --badge-empfehlung-background: 122 83% 20%;
+    --badge-empfehlung-foreground: 122 83% 85%;
 
-    --sidebar-background: 210 10% 15%; 
-    --sidebar-foreground: 210 20% 94%; 
-    --sidebar-border: 210 10% 25%;
-    --sidebar-accent: 210 10% 20%; 
-    --sidebar-accent-foreground: 195 35% 55%;
+    --sidebar-background: 231 15% 18%; 
+    --sidebar-foreground: 60 30% 96%; 
+    --sidebar-border: 232 14% 25%;
+    --sidebar-accent: 232 14% 31%; 
+    --sidebar-accent-foreground: 265 89% 78%;
   }
 }
 

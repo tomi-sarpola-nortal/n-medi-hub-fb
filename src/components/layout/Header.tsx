@@ -5,6 +5,7 @@ import type { User } from '@/types'; // User might still be needed if other head
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Bell } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 // LanguageSwitcher and user-specific imports like Avatar, DropdownMenu, UserCircle, LogOut, Settings are removed
 
 interface HeaderProps {
@@ -26,14 +27,14 @@ export default function Header({ pageTitle }: HeaderProps) {
          <h1 className="flex-1 text-xl font-semibold font-headline whitespace-nowrap hidden md:block">{pageTitle}</h1>
       )}
       
-      <div className="ml-auto flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-2">
         <Button variant="outline" size="icon" className="h-8 w-8">
           <Bell className="h-4 w-4" />
           <span className="sr-only">Toggle notifications</span>
         </Button>
+        <ThemeToggle />
         {/* User Avatar DropdownMenu and LanguageSwitcher are removed from here */}
       </div>
     </header>
   );
 }
-
