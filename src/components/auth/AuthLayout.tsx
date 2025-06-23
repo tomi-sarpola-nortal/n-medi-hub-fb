@@ -51,7 +51,7 @@ export default function AuthLayout({
       <header className="py-6 px-4 sm:px-8 border-b border-border">
         <div className="container mx-auto flex items-center justify-between">
           <Link href="/">
-            <Logo portalText={t.login_logo_text_portal || "Portal"} />
+            <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
           </Link>
           <div className="flex items-center gap-4">
             {showBackButton && (
@@ -60,7 +60,7 @@ export default function AuthLayout({
                 {translatedBackButtonText}
                 </Button>
             )}
-            <div className="w-40">
+            <div>
                 <LanguageSwitcher />
             </div>
           </div>
