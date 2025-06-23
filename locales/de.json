@@ -378,5 +378,7 @@
   "documents_delete_dialog_cancel": "Abbrechen",
   "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen.",
   "settings_pending_approval_title": "Konto wartet auf Genehmigung",
-  "settings_pending_approval_alert": "Ihre Registrierung wartet auf Genehmigung. Sie können Ihre übermittelten Daten unten einsehen, aber es können keine Änderungen vorgenommen werden, bis Ihr Konto genehmigt ist."
+  "settings_pending_approval_alert": "Ihr Konto wartet auf die Genehmigung. Sie können Ihre übermittelten Daten überprüfen, bearbeiten oder Ihr Konto löschen. Der Zugriff auf andere Portalfunktionen ist bis zur Genehmigung Ihrer Registrierung deaktiviert."
 }
+
+    

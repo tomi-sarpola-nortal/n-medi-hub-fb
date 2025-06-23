@@ -378,5 +378,7 @@
   "documents_delete_dialog_cancel": "Cancel",
   "member_review_no_pending": "No pending member reviews at the moment.",
   "settings_pending_approval_title": "Account Pending Approval",
-  "settings_pending_approval_alert": "Your registration is waiting for approval. You can review your submitted data below, but no changes can be made until your account is approved."
+  "settings_pending_approval_alert": "Your account is pending approval. You can review and edit your submitted data or delete your account. Access to other portal features is disabled until your registration is approved."
 }
+
+    
