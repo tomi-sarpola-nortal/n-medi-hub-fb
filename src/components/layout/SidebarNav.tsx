@@ -93,7 +93,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       {/* User Profile Section */}
-      <div className="p-3 mx-2 my-1 rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+      <div className="p-3 mx-2 my-1 rounded-md bg-muted text-sidebar-foreground">
         <div className="w-full h-auto p-0 justify-start items-center gap-3 flex">
           <User className="h-10 w-10 text-primary flex-shrink-0" />
           <div className="text-sm overflow-hidden text-left">
@@ -113,7 +113,7 @@ export function AppSidebar() {
                   isActive={pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))}
                   tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
                   aria-label={t[item.title] || item.title}
-                  className="text-sidebar-foreground data-[active=true]:text-primary data-[active=true]:bg-sidebar-accent font-medium data-[active=true]:border-0 hover:bg-sidebar-accent hover:text-primary"
+                  className="font-medium"
                 >
                   {item.icon && <item.icon className="h-5 w-5"/>}
                   <span>{t[item.title] || item.title}</span>

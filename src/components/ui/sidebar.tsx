@@ -22,7 +22,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH = "18rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -517,16 +517,16 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding,color,background-color,border-color] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground focus-visible:ring-2 active:bg-sidebar-item-hover-background active:text-sidebar-item-hover-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[state=open]:hover:bg-sidebar-item-hover-background data-[state=open]:hover:text-sidebar-item-hover-foreground group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0", /* Updated icon size to size-5 and collapsed size to size-9 */
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding,color,background-color,border-color] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground focus-visible:ring-2 active:bg-sidebar-item-hover-background active:text-sidebar-item-hover-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[state=open]:hover:bg-sidebar-item-hover-background data-[state=open]:hover:text-sidebar-item-hover-foreground group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-2.5 group-data-[collapsible=icon]:justify-center [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "text-sidebar-foreground data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-4 data-[active=true]:border-sidebar-item-active-border data-[active=true]:pl-[calc(0.5rem_-_2px)]", /* Adjusted padding for border */
+        default: "text-sidebar-foreground data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary data-[active=true]:pl-[calc(0.5rem_-_1px)]",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-item-hover-background))] data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-4 data-[active=true]:border-sidebar-item-active-border data-[active=true]:pl-[calc(0.5rem_-_2px)] data-[active=true]:shadow-none",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-item-hover-background hover:text-sidebar-item-hover-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-item-hover-background))] data-[active=true]:bg-sidebar-item-active-background data-[active=true]:text-sidebar-item-active-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary data-[active=true]:pl-[calc(0.5rem_-_1px)] data-[active=true]:shadow-none",
       },
       size: {
-        default: "h-9 text-sm", /* Default height to H-9 */
+        default: "h-9 text-sm",
         sm: "h-7 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0",
       },

@@ -5,7 +5,7 @@ import {
   FileText,
   Settings,
   GraduationCap,
-  CalendarDays,
+  ArrowLeftRight,
   Users,
 } from "lucide-react";
 
@@ -24,7 +24,7 @@ export const navConfig: Record<UserRole, NavItem[]> = {
     {
       title: "sidebar_my_representations",
       href: "/representations",
-      icon: CalendarDays,
+      icon: ArrowLeftRight,
     },
     {
       title: "sidebar_document_templates",
