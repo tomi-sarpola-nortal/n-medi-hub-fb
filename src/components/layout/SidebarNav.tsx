@@ -94,7 +94,7 @@ export function AppSidebar() {
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-4">
         <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
-          <Logo iconSize={50} portalText={t.login_logo_text_portal || "Portal"} />
+          <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
         </Link>
       </SidebarHeader>
 
