@@ -3,9 +3,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Landmark, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
+import Logo from '../layout/Logo';
 
 // Helper for client-side translations (consistent with login page)
 const getClientTranslations = (locale: string) => {
@@ -49,16 +50,8 @@ export default function AuthLayout({
     <div className="flex min-h-screen flex-col bg-background text-foreground font-body">
       <header className="py-6 px-4 sm:px-8 border-b border-border">
         <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <Landmark className="h-10 w-10 text-destructive" data-ai-hint="logo company" />
-            <div>
-              <h1 className="text-xl font-bold font-headline text-charcoal">
-                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
-              </h1>
-              <p className="text-lg font-headline text-primary">
-                {t.login_logo_text_portal || "Portal"}
-              </p>
-            </div>
+          <Link href="/">
+            <Logo portalText={t.login_logo_text_portal || "Portal"} />
           </Link>
           <div className="flex items-center gap-4">
             {showBackButton && (
@@ -85,11 +78,8 @@ export default function AuthLayout({
       </main>
 
       <footer className="py-8 text-center text-xs text-muted-foreground border-t border-border">
-         <div className="inline-flex items-center justify-center space-x-1 mb-2">
-            <Landmark className="h-5 w-5 text-destructive" />
-            <span className="font-bold font-headline text-sm text-charcoal">
-                {t.login_logo_text_main || "ÖSTERREICHISCHE ZAHNÄRZTE KAMMER"}
-            </span>
+         <div className="inline-flex items-center justify-center mb-2">
+            <Logo portalText={t.login_logo_text_portal || "Portal"} iconSize={20} />
         </div>
         <p className="mb-2">{t.login_footer_copyright || "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten."}</p>
         <div className="space-x-4">

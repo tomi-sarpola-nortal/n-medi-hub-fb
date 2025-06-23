@@ -17,10 +17,11 @@ import {
 import { useAuth } from "@/context/auth-context";
 import { navConfig } from "@/config/nav";
 import { Button } from "@/components/ui/button";
-import { LogOut, Landmark, User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
+import { LogOut, User, Settings, GraduationCap, CalendarDays, FileText, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
+import Logo from "./Logo";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -51,10 +52,10 @@ export function AppSidebar() {
        <Sidebar collapsible="none">
         <SidebarHeader className="p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden">
-             <Landmark className="h-8 w-8 flex-shrink-0 text-primary" />
-            <div className="flex flex-col">
-              <span className="font-headline text-lg font-bold text-foreground truncate">ZAHNÄRZTE KAMMER</span>
-              <span className="font-headline text-md font-medium text-primary -mt-1">Portal</span>
+             <Skeleton className="h-8 w-8 rounded-md" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
             </div>
           </div>
         </SidebarHeader>
@@ -87,12 +88,7 @@ export function AppSidebar() {
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-3">
         <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
-          <Landmark className="h-10 w-10 flex-shrink-0 text-destructive" />
-          <div className="flex flex-col">
-            <span className="font-headline text-sm font-bold text-foreground leading-tight">ÖSTERREICHISCHE</span>
-            <span className="font-headline text-lg font-bold text-foreground -mt-1 leading-tight">ZAHNÄRZTE KAMMER</span>
-            <span className="font-headline text-lg font-medium text-primary -mt-1 leading-tight">Portal</span>
-          </div>
+          <Logo portalText={t.login_logo_text_portal || "Portal"} />
         </Link>
       </SidebarHeader>
 
