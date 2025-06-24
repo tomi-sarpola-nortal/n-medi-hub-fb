@@ -71,6 +71,7 @@ export default function NewRepresentationPage() {
 
     const [persons, setPersons] = useState<Person[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [comboboxOpen, setComboboxOpen] = useState(false);
 
     const form = useForm<NewRepresentationFormValues>({
         resolver: zodResolver(formSchema),
@@ -200,12 +201,13 @@ export default function NewRepresentationPage() {
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
-                                            <Popover>
+                                            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
                                                         <Button
                                                             variant="outline"
                                                             role="combobox"
+                                                            aria-expanded={comboboxOpen}
                                                             className={cn(
                                                                 "w-full justify-between",
                                                                 !field.value && "text-muted-foreground"
@@ -230,6 +232,7 @@ export default function NewRepresentationPage() {
                                                                         key={p.id}
                                                                         onSelect={() => {
                                                                             form.setValue("representedPersonId", p.id);
+                                                                            setComboboxOpen(false);
                                                                         }}
                                                                     >
                                                                         <Check
