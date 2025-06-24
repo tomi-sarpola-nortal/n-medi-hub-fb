@@ -16,7 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -44,6 +44,7 @@ const ITEMS_PER_PAGE = 7;
 export default function EducationPage() {
     const { user, loading: authLoading } = useAuth();
     const params = useParams();
+    const router = useRouter();
     const locale = typeof params.locale === 'string' ? params.locale : 'en';
     const [t, setT] = useState<Record<string, string>>({});
 
@@ -84,9 +85,9 @@ export default function EducationPage() {
 
     // Calculate ZFD progress dynamically
     const zfdProgressData = useMemo(() => {
+        const totalCurrentPoints = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
         if (!trainingHistory || zfdGroups.length === 0 || Object.keys(t).length === 0) {
-            const totalCurrent = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
-            return { categories: [], total: { current: totalCurrent, total: 120 }};
+            return { categories: [], total: { current: totalCurrentPoints, total: 120 }};
         }
     
         // 1. Initialize progress data from the fetched ZFD groups
@@ -109,7 +110,6 @@ export default function EducationPage() {
         // 3. Format for rendering
         const categoriesForDisplay = Object.values(progressData);
         const totalMaxPoints = zfdGroups.reduce((sum, group) => sum + group.totalPoints, 0);
-        const totalCurrentPoints = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
         
         return {
             categories: categoriesForDisplay,
@@ -290,7 +290,11 @@ export default function EducationPage() {
                     </TableHeader>
                     <TableBody>
                         {paginatedTrainingHistory.map((item) => (
-                        <TableRow key={item.id}>
+                        <TableRow
+                            key={item.id}
+                            onClick={() => router.push(`/${locale}/education/${item.id}`)}
+                            className="cursor-pointer"
+                        >
                             <TableCell className="font-medium">{format(new Date(item.date), 'dd.MM.yyyy')}</TableCell>
                             <TableCell>{item.title}</TableCell>
                             <TableCell>{item.category}</TableCell>
