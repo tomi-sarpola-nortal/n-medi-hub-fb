@@ -84,7 +84,11 @@ export default function NewRepresentationPage() {
     }, [user, locale, toast]);
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(FormSchema)
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            startTime: '11:00',
+            endTime: '12:00'
+        }
     });
 
     const onSubmit = async (data: FormValues) => {
