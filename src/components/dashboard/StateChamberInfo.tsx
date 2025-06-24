@@ -98,11 +98,11 @@ export default function StateChamberInfo({ chamberId, t }: StateChamberInfoProps
             </div>
             <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                <span>{chamber.phone}</span>
+                <span className="break-words">{chamber.phone}</span>
             </div>
             <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-                <span>{chamber.email}</span>
+                <span className="break-all">{chamber.email}</span>
             </div>
             <div className="flex items-start gap-3">
                 <Clock className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>

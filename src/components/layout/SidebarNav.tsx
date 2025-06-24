@@ -17,11 +17,10 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/auth-context";
 import { navConfig } from "@/config/nav";
-import { LogOut } from "lucide-react";
+import { LogOut, UserCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -99,10 +98,7 @@ export function AppSidebar() {
       <div className="p-4">
         <Link href={`/${locale}/settings`} className="block">
             <div className="w-full h-auto p-4 justify-start items-center gap-3 flex bg-muted rounded-lg hover:bg-accent transition-colors cursor-pointer">
-                <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.avatarUrl} alt={user.name} />
-                    <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
+                <UserCircle className="h-10 w-10 text-muted-foreground flex-shrink-0" />
                 <div className="text-sm overflow-hidden text-left">
                     <p className="font-semibold truncate">{user.name}</p>
                     <p className="text-xs text-muted-foreground truncate">ID: {user.dentistId || 'N/A'}</p>
