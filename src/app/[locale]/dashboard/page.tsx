@@ -13,13 +13,18 @@ import LkMemberDashboard from '@/components/dashboard/LkMemberDashboard';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../locales/de.json');
-    }
-    return require('../../../../locales/en.json');
+    const main = locale === 'de' 
+        ? require('../../../../locales/de.json') 
+        : require('../../../../locales/en.json');
+    const page = locale === 'de' 
+        ? require('../../../../locales/de/dashboard.json') 
+        : require('../../../../locales/en/dashboard.json');
+    return { ...main, ...page };
   } catch (e) {
     console.warn("Translation file not found for dashboard page, falling back to en");
-    return require('../../../../locales/en.json');
+    const main = require('../../../../locales/en.json');
+    const page = require('../../../../locales/en/dashboard.json');
+    return { ...main, ...page };
   }
 };
 
@@ -56,7 +61,7 @@ export default function DashboardPage() {
     );
   }
   
-  const pageTitle = t.dashboard_page_title || "Dashboard";
+  const pageTitle = t.page_title || "Dashboard";
 
   const renderDashboardByRole = () => {
     switch(user.role) {

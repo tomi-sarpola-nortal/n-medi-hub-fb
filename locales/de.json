@@ -1,7 +1,6 @@
 
 {
   "welcome_back": "Willkommen, {userName}!",
-  "dashboard_page_title": "Dashboard",
   "education_page_title": "Meine Fortbildungen",
   "education_breadcrumb_dashboard": "Dashboard",
   "education_breadcrumb_current": "Meine Fortbildungen",
@@ -204,22 +203,6 @@
   "register_success_card_message_line1": "Ihr Antrag wurde erfolgreich an die Zahnärztekammer Salzburg übermittelt.",
   "register_success_card_message_line2": "Nach der Prüfung erhalten Sie Ihre Zahnarzt-ID und weitere Informationen per E-Mail.",
   "register_success_button_to_login": "ZUR ANMELDUNG",
-  "dashboard_training_status_title": "Ihr Fortbildungsstand",
-  "dashboard_training_status_points": "Fortbildungspunkten",
-  "dashboard_training_status_button": "MEINE FORTBILDUNGEN ANSEHEN",
-  "dashboard_representation_status_title": "Ihre Vertretungen",
-  "dashboard_representation_status_hours": "Bestätigte Vertretungsstunden",
-  "dashboard_representation_status_button": "MEINE VERTRETUNGEN ANSEHEN",
-  "dashboard_chamber_info_title": "Ihre Landeskammer",
-  "dashboard_chamber_name": "Zahnärztekammer Wien",
-  "dashboard_chamber_office_hours": "Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr",
-  "dashboard_confirm_reps_title": "Vertretungen bestätigen",
-  "dashboard_confirm_reps_description": "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden.",
-  "dashboard_confirm_reps_confirm_button": "BESTÄTIGEN",
-  "dashboard_confirm_reps_decline_button": "ABLEHNEN",
-  "lk_dashboard_review_members_title": "Mitglieder überprüfen",
-  "lk_dashboard_review_members_desc": "Hier können Sie Datenänderungen von Mitgliedern überprüfen.",
-  "lk_dashboard_perform_review_button": "PRÜFUNG VORNEHMEN",
   "settings_page_title": "Einstellungen",
   "settings_page_description": "Verwalten Sie Ihre Kontoeinstellungen und E-Mail-Präferenzen.",
   "settings_personal_data_title": "Persönliche Daten",
@@ -380,5 +363,3 @@
   "settings_pending_approval_title": "Konto wartet auf Genehmigung",
   "settings_pending_approval_alert": "Ihr Konto wartet auf die Genehmigung. Sie können Ihre übermittelten Daten überprüfen, bearbeiten oder Ihr Konto löschen. Der Zugriff auf andere Portalfunktionen ist bis zur Genehmigung Ihrer Registrierung deaktiviert."
 }
-
-    

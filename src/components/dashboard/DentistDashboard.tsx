@@ -152,7 +152,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                             {/* Training Status Card */}
                             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <CardHeader>
-                                    <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
+                                    <CardTitle className="text-lg font-medium font-headline">{t.training_status_title || "Your Training Status"}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-center pt-6 pb-2">
                                      <CircularProgress
@@ -162,7 +162,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                         label={
                                             <div className="text-center">
                                                 <p className="text-2xl font-bold font-headline">{`${trainingPoints}/${TRAINING_TARGET_POINTS}`}</p>
-                                                <p className="text-xs text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
+                                                <p className="text-xs text-muted-foreground">{t.training_status_points || "Training Points"}</p>
                                             </div>
                                         }
                                         showValue={false}
@@ -170,7 +170,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardContent>
                                 <CardFooter>
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href="/education">{t.dashboard_training_status_button || "MEINE FORTBILDUNGEN ANSEHEN"}</Link>
+                                        <Link href="/education">{t.training_status_button || "VIEW MY TRAININGS"}</Link>
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -178,12 +178,12 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                             {/* Representation Status Card */}
                             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <CardHeader>
-                                    <CardTitle className="text-lg font-medium font-headline">{t.dashboard_representation_status_title || "Ihre Vertretungen"}</CardTitle>
+                                    <CardTitle className="text-lg font-medium font-headline">{t.representation_status_title || "Your Representations"}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-between">
                                     <div>
                                         <p className="text-4xl font-bold">{representationHours}</p>
-                                        <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
+                                        <p className="text-sm text-muted-foreground">{t.representation_status_hours || "Confirmed Representation Hours"}</p>
                                     </div>
                                     <div className="p-3 bg-accent rounded-full">
                                         <CalendarCheck className="h-8 w-8 text-primary"/>
@@ -191,7 +191,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardContent>
                                 <CardFooter>
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href="/representations">{t.dashboard_representation_status_button || "MEINE VERTRETUNGEN ANSEHEN"}</Link>
+                                        <Link href="/representations">{t.representation_status_button || "VIEW MY REPRESENTATIONS"}</Link>
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -200,8 +200,8 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                         {/* Representation Requests Card */}
                         <Card className="shadow-lg">
                             <CardHeader>
-                                <CardTitle className="text-xl font-medium font-headline">{t.dashboard_confirm_reps_title || "Vertretungen bestätigen"}</CardTitle>
-                                <CardDescription>{t.dashboard_confirm_reps_description || "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden."}</CardDescription>
+                                <CardTitle className="text-xl font-medium font-headline">{t.confirm_reps_title || "Confirm Representations"}</CardTitle>
+                                <CardDescription>{t.confirm_reps_description || "Here you can confirm representations where you were represented."}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {mockRepresentationRequests.map((req) => (
@@ -213,8 +213,8 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                             </div>
                                         </div>
                                         <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                                            <Button>{t.dashboard_confirm_reps_confirm_button || "BESTÄTIGEN"}</Button>
-                                            <Button variant="outline">{t.dashboard_confirm_reps_decline_button || "ABLEHNEN"}</Button>
+                                            <Button>{t.confirm_reps_confirm_button || "CONFIRM"}</Button>
+                                            <Button variant="outline">{t.confirm_reps_decline_button || "DECLINE"}</Button>
                                         </div>
                                     </div>
                                 ))}

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,7 +16,7 @@ interface StateChamberInfoProps {
 const LoadingSkeleton = ({ t }: { t: Record<string, string> }) => (
     <Card className="shadow-lg">
         <CardHeader>
-            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_chamber_info_title || 'Your State Chamber'}</CardTitle>
+            <CardTitle className="text-lg font-medium font-headline">{t.chamber_info_title || 'Your State Chamber'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
             <Skeleton className="h-5 w-3/4" />
@@ -78,7 +79,7 @@ export default function StateChamberInfo({ chamberId, t }: StateChamberInfoProps
   if (!chamberId || !chamber) {
     return (
         <Card className="shadow-lg">
-            <CardHeader><CardTitle>{t.dashboard_chamber_info_title || 'Your State Chamber'}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t.chamber_info_title || 'Your State Chamber'}</CardTitle></CardHeader>
             <CardContent><p>Chamber information not found.</p></CardContent>
         </Card>
     );
@@ -87,7 +88,7 @@ export default function StateChamberInfo({ chamberId, t }: StateChamberInfoProps
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-            <CardTitle className="text-lg font-medium font-headline">{t.dashboard_chamber_info_title || 'Your State Chamber'}</CardTitle>
+            <CardTitle className="text-lg font-medium font-headline">{t.chamber_info_title || 'Your State Chamber'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
             <p className="font-semibold">{chamber.name}</p>

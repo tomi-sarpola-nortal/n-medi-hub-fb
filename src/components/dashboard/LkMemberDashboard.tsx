@@ -50,8 +50,8 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                 <div className="lg:col-span-2">
                     <Card className="shadow-lg">
                         <CardHeader>
-                            <CardTitle className="font-headline text-xl">{t.lk_dashboard_review_members_title || 'Mitglieder überprüfen'}</CardTitle>
-                            <CardDescription>{t.lk_dashboard_review_members_desc || 'Hier können Sie Datenänderungen von Mitgliedern überprüfen.'}</CardDescription>
+                            <CardTitle className="font-headline text-xl">{t.review_members_title || 'Review Members'}</CardTitle>
+                            <CardDescription>{t.review_members_desc || 'Here you can review data changes from members.'}</CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
                              {isLoading ? (
@@ -66,12 +66,12 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                                                 <div>
                                                     <p className="font-semibold text-base">{member.name}</p>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : ''} | {t.data_change_label || 'Datenänderung'}
+                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : ''} | {t.data_change_label || 'Data Change'}
                                                     </p>
                                                 </div>
                                                 <Button asChild className="w-full sm:w-auto mt-2 sm:mt-0">
                                                     <Link href={`/member-overview/${member.id}/review`}>
-                                                        {t.lk_dashboard_perform_review_button || 'PRÜFUNG VORNEHMEN'}
+                                                        {t.perform_review_button || 'PERFORM REVIEW'}
                                                     </Link>
                                                 </Button>
                                             </div>
