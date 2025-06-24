@@ -56,6 +56,9 @@ body {
     --zfd-color-2: 217 91% 69%; /* Frei - medium blue */
     --zfd-color-3: 217 91% 85%; /* Literatur - light blue */
 
+    /* New Color for Progress */
+    --dark-blue: 214 100% 27%; /* #003A8C */
+
 
     /* Sidebar specific colors */
     --sidebar-background: 0 0% 100%; /* White */
@@ -113,6 +116,9 @@ body {
     --zfd-color-1: 217 91% 69%;
     --zfd-color-2: 220 85% 75%;
     --zfd-color-3: 220 80% 85%;
+
+    /* New Color for Progress */
+    --dark-blue: 214 100% 27%; /* #003A8C */
 
     --sidebar-background: 231 15% 18%; 
     --sidebar-foreground: 60 30% 96%; 

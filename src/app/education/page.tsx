@@ -215,7 +215,7 @@ export default function EducationPage() {
                         </div>
                     }
                     showValue={false}
-                    progressColor="hsl(var(--zfd-color-1))"
+                    progressColor="hsl(var(--dark-blue))"
                 />
             </div>
             <div className="md:col-span-2 space-y-4">
@@ -258,6 +258,7 @@ export default function EducationPage() {
                       radius={40} 
                       strokeWidth={8}
                       textClassName="text-base font-bold font-headline"
+                      progressColor="hsl(var(--dark-blue))"
                     />
                   </div>
                 </CardContent>
