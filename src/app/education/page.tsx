@@ -81,7 +81,9 @@ export default function EducationPage() {
     // Calculate ZFD progress dynamically
     const zfdProgressData = useMemo(() => {
         if (!trainingHistory || allCategories.length === 0 || Object.keys(t).length === 0) {
-            return { categories: [], total: { current: 0, total: 0 }};
+            // Calculate total points even if categories fail to load, using a default total requirement.
+            const totalCurrent = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
+            return { categories: [], total: { current: totalCurrent, total: 120 }};
         }
 
         // 1. Build ZFD group definitions from the fetched categories
@@ -98,12 +100,11 @@ export default function EducationPage() {
                         childAbbrs: []
                     };
                 }
-                zfdGroups[cat.zfdGroupName].childAbbrs.push(cat.abbreviation);
                 categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupName;
             }
         });
 
-        // 2. Calculate points for each group
+        // 2. Calculate points for each ZFD group (for the progress bars)
         trainingHistory.forEach(record => {
             const zfdGroupName = categoryToZfdGroupMap[record.category];
             if (zfdGroupName && zfdGroups[zfdGroupName]) {
@@ -112,13 +113,15 @@ export default function EducationPage() {
         });
 
         // 3. Format for rendering
-        const categories = Object.values(zfdGroups);
-        const totalCurrent = categories.reduce((sum, cat) => sum + cat.current, 0);
-        const totalMax = categories.reduce((sum, cat) => sum + cat.total, 0);
+        const categoriesForDisplay = Object.values(zfdGroups);
+        const totalMaxPoints = categoriesForDisplay.reduce((sum, cat) => sum + cat.total, 0);
+
+        // **The fix**: Calculate total points directly from the history to ensure accuracy.
+        const totalCurrentPoints = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
         
         return {
-            categories,
-            total: { current: totalCurrent, total: totalMax }
+            categories: categoriesForDisplay,
+            total: { current: totalCurrentPoints, total: totalMaxPoints || 120 } // Fallback to 120 if total is 0
         };
     }, [trainingHistory, allCategories, t]);
 
