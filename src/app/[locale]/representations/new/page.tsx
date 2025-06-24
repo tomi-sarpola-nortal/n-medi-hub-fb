@@ -230,8 +230,8 @@ export default function NewRepresentationPage() {
                                                                     <CommandItem
                                                                         value={p.id}
                                                                         key={p.id}
-                                                                        onSelect={() => {
-                                                                            form.setValue("representedPersonId", p.id);
+                                                                        onSelect={(currentValue) => {
+                                                                            form.setValue("representedPersonId", currentValue);
                                                                             setComboboxOpen(false);
                                                                         }}
                                                                     >
