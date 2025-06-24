@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -141,6 +141,18 @@ export default function RepresentationsPage() {
             });
         }
     };
+
+    const allRepresentations = useMemo(() => {
+        if (!representations) return [];
+
+        const performedWithType = representations.performed.map(r => ({ ...r, type: 'performed' as const }));
+        const wasRepresentedFiltered = representations.wasRepresented
+            .filter(r => r.status !== 'pending')
+            .map(r => ({ ...r, type: 'received' as const }));
+        
+        const combined = [...performedWithType, ...wasRepresentedFiltered];
+        return combined.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    }, [representations]);
     
     const pageTitle = t.representations_page_title || "My Representations";
     const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
@@ -177,45 +189,6 @@ export default function RepresentationsPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-xl font-headline">{t.representations_performed_title || "Overview of my performed representations"}</CardTitle>
-                        <CardDescription>{t.representations_performed_desc || "Here you can see representations where you have covered for others."}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-1/4">{t.representations_table_header_period || "Period"}</TableHead>
-                                    <TableHead>{t.representations_table_header_person || "Represented Person"}</TableHead>
-                                    <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
-                                    <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
-                                    <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {representations.performed.length > 0 ? representations.performed.map((rep) => (
-                                    <TableRow key={rep.id}>
-                                        <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
-                                        <TableCell>{rep.representedPersonName}</TableCell>
-                                        <TableCell>{rep.durationHours} Stunden</TableCell>
-                                        <TableCell>
-                                            <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending'}>
-                                                {rep.status === 'confirmed' ? (t.representations_status_confirmed || 'Confirmed') : (t.representations_status_pending || 'Pending')}
-                                            </RepresentationStatusBadge>
-                                        </TableCell>
-                                        <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
-                                    </TableRow>
-                                )) : (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">No performed representations found.</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
                         <CardTitle className="text-xl font-headline">{t.representations_confirm_title || "Confirm representations"}</CardTitle>
                         <CardDescription>{t.representations_confirm_desc || "Here you can confirm representations where you were represented."}</CardDescription>
                     </CardHeader>
@@ -233,36 +206,38 @@ export default function RepresentationsPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-xl font-headline">{t.representations_my_title || "Overview of my representations"}</CardTitle>
-                        <CardDescription>{t.representations_my_desc || "Here you can view representations where you were represented by others."}</CardDescription>
+                        <CardTitle className="text-xl font-headline">{t.representations_all_title || "Overview of all representations"}</CardTitle>
+                        <CardDescription>{t.representations_all_desc || "Here you can see all your representations, both performed and where you were represented."}</CardDescription>
                     </CardHeader>
                     <CardContent>
                        <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-1/4">{t.representations_table_header_period || "Period"}</TableHead>
-                                    <TableHead>{t.representations_table_header_representing_person || "Representing Person"}</TableHead>
+                                    <TableHead>{t.representations_table_header_type || "Type"}</TableHead>
+                                    <TableHead>{t.representations_table_header_person_involved || "Person Involved"}</TableHead>
                                     <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
                                     <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
                                     <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {representations.wasRepresented.length > 0 ? representations.wasRepresented.map((rep) => (
-                                    <TableRow key={rep.id}>
+                                {allRepresentations.length > 0 ? allRepresentations.map((rep) => (
+                                    <TableRow key={`${rep.id}-${rep.type}`}>
                                         <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
-                                        <TableCell>{rep.representingPersonName}</TableCell>
+                                        <TableCell>{rep.type === 'performed' ? (t.representations_type_performed || 'Performed') : (t.representations_type_received || 'Received')}</TableCell>
+                                        <TableCell>{rep.type === 'performed' ? rep.representedPersonName : rep.representingPersonName}</TableCell>
                                         <TableCell>{rep.durationHours} Stunden</TableCell>
                                         <TableCell>
-                                            <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending'}>
-                                                {rep.status === 'confirmed' ? (t.representations_status_confirmed || 'Confirmed') : (t.representations_status_pending || 'Pending')}
+                                            <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending' | 'declined'}>
+                                                {t[`representations_status_${rep.status}`] || rep.status}
                                             </RepresentationStatusBadge>
                                         </TableCell>
                                         <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                     </TableRow>
                                 )) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">No representations found where you were represented.</TableCell>
+                                        <TableCell colSpan={6} className="h-24 text-center">No representations found.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -273,7 +248,6 @@ export default function RepresentationsPage() {
                  <p className="text-xs text-muted-foreground text-center pt-4">
                     {t.representations_footer_note || "Representations can only be confirmed by the represented person. Your state chamber also has access to this data."}
                 </p>
-
             </div>
         </AppLayout>
     );

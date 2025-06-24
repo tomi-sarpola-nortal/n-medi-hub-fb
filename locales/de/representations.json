@@ -14,11 +14,18 @@
   "representations_table_header_confirmation_date": "Bestätigungsdatum",
   "representations_status_confirmed": "Bestätigt",
   "representations_status_pending": "Eingetragen",
+  "representations_status_declined": "Abgelehnt",
   "representations_confirm_title": "Vertretungen bestätigen",
   "representations_confirm_desc": "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden.",
   "representations_confirm_button": "BESTÄTIGEN",
   "representations_decline_button": "ABLEHNEN",
   "representations_my_title": "Übersicht meiner Vertretungen",
   "representations_my_desc": "Hier können Sie Vertretungen einsehen, bei denen Sie vertreten wurden.",
-  "representations_footer_note": "Vertretungen können nur von der vertretenen Person bestätigt werden. Auch Ihre Landeskammer hat Zugriff auf diese Daten."
+  "representations_footer_note": "Vertretungen können nur von der vertretenen Person bestätigt werden. Auch Ihre Landeskammer hat Zugriff auf diese Daten.",
+  "representations_all_title": "Übersicht aller Vertretungen",
+  "representations_all_desc": "Hier können Sie alle Ihre Vertretungen sehen, sowohl die von Ihnen durchgeführten als auch die, bei denen Sie vertreten wurden.",
+  "representations_table_header_type": "Typ",
+  "representations_table_header_person_involved": "Beteiligte Person",
+  "representations_type_performed": "Durchgeführt",
+  "representations_type_received": "Erhalten"
 }
