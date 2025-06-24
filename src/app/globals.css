@@ -50,6 +50,11 @@ body {
     --badge-leitlinie-foreground: 38 80% 30%; /* Dark Yellow */
     --badge-empfehlung-background: 140 80% 96%; /* Very Light Green */
     --badge-empfehlung-foreground: 140 60% 30%; /* Dark Green */
+    
+    /* ZFD Progress Colors */
+    --zfd-color-1: 221 71% 48%; /* Berufsbezogen - dark blue */
+    --zfd-color-2: 217 91% 69%; /* Frei - medium blue */
+    --zfd-color-3: 217 91% 85%; /* Literatur - light blue */
 
 
     /* Sidebar specific colors */
@@ -103,6 +108,11 @@ body {
     --badge-leitlinie-foreground: 60 95% 77%;
     --badge-empfehlung-background: 122 83% 20%;
     --badge-empfehlung-foreground: 122 83% 85%;
+
+    /* ZFD Progress Colors */
+    --zfd-color-1: 217 91% 69%;
+    --zfd-color-2: 220 85% 75%;
+    --zfd-color-3: 220 80% 85%;
 
     --sidebar-background: 231 15% 18%; 
     --sidebar-foreground: 60 30% 96%; 

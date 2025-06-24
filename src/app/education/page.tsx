@@ -40,7 +40,6 @@ interface SpecialDiplomaItem {
 }
 
 const ITEMS_PER_PAGE = 7;
-const ZFD_CATEGORY_TARGET = 50;
 
 export default function EducationPage() {
     const { user, loading: authLoading } = useAuth();
@@ -118,6 +117,12 @@ export default function EducationPage() {
         };
     }, [trainingHistory, zfdGroups, t]);
 
+     const progressColors = [
+        'bg-[hsl(var(--zfd-color-1))]',
+        'bg-[hsl(var(--zfd-color-2))]',
+        'bg-[hsl(var(--zfd-color-3))]',
+    ];
+
     // Calculate specialist diplomas dynamically
     const specialistDiplomas = useMemo(() => {
         if (!trainingHistory || Object.keys(t).length === 0) return [];
@@ -193,24 +198,42 @@ export default function EducationPage() {
           <CardHeader>
             <CardTitle className="text-xl font-medium font-headline">{t.zfd_fortbildung_title || "ZFD Advanced Training"}</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center gap-6 pt-6">
-             <CircularProgress 
-                value={zfdProgressData.total.total > 0 ? (zfdProgressData.total.current / zfdProgressData.total.total) * 100 : 0} 
-                radius={80} 
-                strokeWidth={14}
-                valueText={t.zfd_total_progress?.replace('{current}', zfdProgressData.total.current.toString()).replace('{total}', zfdProgressData.total.total.toString()) || ''}
-                textClassName="font-headline"
-              />
-            <div className="w-full max-w-lg space-y-4">
-              {zfdProgressData.categories.map(category => (
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center pt-6">
+            <div className="md:col-span-1 flex justify-center">
+                <CircularProgress 
+                    value={zfdProgressData.total.total > 0 ? (zfdProgressData.total.current / zfdProgressData.total.total) * 100 : 0} 
+                    radius={80} 
+                    strokeWidth={12}
+                    label={
+                        <div className="text-center">
+                            <p className="text-3xl font-bold font-headline">
+                                {`${zfdProgressData.total.current}/${zfdProgressData.total.total}`}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                                {t.zfd_total_progress?.split(' ')[1] || "Points"}
+                            </p>
+                        </div>
+                    }
+                    showValue={false}
+                    progressColor="hsl(var(--zfd-color-1))"
+                />
+            </div>
+            <div className="md:col-span-2 space-y-4">
+              {zfdProgressData.categories.map((category, index) => (
                 <div key={category.label}>
-                  <div className="mb-1 flex justify-between">
-                    <span className="text-sm font-medium">{category.label}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {t.zfd_total_progress?.replace('{current}', category.current.toString()).replace('{total}', ZFD_CATEGORY_TARGET.toString())}
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="font-medium text-foreground">{category.label}</span>
+                    <span className="text-muted-foreground">
+                      {t.zfd_total_progress
+                        ?.replace('{current}', category.current.toString())
+                        .replace('{total}', category.total.toString())
+                      }
                     </span>
                   </div>
-                  <Progress value={(category.current / ZFD_CATEGORY_TARGET) * 100} className="h-3" />
+                  <Progress 
+                    value={(category.current / category.total) * 100}
+                    indicatorClassName={progressColors[index % progressColors.length]}
+                  />
                 </div>
               ))}
             </div>
