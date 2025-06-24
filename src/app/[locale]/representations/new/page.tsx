@@ -231,9 +231,12 @@ export default function NewRepresentationPage() {
                                                                         value={p.id}
                                                                         key={p.id}
                                                                         onSelect={(currentValue) => {
-                                                                            console.log("Attempting to select:", currentValue); // test form operation
                                                                             form.setValue("representedPersonId", currentValue);
-                                                                            setComboboxOpen(false);
+                                                                            // Defer closing the popover to prevent a race condition where
+                                                                            // the list unmounts before the click event is fully processed.
+                                                                            setTimeout(() => {
+                                                                                setComboboxOpen(false);
+                                                                            }, 100);
                                                                         }}
                                                                     >
                                                                         <Check
