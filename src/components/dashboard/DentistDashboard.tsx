@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, CalendarCheck } from 'lucide-react';
+import { CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
 import StateChamberInfo from './StateChamberInfo';
 import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import { getConfirmedRepresentationHours } from '@/services/representationService';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CircularProgress } from '@/components/ui/circular-progress';
 
 interface DentistDashboardProps {
     user: Person;
@@ -34,23 +35,35 @@ const LoadingSkeleton = () => (
     <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
       <div className="lg:col-span-2 space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
-            {[...Array(2)].map((_, i) => (
-                <Card key={i}>
-                    <CardHeader>
-                        <Skeleton className="h-5 w-3/4" />
-                    </CardHeader>
-                    <CardContent className="flex items-center justify-between">
-                        <div>
-                            <Skeleton className="h-10 w-24 mb-2" />
-                            <Skeleton className="h-4 w-32" />
-                        </div>
-                        <Skeleton className="h-14 w-14 rounded-full" />
-                    </CardContent>
-                    <CardFooter>
-                        <Skeleton className="h-10 w-full" />
-                    </CardFooter>
-                </Card>
-            ))}
+            {/* Training Card Skeleton */}
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="flex items-center justify-center pt-6 pb-2">
+                    <Skeleton className="h-[140px] w-[140px] rounded-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                </CardFooter>
+            </Card>
+
+            {/* Representation Card Skeleton */}
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="flex items-center justify-between">
+                    <div>
+                        <Skeleton className="h-10 w-24 mb-2" />
+                        <Skeleton className="h-4 w-32" />
+                    </div>
+                    <Skeleton className="h-14 w-14 rounded-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                </CardFooter>
+            </Card>
         </div>
         <Card>
             <CardHeader>
@@ -150,14 +163,19 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 <CardHeader>
                                     <CardTitle className="text-lg font-medium font-headline">{t.dashboard_training_status_title || "Ihr Fortbildungsstand"}</CardTitle>
                                 </CardHeader>
-                                <CardContent className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-4xl font-bold">{stats.trainingPoints} / {TRAINING_TARGET_POINTS}</p>
-                                        <p className="text-sm text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
-                                    </div>
-                                    <div className="p-3 bg-accent rounded-full">
-                                        <GraduationCap className="h-8 w-8 text-primary"/>
-                                    </div>
+                                <CardContent className="flex items-center justify-center pt-6 pb-2">
+                                     <CircularProgress
+                                        value={(stats.trainingPoints / TRAINING_TARGET_POINTS) * 100}
+                                        radius={70}
+                                        strokeWidth={10}
+                                        label={
+                                            <div className="text-center">
+                                                <p className="text-2xl font-bold font-headline">{`${stats.trainingPoints}/${TRAINING_TARGET_POINTS}`}</p>
+                                                <p className="text-xs text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
+                                            </div>
+                                        }
+                                        showValue={false}
+                                    />
                                 </CardContent>
                                 <CardFooter>
                                     <Button variant="outline" className="w-full" asChild>
