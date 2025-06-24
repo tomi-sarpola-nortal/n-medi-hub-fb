@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,7 +17,6 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePickerInput } from "@/components/ui/date-picker";
 import { Loader2, ArrowLeft } from "lucide-react";
@@ -64,6 +63,18 @@ export default function NewRepresentationPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
+
+    const timeSlots = useMemo(() => {
+        const slots = [];
+        for (let hour = 0; hour < 24; hour++) {
+            for (let minute = 0; minute < 60; minute += 15) {
+                const formattedHour = hour.toString().padStart(2, '0');
+                const formattedMinute = minute.toString().padStart(2, '0');
+                slots.push(`${formattedHour}:${formattedMinute}`);
+            }
+        }
+        return slots;
+    }, []);
 
     useEffect(() => {
         setT(getClientTranslations(locale));
@@ -228,9 +239,20 @@ export default function NewRepresentationPage() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>{t.new_representation_form_start_time_label || "Start Time"}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="time" {...field} />
-                                                </FormControl>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a time" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {timeSlots.map(time => (
+                                                            <SelectItem key={time} value={time}>
+                                                                {time}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -241,9 +263,20 @@ export default function NewRepresentationPage() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>{t.new_representation_form_end_time_label || "End Time"}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="time" {...field} />
-                                                </FormControl>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a time" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {timeSlots.map(time => (
+                                                            <SelectItem key={time} value={time}>
+                                                                {time}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
