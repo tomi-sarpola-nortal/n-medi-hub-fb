@@ -19,11 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { DatePickerInput } from "@/components/ui/date-picker";
-import { Loader2, ArrowLeft, ChevronsUpDown, Check } from "lucide-react";
+import { Loader2, ArrowLeft, UserCheck } from "lucide-react";
 import Link from "next/link";
+import { SelectDentistDialog } from "@/components/representations/SelectDentistDialog";
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -65,11 +64,20 @@ export default function NewRepresentationPage() {
     const [dentists, setDentists] = useState<Person[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [comboboxOpen, setComboboxOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedDentistName, setSelectedDentistName] = useState<string | null>(null);
     const { toast } = useToast();
     
     const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')), []);
     const minutes = useMemo(() => ['00', '15', '30', '45'], []);
+
+    const form = useForm<FormValues>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            startTime: '11:00',
+            endTime: '12:00'
+        }
+    });
 
     useEffect(() => {
         setT(getClientTranslations(locale));
@@ -89,13 +97,15 @@ export default function NewRepresentationPage() {
         }
     }, [user, locale, toast]);
 
-    const form = useForm<FormValues>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            startTime: '11:00',
-            endTime: '12:00'
+    useEffect(() => {
+        const dentistId = form.getValues("representedDentistId");
+        if (dentistId && dentists.length > 0) {
+            const dentist = dentists.find(d => d.id === dentistId);
+            if (dentist) {
+                setSelectedDentistName(dentist.name);
+            }
         }
-    });
+    }, [dentists, form]);
 
     const onSubmit = async (data: FormValues) => {
         if (!user) return;
@@ -186,61 +196,29 @@ export default function NewRepresentationPage() {
                     <CardContent>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                <FormField
+                                 <FormField
                                     control={form.control}
                                     name="representedDentistId"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
-                                            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                    <Button
-                                                        variant="outline"
-                                                        role="combobox"
-                                                        className={cn(
-                                                        "w-full justify-between",
-                                                        !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value
-                                                        ? dentists.find(
-                                                            (dentist) => dentist.id === field.value
-                                                            )?.name
-                                                        : (t.new_representation_form_search_dentist || "Search dentist...")}
-                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                    </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                    <Command>
-                                                        <CommandInput placeholder={t.new_representation_form_search_dentist || "Search dentist..."} />
-                                                        <CommandList>
-                                                            <CommandEmpty>{t.new_representation_form_dentist_not_found || "No dentist found."}</CommandEmpty>
-                                                            <CommandGroup>
-                                                                {dentists.map((dentist) => (
-                                                                <CommandItem
-                                                                    value={dentist.id}
-                                                                    key={dentist.id}
-                                                                    onSelect={(currentValue) => {
-                                                                        form.setValue("representedDentistId", currentValue);
-                                                                        setTimeout(() => setComboboxOpen(false), 100);
-                                                                    }}
-                                                                >
-                                                                    <Check
-                                                                    className={cn(
-                                                                        "mr-2 h-4 w-4",
-                                                                        field.value === dentist.id ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                    />
-                                                                    {dentist.name}
-                                                                </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </CommandList>
-                                                    </Command>
-                                                </PopoverContent>
-                                            </Popover>
+                                            <FormControl>
+                                                <Button
+                                                    variant="outline"
+                                                    type="button"
+                                                    className="w-full justify-start text-left font-normal h-10"
+                                                    onClick={() => setIsDialogOpen(true)}
+                                                >
+                                                    {field.value && selectedDentistName ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <UserCheck className="h-4 w-4 text-primary" />
+                                                            <span>{selectedDentistName}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">{t.select_dentist_button_placeholder || "Select a dentist..."}</span>
+                                                    )}
+                                                </Button>
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -345,6 +323,16 @@ export default function NewRepresentationPage() {
                     </CardContent>
                 </Card>
             </div>
+            <SelectDentistDialog
+                isOpen={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                dentists={dentists}
+                t={t}
+                onSelectDentist={(dentist) => {
+                    form.setValue("representedDentistId", dentist.id, { shouldValidate: true });
+                    setSelectedDentistName(dentist.name);
+                }}
+            />
         </AppLayout>
     )
 }

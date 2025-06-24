@@ -34,17 +34,19 @@
   "new_representation_card_title": "Enter Representation Details",
   "new_representation_card_desc": "Select the dentist you represented and the time period.",
   "new_representation_form_dentist_label": "Represented Dentist",
-  "new_representation_form_dentist_placeholder": "Select a dentist...",
-  "new_representation_form_dentist_not_found": "No dentist found.",
-  "new_representation_form_search_dentist": "Search dentist...",
   "new_representation_form_date_label": "Date",
   "new_representation_form_start_time_label": "Start Time",
   "new_representation_form_end_time_label": "End Time",
-  "new_representation_form_duration_label": "Calculated Duration (hours)",
   "new_representation_form_cancel_button": "Cancel",
   "new_representation_form_save_button": "Save Representation",
   "new_representation_success_toast_title": "Representation Saved",
   "new_representation_success_toast_desc": "The request has been sent for confirmation.",
   "new_representation_error_toast_title": "Error",
-  "new_representation_error_toast_desc": "Could not save representation. Please try again."
+  "new_representation_error_toast_desc": "Could not save representation. Please try again.",
+
+  "select_dentist_dialog_title": "Select Represented Dentist",
+  "select_dentist_dialog_desc": "Search for a dentist by name or ID and select them.",
+  "select_dentist_search_placeholder": "Search by name or ID...",
+  "select_dentist_button_placeholder": "Select a dentist...",
+  "no_dentists_found": "No dentists found."
 }

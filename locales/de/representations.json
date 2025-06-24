@@ -34,17 +34,19 @@
   "new_representation_card_title": "Vertretungsdetails eingeben",
   "new_representation_card_desc": "Wählen Sie den vertretenen Zahnarzt und den Zeitraum aus.",
   "new_representation_form_dentist_label": "Vertretener Zahnarzt",
-  "new_representation_form_dentist_placeholder": "Zahnarzt auswählen...",
-  "new_representation_form_dentist_not_found": "Kein Zahnarzt gefunden.",
-  "new_representation_form_search_dentist": "Zahnarzt suchen...",
   "new_representation_form_date_label": "Datum",
   "new_representation_form_start_time_label": "Startzeit",
   "new_representation_form_end_time_label": "Endzeit",
-  "new_representation_form_duration_label": "Berechnete Dauer (Stunden)",
   "new_representation_form_cancel_button": "Abbrechen",
   "new_representation_form_save_button": "Vertretung speichern",
   "new_representation_success_toast_title": "Vertretung gespeichert",
   "new_representation_success_toast_desc": "Die Anfrage wurde zur Bestätigung gesendet.",
   "new_representation_error_toast_title": "Fehler",
-  "new_representation_error_toast_desc": "Vertretung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  "new_representation_error_toast_desc": "Vertretung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+  
+  "select_dentist_dialog_title": "Vertretenen Zahnarzt auswählen",
+  "select_dentist_dialog_desc": "Suchen Sie nach einem Zahnarzt nach Name oder ID und wählen Sie ihn aus.",
+  "select_dentist_search_placeholder": "Suche nach Name oder ID...",
+  "select_dentist_button_placeholder": "Zahnarzt auswählen...",
+  "no_dentists_found": "Keine Zahnärzte gefunden."
 }
