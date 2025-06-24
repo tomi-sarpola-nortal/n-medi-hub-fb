@@ -25,22 +25,31 @@ const organizersToSeed: TrainingOrganizerCreationData[] = [
   { name: 'DentEd Online', isActive: true },
   { name: 'Zahnärztekammer Wien', isActive: true },
   { name: 'Medizinische Universität Wien', isActive: true },
+  { name: 'Dental Tribune', isActive: true },
+  { name: 'Quintessenz Verlag', isActive: true },
+  { name: 'Thieme', isActive: true },
 ];
 
 const historyToSeed: TrainingHistoryCreationData[] = [
-  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 8, organizer: "Universitätsklinik Wien" },
-  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 6, organizer: "ÖZÄK" },
-  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 4, organizer: "Medizinische Universität Graz" },
-  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 5, organizer: "Österreichische Gesellschaft für KFO" },
-  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 3, organizer: "DentEd Online" },
-  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 4, organizer: "Zahnärztekammer Wien" },
-  { date: "2025-03-15", title: "Schmerzmanagement in der Zahnmedizin", category: "ZMK", points: 6, organizer: "Medizinische Universität Wien" },
-  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 12, organizer: "Universitätsklinik Wien" },
-  { date: "2025-02-18", title: "Notfälle in der Zahnarztpraxis", category: "ZMK", points: 8, organizer: "Zahnärztekammer Wien" },
-  { date: "2025-01-30", title: "Fachzeitschrift: Parodontologie Update", category: "Literatur", points: 2, organizer: "DentEd Online" },
-  { date: "2025-01-15", title: "Workshop: Abrechnung und Recht", category: "Frei", points: 5, organizer: "ÖZÄK" },
-  { date: "2024-12-10", title: "Grundkurs Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO" },
+  // This data is crafted to match the ZFD totals in the screenshot (97 points)
+  // Berufsbezogen: 45 points
+  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 15, organizer: "Universitätsklinik Wien" },
+  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 10, organizer: "Universitätsklinik Wien" },
+  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO" },
+  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 5, organizer: "Medizinische Universität Graz" },
+  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 5, organizer: "ÖZÄK" },
+
+  // Frei: 12 points
+  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 8, organizer: "Zahnärztekammer Wien" },
+  { date: "2025-02-01", title: "Workshop: Rechtliche Grundlagen", category: "Frei", points: 4, organizer: "ÖZÄK" },
+  
+  // Literatur: 40 points
+  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 10, organizer: "DentEd Online" },
+  { date: "2025-03-05", title: "Jahresabonnement 'Dental Magazin'", category: "Literatur", points: 10, organizer: "Dental Tribune" },
+  { date: "2025-01-15", title: "Jahresabonnement 'Quintessenz Zahnmedizin'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag" },
+  { date: "2024-12-10", title: "Jahresabonnement 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme" },
 ];
+
 
 const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
     { id: 'wien', data: { name: 'Zahnärztekammer Wien', address: 'Kohlmarkt 11/6\n1010 Wien', phone: '+43 1 513 37 31', email: 'office@wr.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr' } },
@@ -109,7 +118,7 @@ export async function seedTrainingOrganizers(): Promise<{ success: boolean; mess
 
 
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
-    const userEmail = 'adasd@asdas.com';
+    const userEmail = 'sabine.mueller@example.com';
     try {
         const user = await findPersonByEmail(userEmail);
         if (!user) {
