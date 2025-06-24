@@ -197,17 +197,15 @@ export default function EducationPage() {
           <CardHeader>
             <CardTitle className="text-xl font-medium font-headline">{t.zfd_fortbildung_title || "ZFD Advanced Training"}</CardTitle>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-1 flex justify-center">
-              <CircularProgress 
+          <CardContent className="flex flex-col items-center justify-center gap-6 pt-6">
+             <CircularProgress 
                 value={zfdProgressData.total.total > 0 ? (zfdProgressData.total.current / zfdProgressData.total.total) * 100 : 0} 
-                radius={70} 
-                strokeWidth={12}
+                radius={80} 
+                strokeWidth={14}
                 valueText={t.zfd_total_progress?.replace('{current}', zfdProgressData.total.current.toString()).replace('{total}', zfdProgressData.total.total.toString()) || ''}
                 textClassName="font-headline"
               />
-            </div>
-            <div className="md:col-span-2 space-y-4">
+            <div className="w-full max-w-lg space-y-4">
               {zfdProgressData.categories.map(category => (
                 <div key={category.label}>
                   <div className="mb-1 flex justify-between">
