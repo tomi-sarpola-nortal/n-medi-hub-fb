@@ -19,11 +19,14 @@ import { getRegistrationData, updateRegistrationData } from '@/lib/registrationS
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    const page = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
-    return page;
+    const register = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    const common = locale === 'de' ? require('../../../../../locales/de/common.json') : require('../../../../../locales/en/common.json');
+    return { ...register, ...common };
   } catch (e) {
-    console.warn("Translation file not found for register/step2 (password), falling back to en");
-    return require('../../../../../locales/en/register.json'); // Fallback
+    console.warn("Translation file not found for register/step2 (password), falling back to en", e);
+    const register = require('../../../../../locales/en/register.json');
+    const common = require('../../../../../locales/en/common.json');
+    return { ...register, ...common };
   }
 };
 

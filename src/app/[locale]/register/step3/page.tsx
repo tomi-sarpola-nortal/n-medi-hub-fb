@@ -22,13 +22,14 @@ import { uploadFile } from '@/services/storageService';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../../locales/de.json');
-    }
-    return require('../../../../../locales/en.json');
+    const register = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    const common = locale === 'de' ? require('../../../../../locales/de/common.json') : require('../../../../../locales/en/common.json');
+    return { ...register, ...common };
   } catch (e) {
-    console.warn("Translation file not found for register/step3 (personal data), falling back to en");
-    return require('../../../../../locales/en.json');
+    console.warn("Translation file not found for register/step3 (personal data), falling back to en", e);
+    const register = require('../../../../../locales/en/register.json');
+    const common = require('../../../../../locales/en/common.json');
+    return { ...register, ...common };
   }
 };
 
