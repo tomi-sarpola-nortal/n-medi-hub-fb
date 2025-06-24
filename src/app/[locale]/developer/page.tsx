@@ -6,10 +6,12 @@ import SeedButton from '@/components/dashboard/SeedButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, Database, BookMarked } from 'lucide-react';
+import { Loader2, Database, BookMarked, UserCog } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { setSabineMuellerToPending } from '@/app/actions/seedActions';
 
 const getClientTranslations = (locale: string) => {
   try {
@@ -28,10 +30,39 @@ export default function DeveloperPage() {
   const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const [t, setT] = useState<Record<string, string>>({});
   const { user, loading } = useAuth();
+  const { toast } = useToast();
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   useEffect(() => {
     setT(getClientTranslations(locale));
   }, [locale]);
+
+  const handleUpdateStatus = async () => {
+    setIsUpdatingStatus(true);
+    try {
+      const result = await setSabineMuellerToPending();
+      if (result.success) {
+        toast({
+          title: "Status Updated",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Update Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsUpdatingStatus(false);
+  };
 
   const pageTitle = t.developer_module_page_title || "Developer Module";
 
@@ -62,6 +93,22 @@ export default function DeveloperPage() {
                 </CardHeader>
                 <CardContent>
                     <SeedButton />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <UserCog className="h-5 w-5 text-primary" />
+                        <CardTitle>User State Testing</CardTitle>
+                    </div>
+                    <CardDescription>Set specific users to certain states for testing UI and logic flows.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button onClick={handleUpdateStatus} disabled={isUpdatingStatus}>
+                        {isUpdatingStatus && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Set sabine.mueller@example.com to Pending
+                    </Button>
                 </CardContent>
             </Card>
 

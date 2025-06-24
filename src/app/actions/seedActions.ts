@@ -1,7 +1,7 @@
 
 'use server';
 
-import { findPersonByEmail } from '@/services/personService';
+import { findPersonByEmail, updatePerson } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData } from '@/lib/types';
@@ -158,4 +158,23 @@ export async function seedStateChambers(): Promise<{ success: boolean; message: 
         const errorMessage = error instanceof Error ? error.message : String(error);
         return { success: false, message: `Error seeding chambers: ${errorMessage}` };
     }
+}
+
+export async function setSabineMuellerToPending(): Promise<{ success: boolean; message: string }> {
+  const userEmail = 'sabine.mueller@example.com';
+  try {
+    const user = await findPersonByEmail(userEmail);
+    if (!user) {
+      return { success: false, message: `User with email ${userEmail} not found.` };
+    }
+
+    await updatePerson(user.id, { status: 'pending' });
+
+    return { success: true, message: `Successfully set user ${userEmail} to pending status.` };
+
+  } catch (error) {
+    console.error(`Error setting user ${userEmail} to pending:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, message: `Error: ${errorMessage}` };
+  }
 }
