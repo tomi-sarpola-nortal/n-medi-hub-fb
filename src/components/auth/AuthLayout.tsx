@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
@@ -13,13 +13,14 @@ import { ThemeToggle } from '../layout/ThemeToggle';
 // Helper for client-side translations (consistent with login page)
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../locales/de.json');
-    }
-    return require('../../../locales/en.json');
+    const layout = locale === 'de' ? require('../../../locales/de/layout.json') : require('../../../locales/en/layout.json');
+    const register = locale === 'de' ? require('../../../locales/de/register.json') : require('../../../locales/en/register.json');
+    return { ...layout, ...register };
   } catch (e) {
     console.warn("Translation file not found for AuthLayout, falling back to en");
-    return require('../../../locales/en.json'); // Fallback
+    const layout = require('../../../locales/en/layout.json');
+    const register = require('../../../locales/en/register.json');
+    return { ...layout, ...register };
   }
 };
 
@@ -30,6 +31,7 @@ interface AuthLayoutProps {
   showBackButton?: boolean;
   backButtonHref?: string;
   backButtonTextKey?: string; // e.g., "register_back_to_login"
+  locale: string;
 }
 
 export default function AuthLayout({
@@ -39,17 +41,14 @@ export default function AuthLayout({
   showBackButton = false,
   backButtonHref = "/login",
   backButtonTextKey = "register_back_to_login",
+  locale,
 }: AuthLayoutProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const potentialLocale = pathname.split('/')[1];
-  const currentLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
-
   const [t, setT] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
-    setT(getClientTranslations(currentLocale));
-  }, [currentLocale]);
+    setT(getClientTranslations(locale));
+  }, [locale]);
 
   if (!t) {
     return (
@@ -65,7 +64,7 @@ export default function AuthLayout({
     <div className="flex min-h-screen flex-col bg-background text-foreground font-body">
       <header className="py-6 px-4 sm:px-8 border-b border-border">
         <div className="container mx-auto flex items-center justify-between">
-          <Link href="/">
+          <Link href={`/${locale}/`}>
             <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
           </Link>
           <div className="flex items-center gap-4">

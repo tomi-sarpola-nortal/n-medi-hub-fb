@@ -13,18 +13,18 @@ import LkMemberDashboard from '@/components/dashboard/LkMemberDashboard';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    const main = locale === 'de' 
-        ? require('../../../../locales/de.json') 
-        : require('../../../../locales/en.json');
+    const layout = locale === 'de' 
+        ? require('../../../../locales/de/layout.json') 
+        : require('../../../../locales/en/layout.json');
     const page = locale === 'de' 
         ? require('../../../../locales/de/dashboard.json') 
         : require('../../../../locales/en/dashboard.json');
-    return { ...main, ...page };
+    return { ...layout, ...page };
   } catch (e) {
     console.warn("Translation file not found for dashboard page, falling back to en");
-    const main = require('../../../../locales/en.json');
+    const layout = require('../../../../locales/en/layout.json');
     const page = require('../../../../locales/en/dashboard.json');
-    return { ...main, ...page };
+    return { ...layout, ...page };
   }
 };
 

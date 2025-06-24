@@ -1,0 +1,26 @@
+
+{
+  "welcome_back": "Willkommen, {userName}!",
+  "sidebar_dashboard": "Dashboard",
+  "sidebar_documents": "Dokumente",
+  "sidebar_representation": "Vertretung",
+  "sidebar_education_points": "Fortbildungspunkte",
+  "sidebar_settings": "Einstellungen",
+  "sidebar_profile": "Profil",
+  "sidebar_account": "Konto",
+  "sidebar_logout": "Abmelden",
+  "sidebar_my_trainings": "Meine Fortbildungen",
+  "sidebar_my_representations": "Meine Vertretungen",
+  "sidebar_document_templates": "Dokumentvorlagen",
+  "sidebar_member_overview": "Mitgliederübersicht",
+  "sidebar_developer_module": "Entwicklermodul",
+  "header_my_account": "Mein Konto",
+  "header_settings": "Einstellungen",
+  "header_profile": "Profil",
+  "header_logout": "Abmelden",
+  "language_switcher_label": "Sprache",
+  "login_footer_copyright": "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten.",
+  "login_footer_privacy": "Datenschutz",
+  "login_footer_imprint": "Impressum",
+  "login_footer_contact": "Kontakt"
+}

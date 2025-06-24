@@ -16,13 +16,16 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../locales/de.json');
-    }
-    return require('../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../locales/de/settings.json') : require('../../../../locales/en/settings.json');
+    const common = locale === 'de' ? require('../../../../locales/de/common.json') : require('../../../../locales/en/common.json');
+    const register = locale === 'de' ? require('../../../../locales/de/register.json') : require('../../../../locales/en/register.json');
+    return { ...page, ...common, ...register };
   } catch (e) {
     console.warn("Translation file not found for settings page, falling back to en");
-    return require('../../../../locales/en.json');
+    const page = require('../../../../locales/en/settings.json');
+    const common = require('../../../../locales/en/common.json');
+    const register = require('../../../../locales/en/register.json');
+    return { ...page, ...common, ...register };
   }
 };
 
@@ -72,7 +75,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_personal_data_title || "Personal Data"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_personal_data_desc || "Update your personal details and contact information."}</p>
-              <PersonalDataForm user={user} t={t} />
+              <PersonalDataForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
           
@@ -80,7 +83,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_prof_qual_title || "Professional Qualifications"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_prof_qual_desc || "Manage your professional titles, specializations, and qualifications."}</p>
-              <ProfessionalQualificationsForm user={user} t={t} />
+              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
           
@@ -88,7 +91,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_practice_info_title || "Practice Information"}</AccordionTrigger>
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
-                <PracticeInformationForm user={user} t={t} />
+                <PracticeInformationForm user={user} t={t} isDisabled={isPending} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

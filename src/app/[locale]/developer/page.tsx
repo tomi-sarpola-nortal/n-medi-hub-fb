@@ -15,13 +15,14 @@ import { setSabineMuellerToPending } from '@/app/actions/seedActions';
 
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../locales/de.json');
-    }
-    return require('../../../../locales/en.json');
+    const layout = locale === 'de' ? require('../../../../locales/de/layout.json') : require('../../../../locales/en/layout.json');
+    const page = locale === 'de' ? require('../../../../locales/de/developer.json') : require('../../../../locales/en/developer.json');
+    return { ...layout, ...page };
   } catch (e) {
     console.warn("Translation file not found for developer page, falling back to en");
-    return require('../../../../locales/en.json');
+    const layout = require('../../../../locales/en/layout.json');
+    const page = require('../../../../locales/en/developer.json');
+    return { ...layout, ...page };
   }
 };
 

@@ -1,0 +1,19 @@
+
+{
+  "dentist": "Dentist",
+  "lk_member": "State Chamber Member",
+  "ozak_employee": "ÖZAK Employee",
+  "title_dr": "Dr.",
+  "title_prof": "Prof.",
+  "title_mag": "Mag.",
+  "title_none": "None",
+  "nationality_at": "Austria",
+  "nationality_de": "Germany",
+  "nationality_ch": "Switzerland",
+  "nationality_other": "Other",
+  "state_wien": "Vienna",
+  "state_noe": "Lower Austria",
+  "state_ooe": "Upper Austria",
+  "state_bayern": "Bavaria",
+  "state_bw": "Baden-Württemberg"
+}

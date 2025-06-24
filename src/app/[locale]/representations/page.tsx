@@ -19,13 +19,11 @@ import { format } from 'date-fns';
 
 const getClientTranslations = (locale: string) => {
     try {
-        if (locale === 'de') {
-            return require('../../../../locales/de.json');
-        }
-        return require('../../../../locales/en.json');
+        const page = locale === 'de' ? require('../../../../locales/de/representations.json') : require('../../../../locales/en/representations.json');
+        return page;
     } catch (e) {
         console.warn("Translation file not found, falling back to en");
-        return require('../../../../locales/en.json');
+        return require('../../../../locales/en/representations.json');
     }
 };
 

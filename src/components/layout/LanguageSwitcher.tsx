@@ -35,12 +35,10 @@ const UKFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../locales/de.json');
-    }
-    return require('../../../locales/en.json');
+    const layout = locale === 'de' ? require('../../../locales/de/layout.json') : require('../../../locales/en/layout.json');
+    return layout;
   } catch (e) {
-    return require('../../../locales/en.json'); 
+    return require('../../../locales/en/layout.json'); 
   }
 };
 

@@ -21,13 +21,11 @@ import { v4 as uuidv4 } from 'uuid';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../../locales/de.json');
-    }
-    return require('../../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    return page;
   } catch (e) {
     console.warn("Translation file not found for register/step1, falling back to en");
-    return require('../../../../../locales/en.json'); // Fallback
+    return require('../../../../../locales/en/register.json'); // Fallback
   }
 };
 
@@ -79,7 +77,7 @@ export default function RegisterStep1Page() {
         email: data.email,
         sessionId: sessionId,
       });
-      router.push(`/register/step2`);
+      router.push(`/${currentLocale}/register/step2`);
 
     } catch (error: any) {
       console.error("Email check error:", error);
@@ -95,7 +93,7 @@ export default function RegisterStep1Page() {
 
   if (!t) {
     return (
-        <AuthLayout pageTitle="Loading...">
+        <AuthLayout pageTitle="Loading..." locale={currentLocale}>
              <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
@@ -108,8 +106,9 @@ export default function RegisterStep1Page() {
       pageTitle={t.register_page_main_title || "Registration with the Austrian Dental Chamber"}
       pageSubtitle={t.register_step1_subtitle || "Please create an account first to continue with the registration."}
       showBackButton={true}
-      backButtonHref="/login"
+      backButtonHref={`/${currentLocale}/login`}
       backButtonTextKey="register_back_to_login"
+      locale={currentLocale}
     >
       <div className="w-full max-w-xl">
         <RegistrationStepper currentStep={1} totalSteps={6} />

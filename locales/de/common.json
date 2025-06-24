@@ -1,0 +1,19 @@
+
+{
+  "dentist": "Zahnarzt",
+  "lk_member": "Landeskammer-Mitglied",
+  "ozak_employee": "ÖZÄK-Mitarbeiter",
+  "title_dr": "Dr.",
+  "title_prof": "Prof.",
+  "title_mag": "Mag.",
+  "title_none": "Kein Titel",
+  "nationality_at": "Österreich",
+  "nationality_de": "Deutschland",
+  "nationality_ch": "Schweiz",
+  "nationality_other": "Andere",
+  "state_wien": "Wien",
+  "state_noe": "Niederösterreich",
+  "state_ooe": "Oberösterreich",
+  "state_bayern": "Bayern",
+  "state_bw": "Baden-Württemberg"
+}

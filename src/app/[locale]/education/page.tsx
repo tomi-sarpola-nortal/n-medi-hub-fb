@@ -21,13 +21,14 @@ import { useParams, useRouter } from 'next/navigation';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
     try {
-        if (locale === 'de') {
-            return require('../../../../locales/de.json');
-        }
-        return require('../../../../locales/en.json');
+        const page = locale === 'de' ? require('../../../../locales/de/education.json') : require('../../../../locales/en/education.json');
+        const common = locale === 'de' ? require('../../../../locales/de/common.json') : require('../../../../locales/en/common.json');
+        return { ...page, ...common };
     } catch (e) {
         console.warn("Translation file not found for education page, falling back to en");
-        return require('../../../../locales/en.json');
+        const page = require('../../../../locales/en/education.json');
+        const common = require('../../../../locales/en/common.json');
+        return { ...page, ...common };
     }
 };
 

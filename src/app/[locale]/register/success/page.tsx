@@ -11,13 +11,11 @@ import { CheckCircle2, Loader2 } from 'lucide-react';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../../locales/de.json');
-    }
-    return require('../../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    return page;
   } catch (e) {
     console.warn("Translation file not found for register/success, falling back to en");
-    return require('../../../../../locales/en.json'); // Fallback
+    return require('../../../../../locales/en/register.json'); // Fallback
   }
 };
 
@@ -35,7 +33,7 @@ export default function RegistrationSuccessPage() {
 
   if (!t) {
     return (
-        <AuthLayout pageTitle="Loading...">
+        <AuthLayout pageTitle="Loading..." locale={currentLocale}>
              <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
@@ -47,6 +45,7 @@ export default function RegistrationSuccessPage() {
     <AuthLayout
       pageTitle={t.register_success_page_title || "Registration Submitted"}
       showBackButton={false} // No back button on success page
+      locale={currentLocale}
     >
       <div className="w-full max-w-md">
         <Card className="shadow-xl text-center">
@@ -62,7 +61,7 @@ export default function RegistrationSuccessPage() {
               {t.register_success_card_message_line2 || "Nach der Prüfung erhalten Sie Ihre Zahnarzt-ID und weitere Informationen per E-Mail."}
             </p>
             <Button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(`/${currentLocale}/login`)}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base mt-4"
             >
               {t.register_success_button_to_login || "ZUR ANMELDUNG"}

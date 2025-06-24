@@ -25,13 +25,14 @@ import Logo from "./Logo";
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../locales/de.json');
-    }
-    return require('../../../locales/en.json');
+    const layout = locale === 'de' ? require('../../../locales/de/layout.json') : require('../../../locales/en/layout.json');
+    const common = locale === 'de' ? require('../../../locales/de/common.json') : require('../../../locales/en/common.json');
+    return { ...layout, ...common };
   } catch (e) {
     console.warn("Translation file not found, falling back to en for SidebarNav");
-    return require('../../../locales/en.json'); // Fallback
+    const layout = require('../../../locales/en/layout.json');
+    const common = require('../../../locales/en/common.json');
+    return { ...layout, ...common };
   }
 };
 
@@ -88,7 +89,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-4">
-        <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
+        <Link href={`/${locale}/dashboard`} className="flex items-center gap-3 overflow-hidden">
           <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
         </Link>
       </SidebarHeader>
@@ -110,10 +111,11 @@ export function AppSidebar() {
         <SidebarMenu>
           {userNavItems.map((item) => {
             const isNavItemDisabled = isPending && item.href !== '/settings';
+            const itemHref = `/${locale}${item.href}`;
             return (
               <SidebarMenuItem key={item.href}>
                 <Link 
-                  href={item.href}
+                  href={itemHref}
                   legacyBehavior={false}
                   passHref={false}
                   className={isNavItemDisabled ? "pointer-events-none" : ""}
@@ -125,7 +127,7 @@ export function AppSidebar() {
                     disabled={isNavItemDisabled}
                     isActive={
                       (isPending && item.href === '/settings') ||
-                      (!isPending && (pathname.endsWith(item.href) || (item.href !== "/dashboard" && pathname.includes(item.href))))
+                      (!isPending && (pathname === itemHref || (item.href !== "/dashboard" && pathname.startsWith(itemHref))))
                     }
                     tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
                     aria-label={t[item.title] || item.title}

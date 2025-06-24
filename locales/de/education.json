@@ -1,0 +1,23 @@
+
+{
+  "education_page_title": "Meine Fortbildungen",
+  "education_breadcrumb_dashboard": "Dashboard",
+  "education_breadcrumb_current": "Meine Fortbildungen",
+  "zfd_fortbildung_title": "ZFD-Fortbildung",
+  "zfd_total_progress": "{current}/{total} Punkte",
+  "zfd_category_berufsbezogen": "Berufsbezogen",
+  "zfd_category_frei": "Frei",
+  "zfd_category_literatur": "Literatur/Webinare",
+  "spezialdiplome_title": "Spezialdiplome",
+  "spezialdiplome_points": "{currentPoints} / {totalPoints} Punkte",
+  "fortbildungshistorie_title": "Fortbildungshistorie",
+  "fortbildungshistorie_table_date": "Datum",
+  "fortbildungshistorie_table_title": "Titel der Fortbildung",
+  "fortbildungshistorie_table_category": "Kategorie",
+  "fortbildungshistorie_table_points": "Punkte",
+  "fortbildungshistorie_table_organizer": "Veranstalter",
+  "fortbildungshistorie_pagination_showing": "Zeige {start} bis {end} von {total} Fortbildungen",
+  "fortbildungshistorie_pagination_back": "Zurück",
+  "fortbildungshistorie_pagination_next": "Weiter",
+  "fortbildungshistorie_footer_note": "Die angezeigten Punkte basieren auf der Schnittstelle zur Fortbildungsplattform. Ihre vollständige Dokumentation finden Sie im offiziellen Fortbildungskonto der ÖZÄK."
+}

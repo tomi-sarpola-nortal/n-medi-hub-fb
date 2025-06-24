@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -19,13 +20,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../locales/de.json');
-    }
-    return require('../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../locales/de/login.json') : require('../../../../locales/en/login.json');
+    return page;
   } catch (e) {
     console.warn("Translation file not found for login page, falling back to en");
-    return require('../../../../locales/en.json'); // Fallback
+    return require('../../../../locales/en/login.json'); // Fallback
   }
 };
 
@@ -64,7 +63,7 @@ export default function LoginPage() {
     setIsLoading(false); // Set loading false after login attempt is complete
 
     if (result.success) {
-      router.push('/dashboard'); // Explicit redirect on success
+      router.push(`/${currentLocale}/dashboard`); // Explicit redirect on success
     } else {
       // Check if the error is a translation key or a raw message
       const errorMessage = t![result.error as string] || result.error || t!.login_error_description;
@@ -79,7 +78,7 @@ export default function LoginPage() {
   
   if (!t) {
     return (
-        <AuthLayout pageTitle="Loading...">
+        <AuthLayout pageTitle="Loading..." locale={currentLocale}>
              <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
@@ -90,6 +89,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       pageTitle={t.login_page_main_title || "Portal Login"}
+      locale={currentLocale}
     >
       <div className="w-full max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
@@ -165,7 +165,7 @@ export default function LoginPage() {
                       {t.login_register_description || "Wenn Sie neu in Österreich tätig sind und noch keinen Eintrag bei der Österreichischen Zahnärztekammer haben, können Sie sich hier für einen Eintrag anmelden."}
                     </p>
                     <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
-                      <Link href="/register/step1"> 
+                      <Link href={`/${currentLocale}/register/step1`}> 
                         {t.login_register_button_text || "EINTRAG IN DIE KAMMER BEANTRAGEN"}
                       </Link>
                     </Button>

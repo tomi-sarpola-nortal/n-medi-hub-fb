@@ -19,13 +19,11 @@ import { getRegistrationData, updateRegistrationData } from '@/lib/registrationS
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../../locales/de.json');
-    }
-    return require('../../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    return page;
   } catch (e) {
     console.warn("Translation file not found for register/step2 (password), falling back to en");
-    return require('../../../../../locales/en.json'); // Fallback
+    return require('../../../../../locales/en/register.json'); // Fallback
   }
 };
 
@@ -76,17 +74,17 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
 
   useEffect(() => {
     const storedData = getRegistrationData();
-    if (!storedData.email) {
+    if (!storedData.email && t) {
       toast({
-        title: "Error",
-        description: "Email not found. Please start registration from Step 1.",
+        title: t.register_step2_missing_data_title,
+        description: t.register_step2_missing_data_desc,
         variant: "destructive",
       });
-      router.replace('/register/step1'); 
+      router.replace(`/${currentLocale}/register/step1`); 
     } else {
       setEmail(storedData.email);
     }
-  }, [router, toast]);
+  }, [router, toast, t, currentLocale]);
 
   const form = useForm<PasswordFormInputs>({ // form initialization moved up
     resolver: zodResolver(FormSchema),
@@ -118,13 +116,13 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
   const onSubmit: SubmitHandler<PasswordFormInputs> = async (data) => {
     setIsLoading(true);
     updateRegistrationData({ password: data.password });
-    router.push('/register/step3'); // Navigate to the new Step 3 (Personal Data)
+    router.push(`/${currentLocale}/register/step3`); // Navigate to the new Step 3 (Personal Data)
     setIsLoading(false);
   };
 
   if (!email || isLoading || !t) {
     return (
-        <AuthLayout pageTitle="Loading..." pageSubtitle="Verifying registration step...">
+        <AuthLayout pageTitle="Loading..." pageSubtitle="Verifying registration step..." locale={currentLocale}>
             <div className="flex justify-center items-center h-32">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
@@ -144,8 +142,9 @@ export default function RegisterStep2PasswordPage() { // Renamed component for c
       pageTitle={t.register_page_main_title || "Registration with the Austrian Dental Chamber"}
       pageSubtitle={t.register_step1_subtitle || "Please create an account first to continue with the registration."} // Subtitle for account creation part 2
       showBackButton={true}
-      backButtonHref="/register/step1" // Back to Step 1 (Email)
+      backButtonHref={`/${currentLocale}/register/step1`} // Back to Step 1 (Email)
       backButtonTextKey="register_back_button"
+      locale={currentLocale}
     >
       <div className="w-full max-w-xl">
         <RegistrationStepper currentStep={2} totalSteps={6} /> {/* Now Step 2 */}

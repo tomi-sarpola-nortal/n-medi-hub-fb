@@ -17,13 +17,11 @@ import Link from 'next/link';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
     try {
-        if (locale === 'de') {
-            return require('../../../../../locales/de.json');
-        }
-        return require('../../../../../locales/en.json');
+        const page = locale === 'de' ? require('../../../../../locales/de/education.json') : require('../../../../../locales/en/education.json');
+        return page;
     } catch (e) {
         console.warn("Translation file not found, falling back to en");
-        return require('../../../../../locales/en.json');
+        return require('../../../../../locales/en/education.json');
     }
 };
 
