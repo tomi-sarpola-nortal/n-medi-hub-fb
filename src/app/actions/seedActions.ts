@@ -1,13 +1,14 @@
 
 'use server';
 
-import { findPersonByEmail, updatePerson } from '@/services/personService';
+import { findPersonByEmail, updatePerson, createPerson } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData } from '@/lib/types';
+import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData } from '@/lib/types';
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
 import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
 import { createZfdGroup } from '@/services/zfdGroupService';
+import { createRepresentation } from '@/services/representationService';
 
 const zfdGroupsToSeed: { id: string, data: ZfdGroupCreationData }[] = [
   { id: 'berufsbezogen', data: { nameKey: 'zfd_category_berufsbezogen', totalPoints: 60 } },
@@ -44,27 +45,21 @@ categoriesToSeed.forEach(cat => {
     }
 });
 
-
 const historyToSeed: TrainingHistoryCreationData[] = [
   // This data is crafted to match the ZFD totals in the screenshot (97 points)
   // and the order of visible items.
-  
-  // Visible in screenshot, ordered by date descending
-  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 15, organizer: "Universitätsklinik Wien", zfdGroupId: categoryToZfdGroupMap["IMPL"] },
-  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 5, organizer: "ÖZÄK", zfdGroupId: categoryToZfdGroupMap["ZMK"] },
-  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 5, organizer: "Medizinische Universität Graz", zfdGroupId: categoryToZfdGroupMap["PARO"] },
-  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO", zfdGroupId: categoryToZfdGroupMap["KFO"] },
-  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 10, organizer: "DentEd Online", zfdGroupId: categoryToZfdGroupMap["Literatur"] },
-  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 8, organizer: "Zahnärztekammer Wien", zfdGroupId: categoryToZfdGroupMap["Frei"] },
-  { date: "2025-03-05", title: "Jahresabonnement 'Dental Magazin'", category: "Literatur", points: 10, organizer: "Dental Tribune", zfdGroupId: categoryToZfdGroupMap["Literatur"] },
-  
-  // Additional items to reach 97 points total, also ordered by date descending
-  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 10, organizer: "Universitätsklinik Wien", zfdGroupId: categoryToZfdGroupMap["IMPL"] },
-  { date: "2025-02-01", title: "Workshop: Rechtliche Grundlagen", category: "Frei", points: 4, organizer: "ÖZÄK", zfdGroupId: categoryToZfdGroupMap["Frei"] },
-  { date: "2025-01-15", title: "Jahresabonnement 'Quintessenz Zahnmedizin'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: categoryToZfdGroupMap["Literatur"] },
-  { date: "2024-12-10", title: "Jahresabonnement 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: categoryToZfdGroupMap["Literatur"] },
+  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 15, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 5, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 5, organizer: "Medizinische Universität Graz", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 10, organizer: "DentEd Online", zfdGroupId: 'literatur' },
+  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 8, organizer: "Zahnärztekammer Wien", zfdGroupId: 'frei' },
+  { date: "2025-03-05", title: "Jahresabonnement 'Dental Magazin'", category: "Literatur", points: 10, organizer: "Dental Tribune", zfdGroupId: 'literatur' },
+  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 10, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-02-01", title: "Workshop: Rechtliche Grundlagen", category: "Frei", points: 4, organizer: "ÖZÄK", zfdGroupId: 'frei' },
+  { date: "2025-01-15", title: "Jahresabonnement 'Quintessenz Zahnmedizin'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
+  { date: "2024-12-10", title: "Jahresabonnement 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
 ];
-
 
 const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
     { id: 'wien', data: { name: 'Zahnärztekammer Wien', address: 'Kohlmarkt 11/6\n1010 Wien', phone: '+43 1 513 37 31', email: 'office@wr.zahnaerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr' } },
@@ -226,3 +221,108 @@ export async function setSabineMuellerToPending(): Promise<{ success: boolean; m
   }
 }
 
+const usersToSeed = [
+    { id: 'seed-user-markus-weber', email: 'markus.weber@example.com', name: 'Dr. Markus Weber', dentistId: '78954' },
+    { id: 'seed-user-julia-schmidt', email: 'julia.schmidt@example.com', name: 'Dr. Julia Schmidt', dentistId: '65412' },
+    { id: 'seed-user-thomas-mueller', email: 'thomas.mueller@example.com', name: 'Dr. Thomas Müller', dentistId: '34567' },
+    { id: 'seed-user-sabine-becker', email: 'sabine.becker@example.com', name: 'Dr. Sabine Becker', dentistId: '23456' },
+    { id: 'seed-user-lukas-hoffmann', email: 'lukas.hoffmann@example.com', name: 'Dr. Lukas Hoffmann', dentistId: '78954' },
+    { id: 'seed-user-anna-schneider', email: 'anna.schneider@example.com', name: 'Dr. Anna Schneider', dentistId: '65412' },
+];
+
+export async function seedUsersAndRepresentations(): Promise<{ success: boolean; message: string }> {
+    try {
+        let usersCreated = 0;
+        let representationsCreated = 0;
+
+        // 1. Ensure all users exist
+        const userMap = new Map<string, string>(); // email -> id
+        const userNamesMap = new Map<string, string>(); // id -> name
+
+        for (const userData of usersToSeed) {
+            let user = await findPersonByEmail(userData.email);
+            if (!user) {
+                const newUser: PersonCreationData = {
+                    name: userData.name,
+                    email: userData.email,
+                    dentistId: userData.dentistId,
+                    role: 'dentist',
+                    status: 'active',
+                    region: 'Wien',
+                    otpEnabled: false,
+                };
+                await createPerson(userData.id, newUser);
+                usersCreated++;
+                user = await findPersonByEmail(userData.email);
+            }
+             if (user) {
+                userMap.set(user.email, user.id);
+                userNamesMap.set(user.id, user.name);
+            }
+        }
+
+        // 2. Get Sabine Müller's ID
+        const sabineMueller = await findPersonByEmail('sabine.mueller@example.com');
+        if (!sabineMueller) {
+            return { success: false, message: "Could not find sabine.mueller@example.com. Please ensure she exists." };
+        }
+        userNamesMap.set(sabineMueller.id, sabineMueller.name);
+
+        // 3. Create representation data
+        const representationsToCreate: RepresentationCreationData[] = [
+            // Sabine represented others
+            {
+                representingPersonId: sabineMueller.id, representedPersonId: userMap.get('markus.weber@example.com')!,
+                representingPersonName: sabineMueller.name, representedPersonName: 'Dr. Markus Weber (ID: 78954)',
+                startDate: '2025-05-15T08:00:00', endDate: '2025-05-15T15:00:00', durationHours: 7, status: 'confirmed', confirmedAt: '2025-05-22T09:00:00'
+            },
+            {
+                representingPersonId: sabineMueller.id, representedPersonId: userMap.get('julia.schmidt@example.com')!,
+                representingPersonName: sabineMueller.name, representedPersonName: 'Dr. Julia Schmidt (ID: 65412)',
+                startDate: '2025-05-01T08:00:00', endDate: '2025-05-02T19:00:00', durationHours: 13, status: 'pending'
+            },
+            {
+                representingPersonId: sabineMueller.id, representedPersonId: userMap.get('thomas.mueller@example.com')!,
+                representingPersonName: sabineMueller.name, representedPersonName: 'Dr. Thomas Müller (ID: 34567)',
+                startDate: '2025-04-15T08:00:00', endDate: '2025-04-15T18:00:00', durationHours: 8, status: 'confirmed', confirmedAt: '2025-04-21T09:00:00'
+            },
+            {
+                representingPersonId: sabineMueller.id, representedPersonId: userMap.get('sabine.becker@example.com')!,
+                representingPersonName: sabineMueller.name, representedPersonName: 'Dr. Sabine Becker (ID: 23456)',
+                startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:00:00', durationHours: 6, status: 'confirmed', confirmedAt: '2025-04-12T09:00:00'
+            },
+            // Others represented Sabine
+            {
+                representingPersonId: userMap.get('lukas.hoffmann@example.com')!, representedPersonId: sabineMueller.id,
+                representingPersonName: userNamesMap.get(userMap.get('lukas.hoffmann@example.com')!)!, representedPersonName: sabineMueller.name,
+                startDate: '2025-05-10T08:30:00', endDate: '2025-05-10T17:00:00', durationHours: 8.5, status: 'pending'
+            },
+            {
+                representingPersonId: userMap.get('lukas.hoffmann@example.com')!, representedPersonId: sabineMueller.id,
+                representingPersonName: userNamesMap.get(userMap.get('lukas.hoffmann@example.com')!)!, representedPersonName: sabineMueller.name,
+                startDate: '2025-05-11T15:00:00', endDate: '2025-05-11T18:00:00', durationHours: 3, status: 'pending'
+            },
+            {
+                representingPersonId: userMap.get('anna.schneider@example.com')!, representedPersonId: sabineMueller.id,
+                representingPersonName: userNamesMap.get(userMap.get('anna.schneider@example.com')!)!, representedPersonName: sabineMueller.name,
+                startDate: '2025-05-02T10:00:00', endDate: '2025-05-02T17:00:00', durationHours: 7, status: 'pending'
+            },
+             {
+                representingPersonId: userMap.get('thomas.mueller@example.com')!, representedPersonId: sabineMueller.id,
+                representingPersonName: userNamesMap.get(userMap.get('thomas.mueller@example.com')!)!, representedPersonName: sabineMueller.name,
+                startDate: '2024-12-15T15:00:00', endDate: '2024-12-15T18:00:00', durationHours: 3, status: 'confirmed', confirmedAt: '2024-12-21T09:00:00'
+            }
+        ];
+
+        for (const repData of representationsToCreate) {
+            await createRepresentation(repData);
+            representationsCreated++;
+        }
+
+        return { success: true, message: `Seeding complete. Created ${usersCreated} new users and ${representationsCreated} representation records.` };
+    } catch (error) {
+        console.error('Error seeding users and representations:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return { success: false, message: `Error seeding data: ${errorMessage}` };
+    }
+}

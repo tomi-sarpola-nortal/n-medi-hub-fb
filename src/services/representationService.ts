@@ -7,8 +7,12 @@ import {
   query,
   where,
   getDocs,
+  addDoc,
+  serverTimestamp,
   type QuerySnapshot,
 } from 'firebase/firestore';
+import type { Representation, RepresentationCreationData } from '@/lib/types';
+
 
 const REPRESENTATIONS_COLLECTION = 'representations';
 
@@ -17,6 +21,22 @@ const checkDb = () => {
     throw new Error("Firestore is not initialized.");
   }
 };
+
+/**
+ * Creates a new representation document.
+ * @param data The data for the new representation.
+ * @returns The ID of the newly created document.
+ */
+export async function createRepresentation(data: RepresentationCreationData): Promise<string> {
+  checkDb();
+  const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
+  const docRef = await addDoc(representationsRef, {
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
 
 /**
  * Calculates the total confirmed representation hours for a given user.

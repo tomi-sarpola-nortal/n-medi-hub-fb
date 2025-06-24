@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups, seedUsersAndRepresentations } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -13,6 +13,7 @@ export default function SeedButton() {
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [isChambersLoading, setIsChambersLoading] = useState(false);
   const [isZfdGroupsLoading, setIsZfdGroupsLoading] = useState(false);
+  const [isRepresentationsLoading, setIsRepresentationsLoading] = useState(false);
 
 
   const handleSeedCategories = async () => {
@@ -110,6 +111,25 @@ export default function SeedButton() {
     setIsZfdGroupsLoading(false);
   };
 
+  const handleSeedRepresentations = async () => {
+    setIsRepresentationsLoading(true);
+    try {
+      const result = await seedUsersAndRepresentations();
+      toast({
+        title: "Seeding Report (Representations)",
+        description: result.message,
+      });
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute seed action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsRepresentationsLoading(false);
+  };
+
   return (
     <div className="flex flex-wrap gap-4">
         <Button onClick={handleSeedZfdGroups} disabled={isZfdGroupsLoading} variant="destructive" className="w-full sm:w-auto">
@@ -126,6 +146,9 @@ export default function SeedButton() {
         </Button>
         <Button onClick={handleSeedStateChambers} disabled={isChambersLoading} variant="destructive" className="w-full sm:w-auto">
           {isChambersLoading ? "Seeding..." : "Seed State Chambers"}
+        </Button>
+        <Button onClick={handleSeedRepresentations} disabled={isRepresentationsLoading} variant="destructive" className="w-full sm:w-auto">
+          {isRepresentationsLoading ? "Seeding..." : "Seed Representations"}
         </Button>
     </div>
   );

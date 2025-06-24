@@ -268,4 +268,4 @@ export interface Representation {
   confirmedAt?: string; // ISO date string
 }
 
-export type RepresentationCreationData = Omit<Representation, 'id' | 'createdAt'>;
+export type RepresentationCreationData = Omit<Representation, 'id' | 'createdAt' | 'confirmedAt'>;
