@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 
 const locales = ['en', 'de'];
@@ -25,6 +24,14 @@ function getLocale(request: NextRequest): string {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // The matcher in `config` already filters out /_next, /api, etc.
+  // This additional check handles files in the public directory like .md, .pdf, .png etc.
+  // by checking for a dot in the path. If one is found, we assume it's a static file
+  // and don't apply i18n routing.
+  if (pathname.includes('.')) {
+    return;
+  }
 
   // Check if the pathname already has a locale prefix
   const pathnameHasLocale = locales.some(
