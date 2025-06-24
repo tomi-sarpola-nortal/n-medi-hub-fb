@@ -1,12 +1,15 @@
 
+"use client";
+
+import { useEffect, useState, useMemo } from 'react';
+import { useParams } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getTranslations } from '@/lib/translations';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, Loader2 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
@@ -14,27 +17,85 @@ import { getAllPersons } from '@/services/personService';
 import type { Person } from '@/lib/types';
 import { format } from 'date-fns';
 
-interface MemberOverviewPageProps {
-  params: { locale: string };
-}
+// Helper for client-side translations
+const getClientTranslations = (locale: string) => {
+  try {
+    const page = locale === 'de' ? require('../../../../locales/de/member-overview.json') : require('../../../../locales/en/member-overview.json');
+    const common = locale === 'de' ? require('../../../../locales/de/common.json') : require('../../../../locales/en/common.json');
+    return { ...page, ...common };
+  } catch (e) {
+    console.warn("Translation file not found, falling back to en");
+    const page = require('../../../../locales/en/member-overview.json');
+    const common = require('../../../../locales/en/common.json');
+    return { ...page, ...common };
+  }
+};
 
-export default async function MemberOverviewPage({ params }: MemberOverviewPageProps) {
-  const t = getTranslations(params.locale);
+const statusKeyMap: Record<Person['status'], string> = {
+    active: 'member_list_status_active',
+    pending: 'member_list_status_pending',
+    inactive: 'member_list_status_inactive',
+    rejected: 'member_list_status_inactive',
+};
+
+export default function MemberOverviewPage() {
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
+
+  const [t, setT] = useState<Record<string, string>>({});
+  const [allPersons, setAllPersons] = useState<Person[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    setT(getClientTranslations(locale));
+    
+    const fetchPersons = async () => {
+      setIsLoading(true);
+      try {
+        const persons = await getAllPersons();
+        setAllPersons(persons);
+      } catch (error) {
+        console.error("Failed to fetch members:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPersons();
+  }, [locale]);
+
+  const membersToReview = useMemo(() => {
+    return allPersons.filter(p => p.status === 'pending');
+  }, [allPersons]);
+
+  const filteredMembers = useMemo(() => {
+    return allPersons.filter(person => {
+      const statusMatch = statusFilter === 'all' || person.status === statusFilter;
+      
+      const searchMatch = !searchTerm ||
+        person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.dentistId?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      return statusMatch && searchMatch;
+    });
+  }, [allPersons, searchTerm, statusFilter]);
+  
   const pageTitle = t.member_overview_page_title || "Member Overview";
   
-  const allPersons = await getAllPersons();
-
-  const membersToReview = allPersons.filter(p => p.status === 'pending');
-
-  const statusKeyMap: Record<Person['status'], string> = {
-      active: 'member_list_status_active',
-      pending: 'member_list_status_pending',
-      inactive: 'member_list_status_inactive',
-      rejected: 'member_list_status_inactive',
-  };
+  if (isLoading || Object.keys(t).length === 0) {
+    return (
+        <AppLayout pageTitle={pageTitle} locale={locale}>
+            <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        </AppLayout>
+    );
+  }
 
   return (
-    <AppLayout pageTitle={pageTitle} locale={params.locale}>
+    <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-6 p-4 md:p-8">
             <div className="flex items-center justify-between">
                 <div>
@@ -42,7 +103,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                         {pageTitle}
                     </h1>
                     <div className="text-sm text-muted-foreground mt-2">
-                        <Link href="/dashboard" className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
+                        <Link href={`/${locale}/dashboard`} className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
                         <span className="mx-1">/</span>
                         <span className="font-medium text-foreground">{t.member_overview_breadcrumb_current || "Member Overview"}</span>
                     </div>
@@ -67,7 +128,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                     <p className="text-sm text-muted-foreground">{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'} | {t.data_change_label || "Data Change"}</p>
                                 </div>
                                 <Button asChild variant="outline" className="w-full sm:w-auto">
-                                   <Link href={`/member-overview/${member.id}/review`}>{t.member_review_action_button || "PERFORM REVIEW"}</Link>
+                                   <Link href={`/${locale}/member-overview/${member.id}/review`}>{t.member_review_action_button || "PERFORM REVIEW"}</Link>
                                 </Button>
                             </div>
                             {index < membersToReview.length - 1 && <Separator className="mt-4"/>}
@@ -87,10 +148,15 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
                         <div className="relative flex-grow">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder={t.member_list_search_placeholder || "Search by name or dentist ID"} className="pl-10" />
+                            <Input 
+                                placeholder={t.member_list_search_placeholder || "Search by name or dentist ID"} 
+                                className="pl-10" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                         <div className="flex gap-4">
-                            <Select>
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_status || "Status: All"} />
                                 </SelectTrigger>
@@ -101,7 +167,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                     <SelectItem value="inactive">{t.member_list_status_inactive || "Inactive"}</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Select>
+                            <Select disabled>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_points || "Points: All"} />
                                 </SelectTrigger>
@@ -109,7 +175,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                     <SelectItem value="all">{t.member_list_filter_all || "All"}</SelectItem>
                                 </SelectContent>
                             </Select>
-                             <Select>
+                             <Select disabled>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_reps || "Representations: All"} />
                                 </SelectTrigger>
@@ -133,7 +199,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {allPersons.length > 0 ? allPersons.map(member => (
+                            {filteredMembers.length > 0 ? filteredMembers.map(member => (
                                 <TableRow key={member.id}>
                                     <TableCell>{member.dentistId || '-'}</TableCell>
                                     <TableCell className="font-medium">{member.name}</TableCell>
@@ -145,7 +211,7 @@ export default async function MemberOverviewPage({ params }: MemberOverviewPageP
                                     <TableCell>{"-"}</TableCell>
                                     <TableCell>
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
+                                            <Link href={`/${locale}/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
                                         </Button>
                                     </TableCell>
                                 </TableRow>
