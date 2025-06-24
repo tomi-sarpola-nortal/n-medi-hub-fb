@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/context/auth-context";
@@ -11,20 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllPersons } from "@/services/personService";
 import { createRepresentation } from "@/services/representationService";
 import type { Person } from "@/lib/types";
-import { differenceInHours, set } from "date-fns";
+import { set } from "date-fns";
 
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePickerInput } from "@/components/ui/date-picker";
-import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -66,7 +63,6 @@ export default function NewRepresentationPage() {
     const [dentists, setDentists] = useState<Person[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [comboboxOpen, setComboboxOpen] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -91,38 +87,20 @@ export default function NewRepresentationPage() {
         resolver: zodResolver(FormSchema)
     });
 
-    const { watch } = form;
-    const watchDate = watch("date");
-    const watchStartTime = watch("startTime");
-    const watchEndTime = watch("endTime");
-
-    const calculatedDuration = useMemo(() => {
-        if (watchDate && timeRegex.test(watchStartTime) && timeRegex.test(watchEndTime)) {
-            const [startHour, startMinute] = watchStartTime.split(':').map(Number);
-            const [endHour, endMinute] = watchEndTime.split(':').map(Number);
-            
-            const startDate = set(watchDate, { hours: startHour, minutes: startMinute, seconds: 0, milliseconds: 0 });
-            const endDate = set(watchDate, { hours: endHour, minutes: endMinute, seconds: 0, milliseconds: 0 });
-
-            if (endDate > startDate) {
-                const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-                return Math.round(diff * 10) / 10; // Round to one decimal place
-            }
-        }
-        return null;
-    }, [watchDate, watchStartTime, watchEndTime]);
-
     const onSubmit = async (data: FormValues) => {
-        if (!user || calculatedDuration === null) return;
+        if (!user) return;
+
+        const [startHour, startMinute] = data.startTime.split(':').map(Number);
+        const [endHour, endMinute] = data.endTime.split(':').map(Number);
+
+        const startDate = set(data.date, { hours: startHour, minutes: startMinute });
+        const endDate = set(data.date, { hours: endHour, minutes: endMinute });
+        
+        const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+        const calculatedDuration = Math.round(duration * 10) / 10;
 
         setIsSubmitting(true);
         try {
-            const [startHour, startMinute] = data.startTime.split(':').map(Number);
-            const [endHour, endMinute] = data.endTime.split(':').map(Number);
-
-            const startDate = set(data.date, { hours: startHour, minutes: startMinute });
-            const endDate = set(data.date, { hours: endHour, minutes: endMinute });
-            
             const representedDentist = dentists.find(d => d.id === data.representedDentistId);
             if (!representedDentist) {
                 throw new Error("Selected dentist not found.");
@@ -202,56 +180,22 @@ export default function NewRepresentationPage() {
                                     control={form.control}
                                     name="representedDentistId"
                                     render={({ field }) => (
-                                        <FormItem className="flex flex-col">
+                                        <FormItem>
                                             <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
-                                            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant="outline"
-                                                            role="combobox"
-                                                            className={cn(
-                                                                "w-full justify-between",
-                                                                !field.value && "text-muted-foreground"
-                                                            )}
-                                                        >
-                                                            {field.value
-                                                                ? dentists.find(d => d.id === field.value)?.name
-                                                                : (t.new_representation_form_dentist_placeholder || "Select a dentist...")
-                                                            }
-                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                    <Command>
-                                                        <CommandInput placeholder={t.new_representation_form_search_dentist || "Search dentist..."} />
-                                                        <CommandList>
-                                                            <CommandEmpty>{t.new_representation_form_dentist_not_found || "No dentist found."}</CommandEmpty>
-                                                            <CommandGroup>
-                                                                {dentists.map((dentist) => (
-                                                                    <CommandItem
-                                                                        value={dentist.id}
-                                                                        key={dentist.id}
-                                                                        onSelect={(currentValue) => {
-                                                                            form.setValue("representedDentistId", currentValue);
-                                                                            setTimeout(() => setComboboxOpen(false), 100);
-                                                                        }}
-                                                                    >
-                                                                        <Check
-                                                                            className={cn(
-                                                                                "mr-2 h-4 w-4",
-                                                                                field.value === dentist.id ? "opacity-100" : "opacity-0"
-                                                                            )}
-                                                                        />
-                                                                        {dentist.name}
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </CommandList>
-                                                    </Command>
-                                                </PopoverContent>
-                                            </Popover>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t.new_representation_form_dentist_placeholder || "Select a dentist..."} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {dentists.map((dentist) => (
+                                                        <SelectItem key={dentist.id} value={dentist.id}>
+                                                            {dentist.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -301,15 +245,10 @@ export default function NewRepresentationPage() {
                                         )}
                                     />
                                 </div>
-                                
-                                <div>
-                                    <Label>{t.new_representation_form_duration_label || "Calculated Duration (hours)"}</Label>
-                                    <Input value={calculatedDuration !== null ? `${calculatedDuration} hours` : "Please enter valid dates and times"} readOnly disabled className="mt-2 bg-muted/50" />
-                                </div>
 
                                 <div className="flex justify-end gap-4 pt-4">
                                     <Button type="button" variant="outline" onClick={() => router.back()}>{t.new_representation_form_cancel_button || "Cancel"}</Button>
-                                    <Button type="submit" disabled={isSubmitting || calculatedDuration === null}>
+                                    <Button type="submit" disabled={isSubmitting}>
                                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                         {t.new_representation_form_save_button || "Save Representation"}
                                     </Button>
