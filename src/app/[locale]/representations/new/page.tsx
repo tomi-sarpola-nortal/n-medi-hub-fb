@@ -63,18 +63,9 @@ export default function NewRepresentationPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
-
-    const timeSlots = useMemo(() => {
-        const slots = [];
-        for (let hour = 0; hour < 24; hour++) {
-            for (let minute = 0; minute < 60; minute += 15) {
-                const formattedHour = hour.toString().padStart(2, '0');
-                const formattedMinute = minute.toString().padStart(2, '0');
-                slots.push(`${formattedHour}:${formattedMinute}`);
-            }
-        }
-        return slots;
-    }, []);
+    
+    const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')), []);
+    const minutes = useMemo(() => ['00', '15', '30', '45'], []);
 
     useEffect(() => {
         setT(getClientTranslations(locale));
@@ -108,11 +99,11 @@ export default function NewRepresentationPage() {
         const [startHour, startMinute] = data.startTime.split(':').map(Number);
         const [endHour, endMinute] = data.endTime.split(':').map(Number);
 
-        const startDate = set(data.date, { hours: startHour, minutes: startMinute });
-        const endDate = set(data.date, { hours: endHour, minutes: endMinute });
+        const startDate = set(data.date, { hours: startHour, minutes: startMinute, seconds: 0, milliseconds: 0 });
+        const endDate = set(data.date, { hours: endHour, minutes: endMinute, seconds: 0, milliseconds: 0 });
         
         const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-        const calculatedDuration = Math.round(duration * 10) / 10;
+        const calculatedDuration = Math.round(duration * 100) / 100;
 
         setIsSubmitting(true);
         try {
@@ -239,20 +230,30 @@ export default function NewRepresentationPage() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>{t.new_representation_form_start_time_label || "Start Time"}</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select a time" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {timeSlots.map(time => (
-                                                            <SelectItem key={time} value={time}>
-                                                                {time}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <Select
+                                                        onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
+                                                        value={(field.value || '11:00').split(':')[0]}
+                                                    >
+                                                        <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
+                                                        <SelectContent>
+                                                            {hours.map((hour) => (
+                                                                <SelectItem key={`start-h-${hour}`} value={hour}>{hour}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Select
+                                                        onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
+                                                        value={(field.value || '11:00').split(':')[1]}
+                                                    >
+                                                        <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
+                                                        <SelectContent>
+                                                            {minutes.map((minute) => (
+                                                                <SelectItem key={`start-m-${minute}`} value={minute}>{minute}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -263,20 +264,30 @@ export default function NewRepresentationPage() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>{t.new_representation_form_end_time_label || "End Time"}</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select a time" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {timeSlots.map(time => (
-                                                            <SelectItem key={time} value={time}>
-                                                                {time}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                     <Select
+                                                        onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
+                                                        value={(field.value || '12:00').split(':')[0]}
+                                                    >
+                                                        <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
+                                                        <SelectContent>
+                                                            {hours.map((hour) => (
+                                                                <SelectItem key={`end-h-${hour}`} value={hour}>{hour}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Select
+                                                        onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
+                                                        value={(field.value || '12:00').split(':')[1]}
+                                                    >
+                                                        <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
+                                                        <SelectContent>
+                                                            {minutes.map((minute) => (
+                                                                <SelectItem key={`end-m-${minute}`} value={minute}>{minute}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
