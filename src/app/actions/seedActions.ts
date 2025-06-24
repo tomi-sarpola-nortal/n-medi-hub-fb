@@ -289,7 +289,7 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
             {
                 representingPersonId: sabineMueller.id, representedPersonId: userMap.get('sabine.becker@example.com')!,
                 representingPersonName: sabineMueller.name, representedPersonName: 'Dr. Sabine Becker (ID: 23456)',
-                startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:00:00', durationHours: 6, status: 'confirmed', confirmedAt: '2025-04-12T09:00:00'
+                startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:30:00', durationHours: 6.5, status: 'confirmed', confirmedAt: '2025-04-12T09:00:00'
             },
             // Others represented Sabine
             {
