@@ -4,11 +4,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { getTrainingHistoryItem } from '@/services/trainingHistoryService';
+import { getAllZfdGroups } from '@/services/zfdGroupService';
 import type { TrainingHistory } from '@/lib/types';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Calendar, Star, Hash, BookOpen, Building } from 'lucide-react';
+import { Loader2, ArrowLeft, Calendar, Star, Building, Bookmark, BookOpen } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -49,6 +50,7 @@ export default function TrainingDetailPage() {
     
     const [t, setT] = useState<Record<string, string>>({});
     const [item, setItem] = useState<TrainingHistory | null>(null);
+    const [zfdGroupName, setZfdGroupName] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -56,12 +58,23 @@ export default function TrainingDetailPage() {
     }, [locale]);
 
     useEffect(() => {
-        if (user && trainingId) {
+        if (user && trainingId && Object.keys(t).length > 0) {
             const fetchData = async () => {
                 setIsLoading(true);
                 try {
-                    const historyItem = await getTrainingHistoryItem(user.id, trainingId);
+                    const [historyItem, allZfdGroups] = await Promise.all([
+                        getTrainingHistoryItem(user.id, trainingId),
+                        getAllZfdGroups()
+                    ]);
+                    
                     setItem(historyItem);
+
+                    if (historyItem?.zfdGroupId) {
+                        const group = allZfdGroups.find(g => g.id === historyItem.zfdGroupId);
+                        if (group) {
+                            setZfdGroupName(t[group.nameKey] || group.nameKey);
+                        }
+                    }
                 } catch (error) {
                     console.error("Failed to fetch training data:", error);
                 } finally {
@@ -70,9 +83,9 @@ export default function TrainingDetailPage() {
             };
             fetchData();
         } else if (!authLoading) {
-            setIsLoading(false); // Stop loading if no user or id
+            setIsLoading(false);
         }
-    }, [user, trainingId, authLoading]);
+    }, [user, trainingId, authLoading, t]);
     
     const pageTitle = item?.title || t.fortbildungshistorie_table_title || "Training Details";
     const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
@@ -127,9 +140,11 @@ export default function TrainingDetailPage() {
                     <CardContent className="pt-2">
                         <DetailRow icon={Calendar} label={t.fortbildungshistorie_table_date || "Date"} value={format(new Date(item.date), 'dd.MM.yyyy')} />
                         <DetailRow icon={BookOpen} label={t.fortbildungshistorie_table_category || "Category"} value={item.category} />
+                        {zfdGroupName && (
+                            <DetailRow icon={Bookmark} label={"ZFD Group"} value={zfdGroupName} />
+                        )}
                         <DetailRow icon={Star} label={t.fortbildungshistorie_table_points || "Points"} value={item.points} />
                         <DetailRow icon={Building} label={t.fortbildungshistorie_table_organizer || "Organizer"} value={item.organizer} />
-                        <DetailRow icon={Hash} label="ID" value={item.id} />
                     </CardContent>
                 </Card>
             </div>
