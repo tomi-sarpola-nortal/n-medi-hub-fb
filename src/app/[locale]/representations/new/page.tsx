@@ -231,6 +231,7 @@ export default function NewRepresentationPage() {
                                                                         value={p.id}
                                                                         key={p.id}
                                                                         onSelect={(currentValue) => {
+                                                                            console.log("Attempting to select:", currentValue); // test form operation
                                                                             form.setValue("representedPersonId", currentValue);
                                                                             setComboboxOpen(false);
                                                                         }}
