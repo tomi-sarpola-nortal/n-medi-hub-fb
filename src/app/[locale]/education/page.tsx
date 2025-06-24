@@ -40,6 +40,7 @@ interface SpecialDiplomaItem {
 }
 
 const ITEMS_PER_PAGE = 7;
+const ZFD_CATEGORY_TARGET = 50;
 
 export default function EducationPage() {
     const { user, loading: authLoading } = useAuth();
@@ -216,10 +217,10 @@ export default function EducationPage() {
                   <div className="mb-1 flex justify-between">
                     <span className="text-sm font-medium">{category.label}</span>
                     <span className="text-sm text-muted-foreground">
-                      {t.zfd_total_progress?.replace('{current}', category.current.toString()).replace('{total}', category.total.toString())}
+                      {t.zfd_total_progress?.replace('{current}', category.current.toString()).replace('{total}', ZFD_CATEGORY_TARGET.toString())}
                     </span>
                   </div>
-                  <Progress value={category.total > 0 ? (category.current / category.total) * 100 : 0} className="h-3" />
+                  <Progress value={(category.current / ZFD_CATEGORY_TARGET) * 100} className="h-3" />
                 </div>
               ))}
             </div>
