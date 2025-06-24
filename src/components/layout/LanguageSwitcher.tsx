@@ -90,17 +90,17 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   };
   
   if (!t) {
-    return <Skeleton className="w-full h-10" />;
+    return <Skeleton className="w-[120px] h-8" />;
   }
   
   const CurrentFlag = languages.find(lang => lang.value === currentLocale)?.Flag;
   const currentLabel = languages.find(lang => lang.value === currentLocale)?.label;
 
   return (
-    <div className={cn("w-full", className)} {...props}>
+    <div className={cn("", className)} {...props}>
       <Select value={currentLocale} onValueChange={handleChange}>
         <SelectTrigger 
-          className="w-full h-10 text-sm"
+          className="h-8 px-3 text-sm"
           aria-label={t.language_switcher_label || "Language"}
         >
             <div className="flex items-center gap-2">
