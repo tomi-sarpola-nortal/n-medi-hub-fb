@@ -134,14 +134,16 @@ export default function RepresentationsPage() {
                             {pageTitle}
                         </h1>
                          <div className="text-sm text-muted-foreground mt-2">
-                            <Link href="/dashboard" className="hover:underline">{t.representations_breadcrumb_dashboard || "Dashboard"}</Link>
+                            <Link href={`/${locale}/dashboard`} className="hover:underline">{t.representations_breadcrumb_dashboard || "Dashboard"}</Link>
                             <span className="mx-1">/</span>
                             <span className="font-medium text-foreground">{t.representations_breadcrumb_current || "My Representations"}</span>
                         </div>
                     </div>
-                    <Button className="flex items-center gap-2">
-                        <PlusCircle className="h-5 w-5"/>
-                        <span className="hidden sm:inline">{t.representations_new_button || "ENTER NEW REPRESENTATION"}</span>
+                    <Button className="flex items-center gap-2" asChild>
+                        <Link href={`/${locale}/representations/new`}>
+                            <PlusCircle className="h-5 w-5"/>
+                            <span className="hidden sm:inline">{t.representations_new_button || "ENTER NEW REPRESENTATION"}</span>
+                        </Link>
                     </Button>
                 </div>
 

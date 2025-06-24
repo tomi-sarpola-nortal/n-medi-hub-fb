@@ -27,5 +27,24 @@
   "representations_table_header_type": "Type",
   "representations_table_header_person_involved": "Person Involved",
   "representations_type_performed": "Performed",
-  "representations_type_received": "Received"
+  "representations_type_received": "Received",
+
+  "new_representation_page_title": "New Representation",
+  "new_representation_breadcrumb_current": "New",
+  "new_representation_card_title": "Enter Representation Details",
+  "new_representation_card_desc": "Select the dentist you represented and the time period.",
+  "new_representation_form_dentist_label": "Represented Dentist",
+  "new_representation_form_dentist_placeholder": "Select a dentist...",
+  "new_representation_form_dentist_not_found": "No dentist found.",
+  "new_representation_form_search_dentist": "Search dentist...",
+  "new_representation_form_start_date_label": "Start Date & Time",
+  "new_representation_form_end_date_label": "End Date & Time",
+  "new_representation_form_time_placeholder": "HH:MM",
+  "new_representation_form_duration_label": "Calculated Duration (hours)",
+  "new_representation_form_cancel_button": "Cancel",
+  "new_representation_form_save_button": "Save Representation",
+  "new_representation_success_toast_title": "Representation Saved",
+  "new_representation_success_toast_desc": "The request has been sent for confirmation.",
+  "new_representation_error_toast_title": "Error",
+  "new_representation_error_toast_desc": "Could not save representation. Please try again."
 }

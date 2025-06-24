@@ -27,5 +27,24 @@
   "representations_table_header_type": "Typ",
   "representations_table_header_person_involved": "Beteiligte Person",
   "representations_type_performed": "Durchgeführt",
-  "representations_type_received": "Erhalten"
+  "representations_type_received": "Erhalten",
+
+  "new_representation_page_title": "Neue Vertretung",
+  "new_representation_breadcrumb_current": "Neu",
+  "new_representation_card_title": "Vertretungsdetails eingeben",
+  "new_representation_card_desc": "Wählen Sie den vertretenen Zahnarzt und den Zeitraum aus.",
+  "new_representation_form_dentist_label": "Vertretener Zahnarzt",
+  "new_representation_form_dentist_placeholder": "Zahnarzt auswählen...",
+  "new_representation_form_dentist_not_found": "Kein Zahnarzt gefunden.",
+  "new_representation_form_search_dentist": "Zahnarzt suchen...",
+  "new_representation_form_start_date_label": "Startdatum & Uhrzeit",
+  "new_representation_form_end_date_label": "Enddatum & Uhrzeit",
+  "new_representation_form_time_placeholder": "HH:MM",
+  "new_representation_form_duration_label": "Berechnete Dauer (Stunden)",
+  "new_representation_form_cancel_button": "Abbrechen",
+  "new_representation_form_save_button": "Vertretung speichern",
+  "new_representation_success_toast_title": "Vertretung gespeichert",
+  "new_representation_success_toast_desc": "Die Anfrage wurde zur Bestätigung gesendet.",
+  "new_representation_error_toast_title": "Fehler",
+  "new_representation_error_toast_desc": "Vertretung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
 }
