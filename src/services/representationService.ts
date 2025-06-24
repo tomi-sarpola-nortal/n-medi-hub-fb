@@ -69,14 +69,15 @@ export async function createRepresentation(data: RepresentationCreationData): Pr
 
 /**
  * Calculates the total confirmed representation hours for a given user.
- * @param userId The ID of the user who performed the representations.
+ * This function calculates the hours where the user was THE PERSON BEING REPRESENTED.
+ * @param userId The ID of the user who was represented.
  * @returns The total number of confirmed hours.
  */
 export async function getConfirmedRepresentationHours(userId: string): Promise<number> {
   checkDb();
   const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
   const q = query(representationsRef, 
-    where('representingPersonId', '==', userId), 
+    where('representedPersonId', '==', userId),
     where('status', '==', 'confirmed')
   );
   
