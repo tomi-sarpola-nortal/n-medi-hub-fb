@@ -230,6 +230,7 @@ export interface TrainingHistory {
   points: number;
   category: string; // The abbreviation like 'ZMK' or 'IMPL'
   organizer: string;
+  zfdGroupId?: string;
 }
 
 export type TrainingHistoryCreationData = Omit<TrainingHistory, 'id'>;

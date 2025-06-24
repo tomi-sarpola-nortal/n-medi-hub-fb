@@ -64,6 +64,7 @@ export async function getTrainingHistoryForUser(userId: string): Promise<Trainin
       points: data.points,
       category: data.category,
       organizer: data.organizer,
+      zfdGroupId: data.zfdGroupId,
     } as TrainingHistory;
   });
 }

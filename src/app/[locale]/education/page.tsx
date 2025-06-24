@@ -86,20 +86,12 @@ export default function EducationPage() {
 
     // Calculate ZFD progress dynamically
     const zfdProgressData = useMemo(() => {
-        if (!trainingHistory || allCategories.length === 0 || zfdGroups.length === 0 || Object.keys(t).length === 0) {
+        if (!trainingHistory || zfdGroups.length === 0 || Object.keys(t).length === 0) {
             const totalCurrent = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
             return { categories: [], total: { current: totalCurrent, total: 120 }};
         }
-
-        // 1. Map category abbreviations to their ZFD group ID
-        const categoryToZfdGroupMap: { [key: string]: string } = {};
-        allCategories.forEach(cat => {
-            if (cat.zfdGroupId) {
-                categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupId;
-            }
-        });
-
-        // 2. Initialize progress data from the fetched ZFD groups
+    
+        // 1. Initialize progress data from the fetched ZFD groups
         const progressData: { [key: string]: { label: string; total: number; current: number; } } = {};
         zfdGroups.forEach(group => {
             progressData[group.id] = {
@@ -108,25 +100,24 @@ export default function EducationPage() {
                 current: 0,
             };
         });
-
-        // 3. Calculate current points for each ZFD group
+    
+        // 2. Calculate current points for each ZFD group using the direct link
         trainingHistory.forEach(record => {
-            const zfdGroupId = categoryToZfdGroupMap[record.category];
-            if (zfdGroupId && progressData[zfdGroupId]) {
-                progressData[zfdGroupId].current += record.points;
+            if (record.zfdGroupId && progressData[record.zfdGroupId]) {
+                progressData[record.zfdGroupId].current += record.points;
             }
         });
-
-        // 4. Format for rendering
+    
+        // 3. Format for rendering
         const categoriesForDisplay = Object.values(progressData);
-        const totalMaxPoints = categoriesForDisplay.reduce((sum, cat) => sum + cat.total, 0);
+        const totalMaxPoints = zfdGroups.reduce((sum, group) => sum + group.totalPoints, 0);
         const totalCurrentPoints = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
         
         return {
             categories: categoriesForDisplay,
             total: { current: totalCurrentPoints, total: totalMaxPoints || 120 }
         };
-    }, [trainingHistory, allCategories, zfdGroups, t]);
+    }, [trainingHistory, zfdGroups, t]);
 
     // Calculate specialist diplomas dynamically
     const specialistDiplomas = useMemo(() => {
