@@ -33,8 +33,7 @@ const snapshotToCategory = (snapshot: DocumentSnapshot<any> | QueryDocumentSnaps
     name: data.name,
     abbreviation: data.abbreviation,
     isActive: data.isActive,
-    zfdGroupName: data.zfdGroupName,
-    zfdGroupPoints: data.zfdGroupPoints,
+    zfdGroupId: data.zfdGroupId,
   } as TrainingCategory;
 }
 

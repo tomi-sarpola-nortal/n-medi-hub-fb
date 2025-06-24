@@ -209,8 +209,7 @@ export interface TrainingCategory {
   name: string;
   abbreviation: string;
   isActive: boolean;
-  zfdGroupName?: string; // Translation key for the ZFD parent group, e.g., 'zfd_category_berufsbezogen'
-  zfdGroupPoints?: number; // Total points for that ZFD parent group, e.g., 60
+  zfdGroupId?: string; // e.g., 'berufsbezogen'
 }
 
 export type TrainingCategoryCreationData = Omit<TrainingCategory, 'id'>;
@@ -246,6 +245,13 @@ export interface StateChamber {
 
 export type StateChamberCreationData = Omit<StateChamber, 'id'>;
 
+export interface ZfdGroup {
+  id: string; // e.g., 'berufsbezogen'
+  nameKey: string; // Translation key, e.g., 'zfd_category_berufsbezogen'
+  totalPoints: number;
+}
+
+export type ZfdGroupCreationData = Omit<ZfdGroup, 'id'>;
 
 export interface Representation {
   id: string;

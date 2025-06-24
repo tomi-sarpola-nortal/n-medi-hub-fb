@@ -4,17 +4,24 @@
 import { findPersonByEmail, updatePerson } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData } from '@/lib/types';
+import type { TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData } from '@/lib/types';
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
 import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
+import { createZfdGroup } from '@/services/zfdGroupService';
+
+const zfdGroupsToSeed: { id: string, data: ZfdGroupCreationData }[] = [
+  { id: 'berufsbezogen', data: { nameKey: 'zfd_category_berufsbezogen', totalPoints: 60 } },
+  { id: 'literatur', data: { nameKey: 'zfd_category_literatur', totalPoints: 45 } },
+  { id: 'frei', data: { nameKey: 'zfd_category_frei', totalPoints: 15 } },
+];
 
 const categoriesToSeed: TrainingCategoryCreationData[] = [
-  { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
-  { name: 'Literatur', abbreviation: 'Literatur', isActive: true, zfdGroupName: 'zfd_category_literatur', zfdGroupPoints: 45 },
-  { name: 'Kieferorthopädie', abbreviation: 'KFO', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
-  { name: 'Parodontologie', abbreviation: 'PARO', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
-  { name: 'Implantologie', abbreviation: 'IMPL', isActive: true, zfdGroupName: 'zfd_category_berufsbezogen', zfdGroupPoints: 60 },
-  { name: 'Frei wählbare Fortbildung', abbreviation: 'Frei', isActive: true, zfdGroupName: 'zfd_category_frei', zfdGroupPoints: 15 }
+  { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Literatur', abbreviation: 'Literatur', isActive: true, zfdGroupId: 'literatur' },
+  { name: 'Kieferorthopädie', abbreviation: 'KFO', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Parodontologie', abbreviation: 'PARO', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Implantologie', abbreviation: 'IMPL', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Frei wählbare Fortbildung', abbreviation: 'Frei', isActive: true, zfdGroupId: 'frei' }
 ];
 
 const organizersToSeed: TrainingOrganizerCreationData[] = [
@@ -170,6 +177,26 @@ export async function seedStateChambers(): Promise<{ success: boolean; message: 
         const errorMessage = error instanceof Error ? error.message : String(error);
         return { success: false, message: `Error seeding chambers: ${errorMessage}` };
     }
+}
+
+export async function seedZfdGroups(): Promise<{ success: boolean; message: string }> {
+  try {
+    let createdCount = 0;
+    // Note: ZFD groups don't have a unique field to check for existence other than ID, which is fine for setDoc.
+    for (const group of zfdGroupsToSeed) {
+        await createZfdGroup(group.id, group.data);
+        createdCount++;
+    }
+    
+    return { 
+      success: true, 
+      message: `Seeding complete. Created/updated: ${createdCount} ZFD groups.` 
+    };
+  } catch (error) {
+    console.error('Error seeding ZFD groups:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, message: `Error seeding ZFD groups: ${errorMessage}` };
+  }
 }
 
 export async function setSabineMuellerToPending(): Promise<{ success: boolean; message: string }> {

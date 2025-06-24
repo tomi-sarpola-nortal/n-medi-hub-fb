@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -12,6 +12,7 @@ export default function SeedButton() {
   const [isOrganizersLoading, setIsOrganizersLoading] = useState(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [isChambersLoading, setIsChambersLoading] = useState(false);
+  const [isZfdGroupsLoading, setIsZfdGroupsLoading] = useState(false);
 
 
   const handleSeedCategories = async () => {
@@ -89,9 +90,31 @@ export default function SeedButton() {
     }
     setIsChambersLoading(false);
   };
+  
+  const handleSeedZfdGroups = async () => {
+    setIsZfdGroupsLoading(true);
+    try {
+      const result = await seedZfdGroups();
+      toast({
+        title: "Seeding Report (ZFD Groups)",
+        description: result.message,
+      });
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute seed action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsZfdGroupsLoading(false);
+  };
 
   return (
     <div className="flex flex-wrap gap-4">
+        <Button onClick={handleSeedZfdGroups} disabled={isZfdGroupsLoading} variant="destructive" className="w-full sm:w-auto">
+          {isZfdGroupsLoading ? "Seeding..." : "Seed ZFD Groups"}
+        </Button>
         <Button onClick={handleSeedCategories} disabled={isCategoriesLoading} variant="destructive" className="w-full sm:w-auto">
           {isCategoriesLoading ? "Seeding..." : "Seed Training Categories"}
         </Button>

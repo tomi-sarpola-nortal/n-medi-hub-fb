@@ -5,7 +5,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import { getAllTrainingCategories } from '@/services/trainingCategoryService';
-import type { TrainingHistory, TrainingCategory } from '@/lib/types';
+import { getAllZfdGroups } from '@/services/zfdGroupService';
+import type { TrainingHistory, TrainingCategory, ZfdGroup } from '@/lib/types';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -49,6 +50,7 @@ export default function EducationPage() {
 
     const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
     const [allCategories, setAllCategories] = useState<TrainingCategory[]>([]);
+    const [zfdGroups, setZfdGroups] = useState<ZfdGroup[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,12 +63,14 @@ export default function EducationPage() {
             const fetchData = async () => {
                 setIsLoading(true);
                 try {
-                    const [history, categories] = await Promise.all([
+                    const [history, categories, zfdGroupsData] = await Promise.all([
                         getTrainingHistoryForUser(user.id),
-                        getAllTrainingCategories()
+                        getAllTrainingCategories(),
+                        getAllZfdGroups()
                     ]);
                     setTrainingHistory(history);
                     setAllCategories(categories);
+                    setZfdGroups(zfdGroupsData);
                 } catch (error) {
                     console.error("Failed to fetch education data:", error);
                 } finally {
@@ -81,50 +85,47 @@ export default function EducationPage() {
 
     // Calculate ZFD progress dynamically
     const zfdProgressData = useMemo(() => {
-        if (!trainingHistory || allCategories.length === 0 || Object.keys(t).length === 0) {
-            // Calculate total points even if categories fail to load, using a default total requirement.
+        if (!trainingHistory || allCategories.length === 0 || zfdGroups.length === 0 || Object.keys(t).length === 0) {
             const totalCurrent = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
             return { categories: [], total: { current: totalCurrent, total: 120 }};
         }
 
-        // 1. Build ZFD group definitions from the fetched categories
-        const zfdGroups: { [key: string]: { label: string; total: number; current: number; childAbbrs: string[] } } = {};
+        // 1. Map category abbreviations to their ZFD group ID
         const categoryToZfdGroupMap: { [key: string]: string } = {};
-
         allCategories.forEach(cat => {
-            if (cat.zfdGroupName && cat.zfdGroupPoints) {
-                if (!zfdGroups[cat.zfdGroupName]) {
-                    zfdGroups[cat.zfdGroupName] = {
-                        label: t[cat.zfdGroupName] || cat.zfdGroupName,
-                        total: cat.zfdGroupPoints,
-                        current: 0,
-                        childAbbrs: []
-                    };
-                }
-                categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupName;
+            if (cat.zfdGroupId) {
+                categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupId;
             }
         });
 
-        // 2. Calculate points for each ZFD group (for the progress bars)
+        // 2. Initialize progress data from the fetched ZFD groups
+        const progressData: { [key: string]: { label: string; total: number; current: number; } } = {};
+        zfdGroups.forEach(group => {
+            progressData[group.id] = {
+                label: t[group.nameKey] || group.nameKey,
+                total: group.totalPoints,
+                current: 0,
+            };
+        });
+
+        // 3. Calculate current points for each ZFD group
         trainingHistory.forEach(record => {
-            const zfdGroupName = categoryToZfdGroupMap[record.category];
-            if (zfdGroupName && zfdGroups[zfdGroupName]) {
-                zfdGroups[zfdGroupName].current += record.points;
+            const zfdGroupId = categoryToZfdGroupMap[record.category];
+            if (zfdGroupId && progressData[zfdGroupId]) {
+                progressData[zfdGroupId].current += record.points;
             }
         });
 
-        // 3. Format for rendering
-        const categoriesForDisplay = Object.values(zfdGroups);
+        // 4. Format for rendering
+        const categoriesForDisplay = Object.values(progressData);
         const totalMaxPoints = categoriesForDisplay.reduce((sum, cat) => sum + cat.total, 0);
-
-        // **The fix**: Calculate total points directly from the history to ensure accuracy.
         const totalCurrentPoints = trainingHistory.reduce((sum, record) => sum + (record.points || 0), 0);
         
         return {
             categories: categoriesForDisplay,
-            total: { current: totalCurrentPoints, total: totalMaxPoints || 120 } // Fallback to 120 if total is 0
+            total: { current: totalCurrentPoints, total: totalMaxPoints || 120 }
         };
-    }, [trainingHistory, allCategories, t]);
+    }, [trainingHistory, allCategories, zfdGroups, t]);
 
     // Calculate specialist diplomas dynamically
     const specialistDiplomas = useMemo(() => {
