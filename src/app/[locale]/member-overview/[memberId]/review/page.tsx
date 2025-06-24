@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import type { Person } from '@/lib/types';
 import { getPersonById, reviewPerson } from '@/services/personService';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -29,11 +29,6 @@ const getClientTranslations = (locale: string) => {
     return require('../../../../../../locales/en.json');
   }
 };
-
-interface DataReviewPageProps {
-  params: { memberId: string; locale: string };
-}
-
 
 const DataRow = ({ label, value }: { label: string; value?: string | null | string[] }) => (
   <div className="py-2 border-b last:border-b-0">
@@ -61,7 +56,8 @@ const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: stri
 );
 
 
-export default function DataReviewPage({ params }: DataReviewPageProps) {
+export default function DataReviewPage() {
+  const params = useParams<{ memberId: string; locale: string }>();
   const { memberId, locale } = params;
   const router = useRouter();
   const { toast } = useToast();
