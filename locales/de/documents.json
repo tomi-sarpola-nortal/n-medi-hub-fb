@@ -6,6 +6,7 @@
   "documents_upload_button": "NEUES DOKUMENT HOCHLADEN",
   "documents_card_title": "Übersicht aller bereitgestellten Dokumente",
   "documents_card_description": "Hier finden Sie alle Vorlagen, Leitlinien und Empfehlungen, welche von Ihrer Kammer sowie der Österreichischen Zahnärztekammer zur Verfügung gestellt wurden.",
+  "documents_search_placeholder": "Nach Titel oder Herausgeber suchen...",
   "documents_filter_all": "Alle",
   "documents_filter_templates": "Vorlagen",
   "documents_filter_recommendations": "Empfehlungen",

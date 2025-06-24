@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileUp, Download, Trash2, ArrowLeft, ArrowUp, ArrowDown, Loader2, File } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { FileUp, Download, Trash2, ArrowLeft, ArrowUp, ArrowDown, Loader2, File, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
@@ -72,6 +73,7 @@ export default function DocumentsPage() {
   const [documents, setDocuments] = useState<DocumentTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<DocumentTemplate | null>(null);
@@ -104,10 +106,21 @@ export default function DocumentsPage() {
     }));
   };
 
+  const filteredDocuments = useMemo(() => {
+    return documents
+      .filter((doc) => filter === 'all' || doc.type === filter)
+      .filter((doc) => {
+        if (!searchTerm) return true;
+        const term = searchTerm.toLowerCase();
+        return (
+          doc.title.toLowerCase().includes(term) ||
+          doc.publisher.toLowerCase().includes(term)
+        );
+      });
+  }, [documents, filter, searchTerm]);
+
   const displayedDocuments = useMemo(() => {
-    const filtered = filter === 'all' ? documents : documents.filter(doc => doc.type === filter);
-    
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...filteredDocuments].sort((a, b) => {
       const valA = a[sorting.id];
       const valB = b[sorting.id];
       if (valA === null || valA === undefined) return 1;
@@ -120,10 +133,10 @@ export default function DocumentsPage() {
     const start = pagination.pageIndex * pagination.pageSize;
     const end = start + pagination.pageSize;
     return sorted.slice(start, end);
+  }, [filteredDocuments, sorting, pagination]);
 
-  }, [documents, filter, sorting, pagination]);
 
-  const totalPages = Math.ceil((filter === 'all' ? documents.length : documents.filter(doc => doc.type === filter).length) / pagination.pageSize);
+  const totalPages = Math.ceil(filteredDocuments.length / pagination.pageSize);
 
   const handleDeleteClick = (doc: DocumentTemplate) => {
     setDocumentToDelete(doc);
@@ -200,11 +213,22 @@ export default function DocumentsPage() {
           <CardHeader>
             <CardTitle className="text-xl font-headline">{t.documents_card_title || "Overview of all provided documents"}</CardTitle>
             <CardDescription>{t.documents_card_description || "Here you can find all templates, guidelines, and recommendations..."}</CardDescription>
-            <div className="flex flex-wrap items-center gap-2 pt-4">
-              <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{t.documents_filter_all || "All"}</Button>
-              <Button variant={filter === 'vorlage' ? 'default' : 'outline'} onClick={() => setFilter('vorlage')}>{t.documents_filter_templates || "Templates"}</Button>
-              <Button variant={filter === 'empfehlung' ? 'default' : 'outline'} onClick={() => setFilter('empfehlung')}>{t.documents_filter_recommendations || "Recommendations"}</Button>
-              <Button variant={filter === 'leitlinie' ? 'default' : 'outline'} onClick={() => setFilter('leitlinie')}>{t.documents_filter_guidelines || "Guidelines"}</Button>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{t.documents_filter_all || "All"}</Button>
+                    <Button variant={filter === 'vorlage' ? 'default' : 'outline'} onClick={() => setFilter('vorlage')}>{t.documents_filter_templates || "Templates"}</Button>
+                    <Button variant={filter === 'empfehlung' ? 'default' : 'outline'} onClick={() => setFilter('empfehlung')}>{t.documents_filter_recommendations || "Recommendations"}</Button>
+                    <Button variant={filter === 'leitlinie' ? 'default' : 'outline'} onClick={() => setFilter('leitlinie')}>{t.documents_filter_guidelines || "Guidelines"}</Button>
+                </div>
+                <div className="relative w-full sm:w-auto sm:max-w-xs">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder={t.documents_search_placeholder || "Search by title or publisher..."}
+                        className="pl-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
             </div>
           </CardHeader>
           <CardContent>

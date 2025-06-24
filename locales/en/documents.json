@@ -6,6 +6,7 @@
   "documents_upload_button": "UPLOAD NEW DOCUMENT",
   "documents_card_title": "Overview of all provided documents",
   "documents_card_description": "Here you can find all templates, guidelines, and recommendations provided by your chamber and the Austrian Dental Chamber.",
+  "documents_search_placeholder": "Search by title or publisher...",
   "documents_filter_all": "All",
   "documents_filter_templates": "Templates",
   "documents_filter_recommendations": "Recommendations",
