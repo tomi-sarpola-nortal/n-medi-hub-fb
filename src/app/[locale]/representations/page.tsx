@@ -9,13 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { RepresentationStatusBadge } from '@/components/representations/RepresentationStatusBadge';
 import Link from 'next/link';
 import { PlusCircle, Loader2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/auth-context';
 import { getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import type { Representation } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
+import ConfirmRepresentationCard from '@/components/representations/ConfirmRepresentationCard';
 
 const getClientTranslations = (locale: string) => {
     try {
@@ -38,46 +38,6 @@ const formatPeriod = (startDate: string, endDate: string) => {
     }
     
     return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
-};
-
-const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Representation, t: Record<string, string>, onStatusChange: (id: string, status: 'confirmed' | 'declined') => void }) => {
-    const [isSubmitting, setIsSubmitting] = useState<'confirm' | 'decline' | null>(null);
-
-    const handleConfirm = async () => {
-        setIsSubmitting('confirm');
-        await onStatusChange(request.id, 'confirmed');
-        setIsSubmitting(null);
-    };
-
-    const handleDecline = async () => {
-        setIsSubmitting('decline');
-        await onStatusChange(request.id, 'declined');
-        setIsSubmitting(null);
-    };
-
-    const period = formatPeriod(request.startDate, request.endDate);
-    const details = `${period} (${request.durationHours} Stunden)`;
-
-    return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-                <p className="font-semibold">{request.representingPersonName}</p>
-                <div className="text-sm text-muted-foreground">
-                    <p>{details}</p>
-                </div>
-            </div>
-            <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                <Button onClick={handleConfirm} disabled={!!isSubmitting} className="flex-1 sm:flex-none">
-                    {isSubmitting === 'confirm' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t.representations_confirm_button || "CONFIRM"}
-                </Button>
-                <Button onClick={handleDecline} disabled={!!isSubmitting} variant="outline" className="flex-1 sm:flex-none">
-                    {isSubmitting === 'decline' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t.representations_decline_button || "DECLINE"}
-                </Button>
-            </div>
-        </div>
-    );
 };
 
 
@@ -185,22 +145,11 @@ export default function RepresentationsPage() {
                     </Button>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-xl font-headline">{t.representations_confirm_title || "Confirm representations"}</CardTitle>
-                        <CardDescription>{t.representations_confirm_desc || "Here you can confirm representations where you were represented."}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {representations.pendingConfirmation.length > 0 ? representations.pendingConfirmation.map((req, index) => (
-                            <div key={req.id}>
-                                <ConfirmationRequest request={req} t={t} onStatusChange={handleStatusChange} />
-                                {index < representations.pendingConfirmation.length - 1 && <Separator className="my-4"/>}
-                            </div>
-                        )) : (
-                             <p className="text-sm text-muted-foreground text-center py-4">No pending confirmations.</p>
-                        )}
-                    </CardContent>
-                </Card>
+                <ConfirmRepresentationCard 
+                    requests={representations.pendingConfirmation}
+                    t={t}
+                    onStatusChange={handleStatusChange}
+                />
 
                 <Card>
                     <CardHeader>

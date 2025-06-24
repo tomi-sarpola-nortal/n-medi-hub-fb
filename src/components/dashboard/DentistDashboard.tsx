@@ -2,33 +2,22 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { Person } from '@/lib/types';
+import type { Person, Representation } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
 import StateChamberInfo from './StateChamberInfo';
-import { getConfirmedRepresentationHours } from '@/services/representationService';
+import { getConfirmedRepresentationHours, getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CircularProgress } from '@/components/ui/circular-progress';
+import ConfirmRepresentationCard from '../representations/ConfirmRepresentationCard';
+import { useToast } from '@/hooks/use-toast';
 
 interface DentistDashboardProps {
     user: Person;
     t: Record<string, string>;
 }
-
-const mockRepresentationRequests = [
-    {
-        id: '1',
-        name: 'Dr. Lukas Hoffmann',
-        details: ['10.05.2025, 08:30 Uhr - 17:00 Uhr (8,5 Stunden)', '11.05.2025, 15:00 Uhr - 18:00 Uhr (3 Stunden)']
-    },
-    {
-        id: '2',
-        name: 'Dr. Anna Schneider',
-        details: ['02.05.2025, 10:00 Uhr - 17:00 Uhr (7 Stunden)']
-    }
-];
 
 const LoadingSkeleton = () => (
     <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
@@ -112,27 +101,53 @@ const LoadingSkeleton = () => (
 
 
 export default function DentistDashboard({ user, t }: DentistDashboardProps) {
+    const { toast } = useToast();
     const [representationHours, setRepresentationHours] = useState(0);
+    const [pendingRequests, setPendingRequests] = useState<Representation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     
+    const fetchDashboardData = async () => {
+        if (!user) return;
+        // Don't set loading to true here to avoid flicker on refetch
+        try {
+            const [confirmedHours, representationData] = await Promise.all([
+                getConfirmedRepresentationHours(user.id),
+                getRepresentationsForUser(user.id)
+            ]);
+            setRepresentationHours(confirmedHours);
+            setPendingRequests(representationData.pendingConfirmation);
+        } catch (error) {
+            console.error("Failed to fetch dashboard data:", error);
+            setRepresentationHours(0);
+            setPendingRequests([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            if (!user) return;
-
-            setIsLoading(true);
-            try {
-                const confirmedHours = await getConfirmedRepresentationHours(user.id);
-                setRepresentationHours(confirmedHours);
-            } catch (error) {
-                console.error("Failed to fetch representation hours:", error);
-                setRepresentationHours(0);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
+        setIsLoading(true);
         fetchDashboardData();
     }, [user]);
+
+    const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
+        try {
+            await updateRepresentationStatus(representationId, status);
+            toast({
+                title: "Success",
+                description: `Representation has been ${status}.`,
+            });
+            // Refetch data to update the UI
+            fetchDashboardData();
+        } catch (error) {
+            console.error(`Failed to ${status} representation:`, error);
+            toast({
+                title: "Error",
+                description: "Could not update representation status.",
+                variant: "destructive"
+            });
+        }
+    };
 
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
     const welcomeMessage = t.welcome_back.replace('{userName}', fullName);
@@ -198,28 +213,13 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                         </div>
                         
                         {/* Representation Requests Card */}
-                        <Card className="shadow-lg">
-                            <CardHeader>
-                                <CardTitle className="text-xl font-medium font-headline">{t.confirm_reps_title || "Confirm Representations"}</CardTitle>
-                                <CardDescription>{t.confirm_reps_description || "Here you can confirm representations where you were represented."}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {mockRepresentationRequests.map((req) => (
-                                    <div key={req.id} className="p-4 border rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                        <div>
-                                            <p className="font-semibold">{req.name}</p>
-                                            <div className="text-sm text-muted-foreground">
-                                                {req.details.map((line, index) => <p key={index}>{line}</p>)}
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                                            <Button>{t.confirm_reps_confirm_button || "CONFIRM"}</Button>
-                                            <Button variant="outline">{t.confirm_reps_decline_button || "DECLINE"}</Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
+                        {pendingRequests.length > 0 && (
+                             <ConfirmRepresentationCard
+                                requests={pendingRequests}
+                                t={t}
+                                onStatusChange={handleStatusChange}
+                            />
+                        )}
                     </div>
 
                     <div className="lg:col-span-1">
