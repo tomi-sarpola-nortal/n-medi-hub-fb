@@ -228,7 +228,7 @@ export default function NewRepresentationPage() {
                                                             <CommandGroup>
                                                                 {persons.map((p) => (
                                                                     <CommandItem
-                                                                        value={p.name}
+                                                                        value={p.id}
                                                                         key={p.id}
                                                                         onSelect={() => {
                                                                             form.setValue("representedPersonId", p.id);
@@ -320,4 +320,3 @@ export default function NewRepresentationPage() {
         </AppLayout>
     );
 }
-
