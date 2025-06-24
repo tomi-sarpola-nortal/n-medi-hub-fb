@@ -245,17 +245,21 @@ export default function EducationPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {specialistDiplomas.map(diploma => (
               <Card key={diploma.id} className="shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
-                   <CircularProgress 
-                    value={diploma.percentage} 
-                    radius={50} 
-                    strokeWidth={8}
-                    textClassName="font-headline"
-                  />
-                  <CardTitle className="text-lg font-medium font-headline mt-4">{diploma.title}</CardTitle>
-                  <CardDescription>
-                    {t.spezialdiplome_points?.replace('{currentPoints}', diploma.currentPoints.toString()).replace('{totalPoints}', diploma.totalPoints.toString())}
-                  </CardDescription>
+                <CardContent className="p-6 flex flex-row items-center justify-between gap-4">
+                  <div className="text-left">
+                    <CardTitle className="text-lg font-medium font-headline">{diploma.title}</CardTitle>
+                    <CardDescription>
+                      {t.spezialdiplome_points?.replace('{currentPoints}', diploma.currentPoints.toString()).replace('{totalPoints}', diploma.totalPoints.toString())}
+                    </CardDescription>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <CircularProgress 
+                      value={diploma.percentage} 
+                      radius={40} 
+                      strokeWidth={8}
+                      textClassName="text-base font-bold font-headline"
+                    />
+                  </div>
                 </CardContent>
               </Card>
             ))}
