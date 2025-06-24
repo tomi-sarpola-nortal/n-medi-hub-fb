@@ -1,7 +1,6 @@
-
 'use client';
 
-import type { User } from '@/types'; // User might still be needed if other header features depend on it in future
+import type { User } from '@/lib/types'; // User might still be needed if other header features depend on it in future
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Bell } from 'lucide-react';
@@ -20,7 +19,7 @@ export default function Header({ pageTitle }: HeaderProps) {
   // const t = getClientTranslations(locale); // Removed
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 py-2 sm:static sm:h-auto sm:bg-transparent sm:px-6">
       <SidebarTrigger className="sm:hidden" />
       
       {pageTitle && (
