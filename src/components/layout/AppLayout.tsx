@@ -20,7 +20,7 @@ export default function AppLayout({ children, pageTitle, locale }: AppLayoutProp
       <AppSidebar /> 
       <SidebarInset>
         <Header pageTitle={pageTitle} currentLocale={locale} /> 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto p-2">
           {children}
         </main>
       </SidebarInset>
