@@ -79,7 +79,7 @@ export default function RepresentationsPage() {
         } else if (!authLoading) {
             setIsLoading(false);
         }
-    }, [user, authLoading]);
+    }, [user, authLoading, toast]);
 
     const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
         try {

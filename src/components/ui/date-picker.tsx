@@ -85,6 +85,7 @@ export function DatePickerInput({
   };
 
   const isDateDisabled = typeof disabled === 'function' ? disabled : undefined;
+  const isFullyDisabled = typeof disabled === 'boolean' ? disabled : false;
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -95,12 +96,14 @@ export function DatePickerInput({
           onBlur={handleInputBlur}
           placeholder={placeholder}
           className="pr-10"
+          disabled={isFullyDisabled}
         />
         <PopoverTrigger asChild>
             <Button
                 type="button"
                 variant="ghost"
                 className="absolute right-0 top-0 h-full px-3"
+                disabled={isFullyDisabled}
             >
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -112,7 +115,7 @@ export function DatePickerInput({
           selected={dateValue}
           onSelect={handleDateSelect}
           initialFocus
-          disabled={isDateDisabled}
+          disabled={isDateDisabled || isFullyDisabled}
         />
       </PopoverContent>
     </Popover>

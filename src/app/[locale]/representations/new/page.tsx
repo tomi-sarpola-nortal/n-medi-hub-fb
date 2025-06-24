@@ -1,195 +1,198 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuth } from '@/context/auth-context';
-import { useRouter, useParams, usePathname } from 'next/navigation';
-import { getAllPersons } from '@/services/personService';
-import { createRepresentation } from '@/services/representationService';
-import { useToast } from '@/hooks/use-toast';
-import type { Person } from '@/lib/types';
-import AppLayout from '@/components/layout/AppLayout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { DatePickerInput } from '@/components/ui/date-picker';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { ArrowLeft, Check, ChevronsUpDown, Loader2 } from 'lucide-react';
-import { differenceInMinutes } from 'date-fns';
+import { useEffect, useState, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuth } from "@/context/auth-context";
+import { useRouter, useParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { getAllPersons } from "@/services/personService";
+import { createRepresentation } from "@/services/representationService";
+import type { Person } from "@/lib/types";
+import { differenceInHours, set } from "date-fns";
 
+import AppLayout from "@/components/layout/AppLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { DatePickerInput } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
+import { Loader2, ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+// Helper for client-side translations
 const getClientTranslations = (locale: string) => {
-  try {
-    const page = locale === 'de' ? require('../../../../../locales/de/representations.json') : require('../../../../../locales/en/representations.json');
-    return page;
-  } catch (e) {
-    console.warn("Translation file not found for new representation page, falling back to en");
-    return require('../../../../../locales/en/representations.json');
-  }
+    try {
+        const page = locale === 'de' ? require('../../../../../locales/de/representations.json') : require('../../../../../locales/en/representations.json');
+        return page;
+    } catch (e) {
+        console.warn("Translation file not found, falling back to en");
+        return require('../../../../../locales/en/representations.json');
+    }
 };
 
-const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/; // HH:MM format
 
-const formSchema = z.object({
-  representedPersonId: z.string().min(1, 'You must select a dentist.'),
-  startDate: z.date({ required_error: 'Start date is required.' }),
-  startTime: z.string().regex(timeRegex, 'Invalid time format. Use HH:MM.'),
-  endDate: z.date({ required_error: 'End date is required.' }),
-  endTime: z.string().regex(timeRegex, 'Invalid time format. Use HH:MM.'),
+const FormSchema = z.object({
+    representedDentistId: z.string({ required_error: "Please select a dentist." }),
+    date: z.date({ required_error: "Please select a date." }),
+    startTime: z.string().regex(timeRegex, "Invalid time format. Use HH:MM."),
+    endTime: z.string().regex(timeRegex, "Invalid time format. Use HH:MM."),
 }).refine(data => {
-    const startDateTime = new Date(data.startDate);
+    if (!timeRegex.test(data.startTime) || !timeRegex.test(data.endTime)) return false;
     const [startHour, startMinute] = data.startTime.split(':').map(Number);
-    startDateTime.setHours(startHour, startMinute);
-
-    const endDateTime = new Date(data.endDate);
     const [endHour, endMinute] = data.endTime.split(':').map(Number);
-    endDateTime.setHours(endHour, endMinute);
-
-    return endDateTime > startDateTime;
+    return endHour > startHour || (endHour === startHour && endMinute > startMinute);
 }, {
-    message: "End date and time must be after the start date and time.",
-    path: ["endDate"],
+    message: "End time must be after start time.",
+    path: ["endTime"],
 });
 
-
-type NewRepresentationFormValues = z.infer<typeof formSchema>;
-
+type FormValues = z.infer<typeof FormSchema>;
 
 export default function NewRepresentationPage() {
     const { user } = useAuth();
     const router = useRouter();
     const params = useParams();
     const locale = typeof params.locale === 'string' ? params.locale : 'en';
-    const { toast } = useToast();
-    const t = getClientTranslations(locale);
 
-    const [persons, setPersons] = useState<Person[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [t, setT] = useState<Record<string, string>>({});
+    const [dentists, setDentists] = useState<Person[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [comboboxOpen, setComboboxOpen] = useState(false);
-
-    const form = useForm<NewRepresentationFormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            representedPersonId: '',
-            startTime: '08:00',
-            endTime: '17:00'
-        },
-    });
-    
-    const formValues = form.watch();
-
-    const calculatedDuration = (): number => {
-        const { startDate, startTime, endDate, endTime } = formValues;
-        if (startDate && startTime && endDate && endTime && timeRegex.test(startTime) && timeRegex.test(endTime)) {
-            const startDateTime = new Date(startDate);
-            const [startHour, startMinute] = startTime.split(':').map(Number);
-            startDateTime.setHours(startHour, startMinute);
-
-            const endDateTime = new Date(endDate);
-            const [endHour, endMinute] = endTime.split(':').map(Number);
-            endDateTime.setHours(endHour, endMinute);
-
-            if (endDateTime > startDateTime) {
-                const diffMinutes = differenceInMinutes(endDateTime, startDateTime);
-                return parseFloat((diffMinutes / 60).toFixed(2));
-            }
-        }
-        return 0;
-    };
-
+    const { toast } = useToast();
 
     useEffect(() => {
-        const fetchPersons = async () => {
-            if (user) {
+        setT(getClientTranslations(locale));
+        async function fetchDentists() {
+            setIsLoading(true);
+            try {
                 const allPersons = await getAllPersons();
-                // Filter out the current user from the list of people they can represent for
-                setPersons(allPersons.filter(p => p.id !== user.id));
+                const availableDentists = allPersons.filter(p => p.id !== user?.id && p.status === 'active' && p.role === 'dentist');
+                setDentists(availableDentists);
+            } catch (error) {
+                toast({ title: "Error", description: "Could not fetch dentists.", variant: "destructive" });
             }
-        };
-        fetchPersons();
-    }, [user]);
-
-    const onSubmit = async (data: NewRepresentationFormValues) => {
-        if (!user) return;
-        setIsLoading(true);
-
-        const representedPerson = persons.find(p => p.id === data.representedPersonId);
-        if (!representedPerson) {
-            toast({ title: t.new_representation_error_toast_title, description: "Selected dentist not found.", variant: 'destructive' });
             setIsLoading(false);
-            return;
         }
+        if (user) {
+            fetchDentists();
+        }
+    }, [user, locale, toast]);
 
-        const startDateTime = new Date(data.startDate);
-        const [startHour, startMinute] = data.startTime.split(':').map(Number);
-        startDateTime.setHours(startHour, startMinute);
+    const form = useForm<FormValues>({
+        resolver: zodResolver(FormSchema)
+    });
 
-        const endDateTime = new Date(data.endDate);
-        const [endHour, endMinute] = data.endTime.split(':').map(Number);
-        endDateTime.setHours(endHour, endMinute);
-        
+    const { watch } = form;
+    const watchDate = watch("date");
+    const watchStartTime = watch("startTime");
+    const watchEndTime = watch("endTime");
+
+    const calculatedDuration = useMemo(() => {
+        if (watchDate && timeRegex.test(watchStartTime) && timeRegex.test(watchEndTime)) {
+            const [startHour, startMinute] = watchStartTime.split(':').map(Number);
+            const [endHour, endMinute] = watchEndTime.split(':').map(Number);
+            
+            const startDate = set(watchDate, { hours: startHour, minutes: startMinute, seconds: 0, milliseconds: 0 });
+            const endDate = set(watchDate, { hours: endHour, minutes: endMinute, seconds: 0, milliseconds: 0 });
+
+            if (endDate > startDate) {
+                const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+                return Math.round(diff * 10) / 10; // Round to one decimal place
+            }
+        }
+        return null;
+    }, [watchDate, watchStartTime, watchEndTime]);
+
+    const onSubmit = async (data: FormValues) => {
+        if (!user || calculatedDuration === null) return;
+
+        setIsSubmitting(true);
         try {
+            const [startHour, startMinute] = data.startTime.split(':').map(Number);
+            const [endHour, endMinute] = data.endTime.split(':').map(Number);
+
+            const startDate = set(data.date, { hours: startHour, minutes: startMinute });
+            const endDate = set(data.date, { hours: endHour, minutes: endMinute });
+            
+            const representedDentist = dentists.find(d => d.id === data.representedDentistId);
+            if (!representedDentist) {
+                throw new Error("Selected dentist not found.");
+            }
+
             await createRepresentation({
                 representingPersonId: user.id,
-                representedPersonId: representedPerson.id,
                 representingPersonName: user.name,
-                representedPersonName: representedPerson.name,
-                startDate: startDateTime.toISOString(),
-                endDate: endDateTime.toISOString(),
-                durationHours: calculatedDuration(),
-                status: 'pending',
+                representedPersonId: representedDentist.id,
+                representedPersonName: representedDentist.name,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                durationHours: calculatedDuration,
+                status: 'pending'
             });
 
             toast({
-                title: t.new_representation_success_toast_title,
-                description: t.new_representation_success_toast_desc,
+                title: t.new_representation_success_toast_title || "Representation Saved",
+                description: t.new_representation_success_toast_desc || "The request has been sent for confirmation.",
             });
             router.push(`/${locale}/representations`);
 
         } catch (error) {
-            console.error("Failed to create representation:", error);
+            console.error("Failed to save representation:", error);
             toast({
-                title: t.new_representation_error_toast_title,
-                description: t.new_representation_error_toast_desc,
-                variant: 'destructive',
+                title: t.new_representation_error_toast_title || "Error",
+                description: t.new_representation_error_toast_desc || "Could not save representation. Please try again.",
+                variant: "destructive",
             });
         } finally {
-            setIsLoading(false);
+            setIsSubmitting(false);
         }
     };
-
+    
     const pageTitle = t.new_representation_page_title || "New Representation";
+
+    if (isLoading || !user) {
+        return (
+            <AppLayout pageTitle={pageTitle} locale={locale}>
+                <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+            </AppLayout>
+        );
+    }
     
     return (
         <AppLayout pageTitle={pageTitle} locale={locale}>
-            <div className="flex-1 space-y-6 p-4 md:p-8">
-                 <div className="flex items-center justify-between">
+            <div className="flex-1 space-y-6 p-4 md:p-8 max-w-2xl mx-auto">
+                 <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                       <Link href={`/${locale}/representations`}>
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                    </Button>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                            <Link href={`/${locale}/representations`} className="hidden lg:block">
-                                <ArrowLeft className="h-6 w-6 text-muted-foreground"/>
-                            </Link>
-                           {pageTitle}
-                        </h1>
-                         <div className="text-sm text-muted-foreground mt-2">
+                        <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
+                        <div className="text-sm text-muted-foreground mt-2">
                             <Link href={`/${locale}/dashboard`} className="hover:underline">{t.representations_breadcrumb_dashboard || "Dashboard"}</Link>
                             <span className="mx-1">/</span>
-                             <Link href={`/${locale}/representations`} className="hover:underline">{t.representations_breadcrumb_current || "My Representations"}</Link>
+                            <Link href={`/${locale}/representations`} className="hover:underline">{t.representations_breadcrumb_current || "My Representations"}</Link>
                             <span className="mx-1">/</span>
                             <span className="font-medium text-foreground">{t.new_representation_breadcrumb_current || "New"}</span>
                         </div>
                     </div>
                 </div>
 
-                <Card className="max-w-2xl mx-auto">
+                <Card>
                     <CardHeader>
-                        <CardTitle>{t.new_representation_card_title || "Enter Representation Details"}</CardTitle>
+                        <CardTitle className="font-headline text-xl">{t.new_representation_card_title || "Enter Representation Details"}</CardTitle>
                         <CardDescription>{t.new_representation_card_desc || "Select the dentist you represented and the time period."}</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -197,7 +200,7 @@ export default function NewRepresentationPage() {
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                                 <FormField
                                     control={form.control}
-                                    name="representedPersonId"
+                                    name="representedDentistId"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
@@ -207,15 +210,15 @@ export default function NewRepresentationPage() {
                                                         <Button
                                                             variant="outline"
                                                             role="combobox"
-                                                            aria-expanded={comboboxOpen}
                                                             className={cn(
                                                                 "w-full justify-between",
                                                                 !field.value && "text-muted-foreground"
                                                             )}
                                                         >
                                                             {field.value
-                                                                ? persons.find((p) => p.id === field.value)?.name
-                                                                : (t.new_representation_form_dentist_placeholder || "Select a dentist...")}
+                                                                ? dentists.find(d => d.id === field.value)?.name
+                                                                : (t.new_representation_form_dentist_placeholder || "Select a dentist...")
+                                                            }
                                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                         </Button>
                                                     </FormControl>
@@ -226,26 +229,22 @@ export default function NewRepresentationPage() {
                                                         <CommandList>
                                                             <CommandEmpty>{t.new_representation_form_dentist_not_found || "No dentist found."}</CommandEmpty>
                                                             <CommandGroup>
-                                                                {persons.map((p) => (
+                                                                {dentists.map((dentist) => (
                                                                     <CommandItem
-                                                                        value={p.id}
-                                                                        key={p.id}
+                                                                        value={dentist.id}
+                                                                        key={dentist.id}
                                                                         onSelect={(currentValue) => {
-                                                                            form.setValue("representedPersonId", currentValue);
-                                                                            // Defer closing the popover to prevent a race condition where
-                                                                            // the list unmounts before the click event is fully processed.
-                                                                            setTimeout(() => {
-                                                                                setComboboxOpen(false);
-                                                                            }, 100);
+                                                                            form.setValue("representedDentistId", currentValue);
+                                                                            setTimeout(() => setComboboxOpen(false), 100);
                                                                         }}
                                                                     >
                                                                         <Check
                                                                             className={cn(
                                                                                 "mr-2 h-4 w-4",
-                                                                                p.id === field.value ? "opacity-100" : "opacity-0"
+                                                                                field.value === dentist.id ? "opacity-100" : "opacity-0"
                                                                             )}
                                                                         />
-                                                                        {p.name} (ID: {p.dentistId || 'N/A'})
+                                                                        {dentist.name}
                                                                     </CommandItem>
                                                                 ))}
                                                             </CommandGroup>
@@ -257,44 +256,46 @@ export default function NewRepresentationPage() {
                                         </FormItem>
                                     )}
                                 />
+                                
+                                <FormField
+                                    control={form.control}
+                                    name="date"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>{t.new_representation_form_date_label || "Date"}</FormLabel>
+                                            <DatePickerInput
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                disabled={(date) => date > new Date()}
+                                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4">
                                      <FormField
                                         control={form.control}
-                                        name="startDate"
+                                        name="startTime"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t.new_representation_form_start_date_label || "Start Date & Time"}</FormLabel>
-                                                <div className="flex gap-2">
-                                                    <DatePickerInput
-                                                        value={field.value}
-                                                        onChange={field.onChange}
-                                                        disabled={(date) => date > new Date()}
-                                                    />
-                                                    <FormField control={form.control} name="startTime" render={({ field: timeField }) => (
-                                                        <Input {...timeField} placeholder={t.new_representation_form_time_placeholder || "HH:MM"} className="w-24" />
-                                                    )}/>
-                                                </div>
+                                                <FormLabel>{t.new_representation_form_start_time_label || "Start Time"}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" {...field} />
+                                                </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
+                                     <FormField
                                         control={form.control}
-                                        name="endDate"
+                                        name="endTime"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t.new_representation_form_end_date_label || "End Date & Time"}</FormLabel>
-                                                <div className="flex gap-2">
-                                                     <DatePickerInput
-                                                        value={field.value}
-                                                        onChange={field.onChange}
-                                                        disabled={(date) => date > new Date() || (formValues.startDate && date < formValues.startDate)}
-                                                    />
-                                                     <FormField control={form.control} name="endTime" render={({ field: timeField }) => (
-                                                        <Input {...timeField} placeholder={t.new_representation_form_time_placeholder || "HH:MM"} className="w-24" />
-                                                    )}/>
-                                                </div>
+                                                <FormLabel>{t.new_representation_form_end_time_label || "End Time"}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" {...field} />
+                                                </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -302,17 +303,14 @@ export default function NewRepresentationPage() {
                                 </div>
                                 
                                 <div>
-                                    <FormLabel>{t.new_representation_form_duration_label || "Calculated Duration (hours)"}</FormLabel>
-                                    <Input value={calculatedDuration()} readOnly disabled className="bg-muted mt-2" />
+                                    <Label>{t.new_representation_form_duration_label || "Calculated Duration (hours)"}</Label>
+                                    <Input value={calculatedDuration !== null ? `${calculatedDuration} hours` : "Please enter valid dates and times"} readOnly disabled className="mt-2 bg-muted/50" />
                                 </div>
 
-
                                 <div className="flex justify-end gap-4 pt-4">
-                                    <Button type="button" variant="outline" onClick={() => router.back()} disabled={isLoading}>
-                                        {t.new_representation_form_cancel_button || "Cancel"}
-                                    </Button>
-                                    <Button type="submit" disabled={isLoading}>
-                                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    <Button type="button" variant="outline" onClick={() => router.back()}>{t.new_representation_form_cancel_button || "Cancel"}</Button>
+                                    <Button type="submit" disabled={isSubmitting || calculatedDuration === null}>
+                                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                         {t.new_representation_form_save_button || "Save Representation"}
                                     </Button>
                                 </div>
@@ -322,5 +320,5 @@ export default function NewRepresentationPage() {
                 </Card>
             </div>
         </AppLayout>
-    );
+    )
 }
