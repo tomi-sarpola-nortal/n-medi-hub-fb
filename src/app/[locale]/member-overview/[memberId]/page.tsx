@@ -10,6 +10,9 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { getPersonById } from '@/services/personService';
 import { getTranslations } from '@/lib/translations';
 import type { Person } from '@/lib/types';
+import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { format } from 'date-fns';
 
 interface MemberReviewPageProps {
   params: { memberId: string; locale: string };
@@ -47,6 +50,8 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
     notFound();
   }
 
+  const trainingHistory = await getTrainingHistoryForUser(person.id);
+
   const pageTitle = t.member_review_page_title?.replace('{memberName}', person.name) || person.name;
   
   const statusKeyMap: Record<Person['status'], string> = {
@@ -80,7 +85,7 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
              <Tabs defaultValue="stammdaten" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
                     <TabsTrigger value="stammdaten">{t.member_review_stammdaten_tab || "Stammdaten"}</TabsTrigger>
-                    <TabsTrigger value="fortbildungen" disabled>{t.member_review_fortbildungen_tab || "Fortbildungen"}</TabsTrigger>
+                    <TabsTrigger value="fortbildungen">{t.member_review_fortbildungen_tab || "Fortbildungen"}</TabsTrigger>
                     <TabsTrigger value="vertretungen" disabled>{t.member_review_vertretungen_tab || "Vertretungen"}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="stammdaten" className="mt-6">
@@ -179,8 +184,50 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
                         </div>
                     </div>
                 </TabsContent>
+                <TabsContent value="fortbildungen" className="mt-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t.fortbildungshistorie_title || "Training History"}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t.fortbildungshistorie_table_date || "Date"}</TableHead>
+                                        <TableHead>{t.fortbildungshistorie_table_title || "Training Title"}</TableHead>
+                                        <TableHead>{t.fortbildungshistorie_table_category || "Category"}</TableHead>
+                                        <TableHead className="text-right">{t.fortbildungshistorie_table_points || "Points"}</TableHead>
+                                        <TableHead>{t.fortbildungshistorie_table_organizer || "Organizer"}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {trainingHistory.length > 0 ? trainingHistory.map((item) => (
+                                    <TableRow key={item.id}>
+                                        <TableCell className="font-medium">{format(new Date(item.date), 'dd.MM.yyyy')}</TableCell>
+                                        <TableCell>{item.title}</TableCell>
+                                        <TableCell>{item.category}</TableCell>
+                                        <TableCell className="text-right">{item.points}</TableCell>
+                                        <TableCell>{item.organizer}</TableCell>
+                                    </TableRow>
+                                    )) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center">
+                                                No training history found for this member.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="vertretungen" className="mt-6">
+                    {/* Placeholder for representations */}
+                </TabsContent>
              </Tabs>
         </div>
     </AppLayout>
   );
 }
+
+    
