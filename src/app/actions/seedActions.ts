@@ -134,7 +134,10 @@ export async function seedTrainingHistory(): Promise<{ success: boolean; message
             await addTrainingHistoryForUser(user.id, record);
         }
 
-        return { success: true, message: `Successfully seeded ${historyToSeed.length} training history records for ${userEmail}.` };
+        const totalPoints = historyToSeed.reduce((sum, record) => sum + record.points, 0);
+        await updatePerson(user.id, { educationPoints: totalPoints });
+
+        return { success: true, message: `Successfully seeded ${historyToSeed.length} training history records for ${userEmail} and updated total points to ${totalPoints}.` };
 
     } catch (error) {
         console.error('Error seeding training history:', error);

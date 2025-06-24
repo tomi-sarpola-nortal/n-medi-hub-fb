@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
 import StateChamberInfo from './StateChamberInfo';
-import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import { getConfirmedRepresentationHours } from '@/services/representationService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CircularProgress } from '@/components/ui/circular-progress';
@@ -113,7 +112,7 @@ const LoadingSkeleton = () => (
 
 
 export default function DentistDashboard({ user, t }: DentistDashboardProps) {
-    const [stats, setStats] = useState({ trainingPoints: 0, representationHours: 0 });
+    const [representationHours, setRepresentationHours] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     
     useEffect(() => {
@@ -122,20 +121,11 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
 
             setIsLoading(true);
             try {
-                const [trainingHistory, confirmedHours] = await Promise.all([
-                    getTrainingHistoryForUser(user.id),
-                    getConfirmedRepresentationHours(user.id)
-                ]);
-
-                const totalPoints = trainingHistory.reduce((sum, record) => sum + record.points, 0);
-
-                setStats({
-                    trainingPoints: totalPoints,
-                    representationHours: confirmedHours,
-                });
+                const confirmedHours = await getConfirmedRepresentationHours(user.id);
+                setRepresentationHours(confirmedHours);
             } catch (error) {
-                console.error("Failed to fetch dashboard data:", error);
-                setStats({ trainingPoints: 0, representationHours: 0 });
+                console.error("Failed to fetch representation hours:", error);
+                setRepresentationHours(0);
             } finally {
                 setIsLoading(false);
             }
@@ -147,6 +137,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
     const welcomeMessage = t.welcome_back.replace('{userName}', fullName);
     const TRAINING_TARGET_POINTS = 120;
+    const trainingPoints = user.educationPoints || 0;
 
     return (
         <div className="flex-1 space-y-8 p-4 md:p-8">
@@ -165,12 +156,12 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-center pt-6 pb-2">
                                      <CircularProgress
-                                        value={(stats.trainingPoints / TRAINING_TARGET_POINTS) * 100}
+                                        value={(trainingPoints / TRAINING_TARGET_POINTS) * 100}
                                         radius={70}
                                         strokeWidth={10}
                                         label={
                                             <div className="text-center">
-                                                <p className="text-2xl font-bold font-headline">{`${stats.trainingPoints}/${TRAINING_TARGET_POINTS}`}</p>
+                                                <p className="text-2xl font-bold font-headline">{`${trainingPoints}/${TRAINING_TARGET_POINTS}`}</p>
                                                 <p className="text-xs text-muted-foreground">{t.dashboard_training_status_points || "Fortbildungspunkten"}</p>
                                             </div>
                                         }
@@ -191,7 +182,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-4xl font-bold">{stats.representationHours}</p>
+                                        <p className="text-4xl font-bold">{representationHours}</p>
                                         <p className="text-sm text-muted-foreground">{t.dashboard_representation_status_hours || "Bestätigte Vertretungsstunden"}</p>
                                     </div>
                                     <div className="p-3 bg-accent rounded-full">
