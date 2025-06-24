@@ -1,44 +1,162 @@
 
+"use client";
+
+import { useEffect, useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { getTranslations } from '@/lib/translations';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RepresentationStatusBadge } from '@/components/representations/RepresentationStatusBadge';
 import Link from 'next/link';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/auth-context';
+import { getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
+import type { Representation } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
+import { useParams } from 'next/navigation';
+import { format } from 'date-fns';
 
-// Mock Data
-const performedRepresentations = [
-    { id: '1', period: '15.05.2025, 08:00 - 15:00 Uhr', person: 'Dr. Markus Weber (ID: 78954)', duration: '7 Stunden', status: 'confirmed', confirmationDate: '22.05.2025' },
-    { id: '2', period: '01.05.2025, 08:00 - 15:00 Uhr\n02.05.2025, 13:00 - 19:00 Uhr', person: 'Dr. Julia Schmidt (ID: 65412)', duration: '13 Stunden', status: 'pending', confirmationDate: '-' },
-    { id: '3', period: '15.04.2025, 08:00 - 18:00 Uhr', person: 'Dr. Thomas Müller (ID: 34567)', duration: '8 Stunden', status: 'confirmed', confirmationDate: '21.04.2025' },
-    { id: '4', period: '01.04.2025, 07:00 - 13:00 Uhr', person: 'Dr. Sabine Becker (ID: 23456)', duration: '6 Stunden', status: 'confirmed', confirmationDate: '12.04.2025' },
-];
+const getClientTranslations = (locale: string) => {
+    try {
+        if (locale === 'de') {
+            return require('../../../locales/de.json');
+        }
+        return require('../../../locales/en.json');
+    } catch (e) {
+        console.warn("Translation file not found, falling back to en");
+        return require('../../../locales/en.json');
+    }
+};
 
-const pendingConfirmations = [
-    { id: '1', person: 'Dr. Lukas Hoffmann', details: ['10.05.2025, 08:30 Uhr - 17:00 Uhr (8,5 Stunden)', '11.05.2025, 15:00 Uhr - 18:00 Uhr (3 Stunden)'] },
-    { id: '2', person: 'Dr. Anna Schneider', details: ['02.05.2025, 10:00 Uhr - 17:00 Uhr (7 Stunden)'] },
-];
+const formatPeriod = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const isSameDay = format(start, 'yyyy-MM-dd') === format(end, 'yyyy-MM-dd');
+    
+    if (isSameDay) {
+        return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'HH:mm')} Uhr`;
+    }
+    
+    return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
+};
 
-const myRepresentations = [
-    { id: '1', period: '10.05.2025, 08:30 Uhr - 17:00 Uhr\n11.05.2025, 15:00 Uhr - 18:00 Uhr', person: 'Dr. Lukas Hoffmann (ID: 78954)', duration: '8,5 Stunden', status: 'pending', confirmationDate: '-' },
-    { id: '2', period: '02.05.2025, 10:00 Uhr - 17:00 Uhr', person: 'Dr. Anna Schneider (ID: 65412)', duration: '3 Stunden', status: 'pending', confirmationDate: '-' },
-    { id: '3', period: '15.12.2024, 15:00 Uhr - 18:00 Uhr', person: 'Dr. Thomas Müller (ID: 34567)', duration: '3 Stunden', status: 'confirmed', confirmationDate: '21.12.2024' },
-];
+const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Representation, t: Record<string, string>, onStatusChange: (id: string, status: 'confirmed' | 'declined') => void }) => {
+    const [isSubmitting, setIsSubmitting] = useState<'confirm' | 'decline' | null>(null);
 
+    const handleConfirm = async () => {
+        setIsSubmitting('confirm');
+        await onStatusChange(request.id, 'confirmed');
+        setIsSubmitting(null);
+    };
 
-interface RepresentationsPageProps {
-  params: { locale: string };
-}
+    const handleDecline = async () => {
+        setIsSubmitting('decline');
+        await onStatusChange(request.id, 'declined');
+        setIsSubmitting(null);
+    };
 
-export default async function RepresentationsPage({ params }: RepresentationsPageProps) {
-    const t = getTranslations(params.locale);
-    const pageTitle = t.representations_page_title || "My Representations";
+    const period = formatPeriod(request.startDate, request.endDate);
+    const details = `${period} (${request.durationHours} Stunden)`;
 
     return (
-        <AppLayout pageTitle={pageTitle} locale={params.locale}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <p className="font-semibold">{request.representingPersonName}</p>
+                <div className="text-sm text-muted-foreground">
+                    <p>{details}</p>
+                </div>
+            </div>
+            <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+                <Button onClick={handleConfirm} disabled={!!isSubmitting} className="flex-1 sm:flex-none">
+                    {isSubmitting === 'confirm' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t.representations_confirm_button || "CONFIRM"}
+                </Button>
+                <Button onClick={handleDecline} disabled={!!isSubmitting} variant="outline" className="flex-1 sm:flex-none">
+                    {isSubmitting === 'decline' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t.representations_decline_button || "DECLINE"}
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+
+export default function RepresentationsPage() {
+    const { user, loading: authLoading } = useAuth();
+    const { toast } = useToast();
+    const params = useParams();
+    const locale = typeof params?.locale === 'string' ? params.locale : 'en';
+
+    const [t, setT] = useState<Record<string, string>>({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [representations, setRepresentations] = useState<{
+        performed: Representation[],
+        pendingConfirmation: Representation[],
+        wasRepresented: Representation[],
+    }>({ performed: [], pendingConfirmation: [], wasRepresented: [] });
+
+    useEffect(() => {
+        setT(getClientTranslations(locale));
+    }, [locale]);
+    
+    const fetchRepresentations = async () => {
+        if (!user) return;
+        setIsLoading(true);
+        try {
+            const data = await getRepresentationsForUser(user.id);
+            setRepresentations(data);
+        } catch (error) {
+            console.error("Failed to fetch representations:", error);
+            toast({ title: "Error", description: "Could not fetch representation data.", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    useEffect(() => {
+        if (user) {
+            fetchRepresentations();
+        } else if (!authLoading) {
+            setIsLoading(false);
+        }
+    }, [user, authLoading]);
+
+    const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
+        try {
+            await updateRepresentationStatus(representationId, status);
+            toast({
+                title: "Success",
+                description: `Representation has been ${status}.`,
+            });
+            // Refetch data to update the UI
+            fetchRepresentations();
+        } catch (error) {
+            console.error(`Failed to ${status} representation:`, error);
+            toast({
+                title: "Error",
+                description: "Could not update representation status.",
+                variant: "destructive"
+            });
+        }
+    };
+    
+    const pageTitle = t.representations_page_title || "My Representations";
+    const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
+
+    if (pageIsLoading) {
+        return (
+            <AppLayout pageTitle={pageTitle} locale={locale}>
+                <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+            </AppLayout>
+        );
+    }
+    
+    return (
+        <AppLayout pageTitle={pageTitle} locale={locale}>
             <div className="flex-1 space-y-6 p-4 md:p-8">
                 <div className="flex items-start justify-between">
                     <div>
@@ -74,19 +192,23 @@ export default async function RepresentationsPage({ params }: RepresentationsPag
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {performedRepresentations.map((rep) => (
+                                {representations.performed.length > 0 ? representations.performed.map((rep) => (
                                     <TableRow key={rep.id}>
-                                        <TableCell className="font-medium whitespace-pre-line">{rep.period}</TableCell>
-                                        <TableCell>{rep.person}</TableCell>
-                                        <TableCell>{rep.duration}</TableCell>
+                                        <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
+                                        <TableCell>{rep.representedPersonName}</TableCell>
+                                        <TableCell>{rep.durationHours} Stunden</TableCell>
                                         <TableCell>
                                             <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending'}>
                                                 {rep.status === 'confirmed' ? (t.representations_status_confirmed || 'Confirmed') : (t.representations_status_pending || 'Pending')}
                                             </RepresentationStatusBadge>
                                         </TableCell>
-                                        <TableCell>{rep.confirmationDate}</TableCell>
+                                        <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                     </TableRow>
-                                ))}
+                                )) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center">No performed representations found.</TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </CardContent>
@@ -98,23 +220,14 @@ export default async function RepresentationsPage({ params }: RepresentationsPag
                         <CardDescription>{t.representations_confirm_desc || "Here you can confirm representations where you were represented."}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {pendingConfirmations.map((req, index) => (
-                             <div key={req.id}>
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                    <div>
-                                        <p className="font-semibold">{req.person}</p>
-                                        <div className="text-sm text-muted-foreground">
-                                            {req.details.map((line, idx) => <p key={idx}>{line}</p>)}
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                                        <Button className="flex-1 sm:flex-none">{t.representations_confirm_button || "CONFIRM"}</Button>
-                                        <Button variant="outline" className="flex-1 sm:flex-none">{t.representations_decline_button || "DECLINE"}</Button>
-                                    </div>
-                                </div>
-                                {index < pendingConfirmations.length - 1 && <Separator className="my-4"/>}
+                        {representations.pendingConfirmation.length > 0 ? representations.pendingConfirmation.map((req, index) => (
+                            <div key={req.id}>
+                                <ConfirmationRequest request={req} t={t} onStatusChange={handleStatusChange} />
+                                {index < representations.pendingConfirmation.length - 1 && <Separator className="my-4"/>}
                             </div>
-                        ))}
+                        )) : (
+                             <p className="text-sm text-muted-foreground text-center py-4">No pending confirmations.</p>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -135,19 +248,23 @@ export default async function RepresentationsPage({ params }: RepresentationsPag
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {myRepresentations.map((rep) => (
+                                {representations.wasRepresented.length > 0 ? representations.wasRepresented.map((rep) => (
                                     <TableRow key={rep.id}>
-                                        <TableCell className="font-medium whitespace-pre-line">{rep.period}</TableCell>
-                                        <TableCell>{rep.person}</TableCell>
-                                        <TableCell>{rep.duration}</TableCell>
+                                        <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
+                                        <TableCell>{rep.representingPersonName}</TableCell>
+                                        <TableCell>{rep.durationHours} Stunden</TableCell>
                                         <TableCell>
                                             <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending'}>
                                                 {rep.status === 'confirmed' ? (t.representations_status_confirmed || 'Confirmed') : (t.representations_status_pending || 'Pending')}
                                             </RepresentationStatusBadge>
                                         </TableCell>
-                                        <TableCell>{rep.confirmationDate}</TableCell>
+                                        <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                     </TableRow>
-                                ))}
+                                )) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center">No representations found where you were represented.</TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </CardContent>
