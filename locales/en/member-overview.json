@@ -91,5 +91,10 @@
   "member_list_delete_user_button": "Delete User",
   "member_list_delete_dialog_title": "Are you absolutely sure?",
   "member_list_delete_dialog_desc": "This will permanently delete the user {memberName} and all associated data. This action cannot be undone.",
-  "member_list_delete_dialog_confirm": "Delete User"
+  "member_list_delete_dialog_confirm": "Delete User",
+  "member_review_column_field": "Field",
+  "member_review_column_status": "Status",
+  "member_review_status_updated": "Updated",
+  "member_review_status_no_change": "No Change"
 }
+

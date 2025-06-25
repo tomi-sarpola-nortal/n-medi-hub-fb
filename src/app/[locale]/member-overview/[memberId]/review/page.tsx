@@ -56,14 +56,6 @@ const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: stri
     </div>
 );
 
-const DiffRow = ({ field, oldValue, newValue, t }: { field: string; oldValue: any; newValue: any; t: Record<string, string> }) => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 py-3 border-b">
-        <div className="md:col-span-1 text-sm font-semibold text-muted-foreground">{t[`register_step2_label_${field}`] || t[`register_step4_label_${field}`] || t[`register_step5_label_${field}`] || field}</div>
-        <div className="md:col-span-1 text-sm text-foreground bg-red-100/50 dark:bg-red-900/30 p-2 rounded-md"><span className="font-mono text-xs text-red-500 mr-2">OLD</span>{oldValue || <span className="italic">empty</span>}</div>
-        <div className="md:col-span-1 text-sm text-foreground bg-green-100/50 dark:bg-green-900/30 p-2 rounded-md"><span className="font-mono text-xs text-green-500 mr-2">NEW</span>{newValue || <span className="italic">empty</span>}</div>
-    </div>
-);
-
 export default function DataReviewPage() {
   const params = useParams<{ memberId: string; locale: string }>();
   const { memberId, locale } = params;
@@ -160,30 +152,55 @@ export default function DataReviewPage() {
       </>
   );
 
-  const renderDataChangeReview = () => (
-    <>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg font-headline">{t.member_review_info_name || "First and Last Name"}</CardTitle>
-                </CardHeader>
-                <CardContent>{person.name}</CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg font-headline">{t.member_review_info_id || "Dentist ID"}</CardTitle>
-                </CardHeader>
-                <CardContent>{person.dentistId || '-'}</CardContent>
-            </Card>
-        </div>
-        
-        <div className="mt-6">
-            {changedFields.map(diff => (
-                <DiffRow key={diff.field} field={diff.field} oldValue={diff.oldValue} newValue={diff.newValue} t={t} />
-            ))}
-        </div>
-    </>
-  );
+  const renderDataChangeReview = () => {
+    // Helper to format values for display
+    const formatValue = (value: any) => {
+        if (value === null || value === undefined || value === '') return <span className="italic text-muted-foreground">empty</span>;
+        if (Array.isArray(value)) return value.join(', ');
+        return String(value);
+    };
+    
+    return (
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg font-headline">{t.member_review_info_name || "First and Last Name"}</CardTitle>
+                    </CardHeader>
+                    <CardContent>{person.name}</CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg font-headline">{t.member_review_info_id || "Dentist ID"}</CardTitle>
+                    </CardHeader>
+                    <CardContent>{person.dentistId || '-'}</CardContent>
+                </Card>
+            </div>
+            
+            <div className="mt-6 border rounded-lg">
+                <div className="grid grid-cols-4 gap-4 px-4 py-2 font-semibold text-muted-foreground bg-muted/50 border-b">
+                    <div className="col-span-1">{t.member_review_column_field || "Field"}</div>
+                    <div className="col-span-1">{t.member_review_old_data || "Old"}</div>
+                    <div className="col-span-1">{t.member_review_new_data || "New"}</div>
+                    <div className="col-span-1">{t.member_review_column_status || "Status"}</div>
+                </div>
+                {changedFields.map(diff => {
+                    const isUpdated = JSON.stringify(diff.oldValue) !== JSON.stringify(diff.newValue);
+                    return (
+                        <div key={diff.field} className="grid grid-cols-4 gap-4 px-4 py-3 border-b last:border-b-0 items-start">
+                            <div className="col-span-1 text-sm font-medium text-foreground">{t[`register_step2_label_${diff.field}`] || t[`register_step4_label_${diff.field}`] || t[`register_step5_label_${diff.field}`] || diff.field}</div>
+                            <div className="col-span-1 text-sm text-muted-foreground">{formatValue(diff.oldValue)}</div>
+                            <div className="col-span-1 text-sm text-foreground">{formatValue(diff.newValue)}</div>
+                            <div className={`col-span-1 text-sm ${isUpdated ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
+                                {isUpdated ? (t.member_review_status_updated || 'Updated') : (t.member_review_status_no_change || 'No Change')}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </>
+    );
+  };
 
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
@@ -273,3 +290,4 @@ export default function DataReviewPage() {
     </AppLayout>
   );
 }
+

@@ -91,5 +91,10 @@
   "member_list_delete_user_button": "Benutzer löschen",
   "member_list_delete_dialog_title": "Sind Sie absolut sicher?",
   "member_list_delete_dialog_desc": "Dadurch wird der Benutzer {memberName} und alle zugehörigen Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
-  "member_list_delete_dialog_confirm": "Benutzer löschen"
+  "member_list_delete_dialog_confirm": "Benutzer löschen",
+  "member_review_column_field": "Feld",
+  "member_review_column_status": "Status",
+  "member_review_status_updated": "Geändert",
+  "member_review_status_no_change": "Keine Änderung"
 }
+
