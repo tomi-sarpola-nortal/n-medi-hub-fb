@@ -19,8 +19,10 @@
   "member_list_filter_points_medium": "Punkte: 76-150",
   "member_list_filter_points_high": "Punkte: 150+",
   "member_list_filter_reps_all": "Vertretungen: Alle",
-  "member_list_filter_reps_with": "Mit Stunden",
-  "member_list_filter_reps_without": "Ohne Stunden",
+  "member_list_filter_reps_none": "Vertretungen: 0",
+  "member_list_filter_reps_low": "Vertretungen: 1-20",
+  "member_list_filter_reps_medium": "Vertretungen: 21-50",
+  "member_list_filter_reps_high": "Vertretungen: 50+",
   "member_list_table_header_id": "Zahnarzt-ID",
   "member_list_table_header_name": "Name",
   "member_list_table_header_status": "Status",
@@ -81,3 +83,5 @@
   "member_overview_rep_action_decline": "Ablehnen",
   "member_overview_rep_no_reps_found": "Für dieses Mitglied wurden keine Vertretungen gefunden."
 }
+
+    

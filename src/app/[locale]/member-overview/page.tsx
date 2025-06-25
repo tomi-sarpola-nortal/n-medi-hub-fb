@@ -114,8 +114,11 @@ export default function MemberOverviewPage() {
 
       const repsMatch = (() => {
         if (repsFilter === 'all') return true;
-        if (repsFilter === 'has_hours') return person.totalRepHours > 0;
-        if (repsFilter === 'no_hours') return person.totalRepHours === 0;
+        const hours = person.totalRepHours || 0;
+        if (repsFilter === '0') return hours === 0;
+        if (repsFilter === '1-20') return hours >= 1 && hours <= 20;
+        if (repsFilter === '21-50') return hours > 20 && hours <= 50;
+        if (repsFilter === '50+') return hours > 50;
         return true;
       })();
 
@@ -225,8 +228,10 @@ export default function MemberOverviewPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">{t.member_list_filter_reps_all || "Reps: All"}</SelectItem>
-                                    <SelectItem value="has_hours">{t.member_list_filter_reps_with || "With Hours"}</SelectItem>
-                                    <SelectItem value="no_hours">{t.member_list_filter_reps_without || "Without Hours"}</SelectItem>
+                                    <SelectItem value="0">{t.member_list_filter_reps_none || "Reps: 0"}</SelectItem>
+                                    <SelectItem value="1-20">{t.member_list_filter_reps_low || "Reps: 1-20"}</SelectItem>
+                                    <SelectItem value="21-50">{t.member_list_filter_reps_medium || "Reps: 21-50"}</SelectItem>
+                                    <SelectItem value="50+">{t.member_list_filter_reps_high || "Reps: 50+"}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -276,3 +281,4 @@ export default function MemberOverviewPage() {
   )
 }
 
+    
