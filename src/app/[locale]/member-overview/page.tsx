@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { getAllPersons } from '@/services/personService';
+import { getAllRepresentations } from '@/services/representationService';
 import type { Person } from '@/lib/types';
 import { format } from 'date-fns';
 
@@ -38,49 +39,89 @@ const statusKeyMap: Record<Person['status'], string> = {
     rejected: 'member_list_status_inactive',
 };
 
+interface AugmentedPerson extends Person {
+  totalRepHours: number;
+}
+
 export default function MemberOverviewPage() {
   const params = useParams();
   const locale = typeof params.locale === 'string' ? params.locale : 'en';
 
   const [t, setT] = useState<Record<string, string>>({});
-  const [allPersons, setAllPersons] = useState<Person[]>([]);
+  const [augmentedPersons, setAugmentedPersons] = useState<AugmentedPerson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [pointsFilter, setPointsFilter] = useState('all');
+  const [repsFilter, setRepsFilter] = useState('all');
 
   useEffect(() => {
     setT(getClientTranslations(locale));
     
-    const fetchPersons = async () => {
+    const fetchAndProcessData = async () => {
       setIsLoading(true);
       try {
-        const persons = await getAllPersons();
-        setAllPersons(persons);
+        const [persons, allReps] = await Promise.all([
+            getAllPersons(),
+            getAllRepresentations(),
+        ]);
+
+        const repHoursMap = new Map<string, number>();
+        allReps.forEach(rep => {
+            if (rep.status === 'confirmed') {
+                const currentHours = repHoursMap.get(rep.representedPersonId) || 0;
+                repHoursMap.set(rep.representedPersonId, currentHours + rep.durationHours);
+            }
+        });
+
+        const augmented = persons.map(person => ({
+            ...person,
+            totalRepHours: repHoursMap.get(person.id) || 0,
+        }));
+
+        setAugmentedPersons(augmented);
       } catch (error) {
-        console.error("Failed to fetch members:", error);
+        console.error("Failed to fetch member data:", error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchPersons();
+    fetchAndProcessData();
   }, [locale]);
 
   const membersToReview = useMemo(() => {
-    return allPersons.filter(p => p.status === 'pending');
-  }, [allPersons]);
+    return augmentedPersons.filter(p => p.status === 'pending');
+  }, [augmentedPersons]);
 
   const filteredMembers = useMemo(() => {
-    return allPersons.filter(person => {
+    return augmentedPersons.filter(person => {
       const statusMatch = statusFilter === 'all' || person.status === statusFilter;
       
       const searchMatch = !searchTerm ||
         (person.name && person.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (person.dentistId && person.dentistId.toLowerCase().includes(searchTerm.toLowerCase()));
       
-      return statusMatch && searchMatch;
+      const pointsMatch = (() => {
+        if (pointsFilter === 'all') return true;
+        const points = person.educationPoints || 0;
+        if (pointsFilter === '0-75') return points >= 0 && points <= 75;
+        if (pointsFilter === '76-150') return points > 75 && points <= 150;
+        if (pointsFilter === '150+') return points > 150;
+        return true;
+      })();
+
+      const repsMatch = (() => {
+        if (repsFilter === 'all') return true;
+        if (repsFilter === 'has_hours') return person.totalRepHours > 0;
+        if (repsFilter === 'no_hours') return person.totalRepHours === 0;
+        return true;
+      })();
+
+      return statusMatch && searchMatch && pointsMatch && repsMatch;
     });
-  }, [allPersons, searchTerm, statusFilter]);
+  }, [augmentedPersons, searchTerm, statusFilter, pointsFilter, repsFilter]);
   
   const pageTitle = t.member_overview_page_title || "Member Overview";
   
@@ -155,7 +196,7 @@ export default function MemberOverviewPage() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-2">
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_status || "Status: All"} />
@@ -167,20 +208,25 @@ export default function MemberOverviewPage() {
                                     <SelectItem value="inactive">{t.member_list_status_inactive || "Inactive"}</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Select disabled>
+                            <Select value={pointsFilter} onValueChange={setPointsFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_points || "Points: All"} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t.member_list_filter_all || "All"}</SelectItem>
+                                    <SelectItem value="all">{t.member_list_filter_points_all || "Points: All"}</SelectItem>
+                                    <SelectItem value="0-75">{t.member_list_filter_points_low || "Points: 0-75"}</SelectItem>
+                                    <SelectItem value="76-150">{t.member_list_filter_points_medium || "Points: 76-150"}</SelectItem>
+                                    <SelectItem value="150+">{t.member_list_filter_points_high || "Points: 150+"}</SelectItem>
                                 </SelectContent>
                             </Select>
-                             <Select disabled>
+                             <Select value={repsFilter} onValueChange={setRepsFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
                                     <SelectValue placeholder={t.member_list_filter_reps || "Representations: All"} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t.member_list_filter_all || "All"}</SelectItem>
+                                    <SelectItem value="all">{t.member_list_filter_reps_all || "Reps: All"}</SelectItem>
+                                    <SelectItem value="has_hours">{t.member_list_filter_reps_with || "With Hours"}</SelectItem>
+                                    <SelectItem value="no_hours">{t.member_list_filter_reps_without || "Without Hours"}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -207,8 +253,8 @@ export default function MemberOverviewPage() {
                                         <StatusBadge status={member.status}>{t[statusKeyMap[member.status]] || member.status}</StatusBadge>
                                     </TableCell>
                                     <TableCell>{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}</TableCell>
-                                    <TableCell>{member.educationPoints ? `${member.educationPoints} / 150` : 'N/A'}</TableCell>
-                                    <TableCell>{"-"}</TableCell>
+                                    <TableCell>{member.educationPoints || 0}</TableCell>
+                                    <TableCell>{member.totalRepHours.toFixed(1)} h</TableCell>
                                     <TableCell>
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/${locale}/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
@@ -229,3 +275,4 @@ export default function MemberOverviewPage() {
     </AppLayout>
   )
 }
+

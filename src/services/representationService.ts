@@ -147,3 +147,14 @@ export async function updateRepresentationStatus(representationId: string, statu
     
     await updateDoc(representationRef, updateData);
 }
+
+/**
+ * Fetches all representation documents from Firestore.
+ * @returns An array of Representation objects.
+ */
+export async function getAllRepresentations(): Promise<Representation[]> {
+    checkDb();
+    const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
+    const snapshot = await getDocs(representationsRef);
+    return snapshot.docs.map(snapshotToRepresentation);
+}
