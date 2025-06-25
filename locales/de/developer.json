@@ -4,5 +4,6 @@
   "developer_module_page_description": "Diese Seite enthält Werkzeuge und Aktionen für Entwicklungs- und Testzwecke.",
   "developer_module_project_history_title": "Projekthistorie",
   "developer_module_project_history_desc": "Eine Zusammenfassung der implementierten Funktionen und der Projekthistorie anzeigen.",
-  "developer_module_show_markup_button": "Markup-Datei anzeigen"
+  "developer_module_show_project_history_button": "Projekthistorie anzeigen",
+  "developer_module_show_prompt_history_button": "Prompt-Historie anzeigen"
 }

@@ -122,11 +122,18 @@ export default function DeveloperPage() {
                     <CardDescription>{t.developer_module_project_history_desc || "View a summary of implemented features and project history."}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild variant="outline">
-                        <Link href="/docs/project-history.md" target="_blank">
-                            {t.developer_module_show_markup_button || "Show Markup File"}
-                        </Link>
-                    </Button>
+                    <div className="flex flex-wrap gap-4">
+                        <Button asChild variant="outline">
+                            <Link href="/docs/project-history.md" target="_blank">
+                                {t.developer_module_show_project_history_button || "Show Project History"}
+                            </Link>
+                        </Button>
+                         <Button asChild variant="outline">
+                            <Link href="/docs/project-history.md" target="_blank">
+                                {t.developer_module_show_prompt_history_button || "Show Prompt History"}
+                            </Link>
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </div>
