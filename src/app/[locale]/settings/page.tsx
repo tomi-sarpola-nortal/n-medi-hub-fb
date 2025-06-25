@@ -82,7 +82,7 @@ export default function SettingsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
                   <div>
                     <AlertTitle>{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
-                    <AlertDescription className="text-muted-foreground">
+                    <AlertDescription className="text-sm text-muted-foreground">
                       {t.settings_pending_changes_desc || "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."}
                     </AlertDescription>
                   </div>
