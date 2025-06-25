@@ -19,11 +19,21 @@ interface LkMemberDashboardProps {
     locale: string;
 }
 
+interface OverdueRepGroup {
+    personId: string;
+    personName: string;
+    count: number;
+}
+
 export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboardProps) {
     const [registrationsToReview, setRegistrationsToReview] = React.useState<Person[]>([]);
     const [changesToReview, setChangesToReview] = React.useState<Person[]>([]);
-    const [oldRepresentations, setOldRepresentations] = React.useState<Representation[]>([]);
+    const [overdueRepsByPerson, setOverdueRepsByPerson] = React.useState<OverdueRepGroup[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
+
+    const totalOverdueCount = React.useMemo(() => {
+        return overdueRepsByPerson.reduce((sum, p) => sum + p.count, 0);
+    }, [overdueRepsByPerson]);
 
     React.useEffect(() => {
         const fetchDashboardData = async () => {
@@ -46,7 +56,20 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                 }
 
                 if (oldRepsResult.status === 'fulfilled') {
-                    setOldRepresentations(oldRepsResult.value);
+                     const reps = oldRepsResult.value;
+                     const grouped = reps.reduce((acc, rep) => {
+                         if (!acc[rep.representedPersonId]) {
+                             acc[rep.representedPersonId] = {
+                                 personId: rep.representedPersonId,
+                                 personName: rep.representedPersonName,
+                                 count: 0,
+                             };
+                         }
+                         acc[rep.representedPersonId].count++;
+                         return acc;
+                     }, {} as Record<string, OverdueRepGroup>);
+                     
+                     setOverdueRepsByPerson(Object.values(grouped));
                 } else {
                      console.error("Failed to fetch overdue representations:", oldRepsResult.reason);
                 }
@@ -151,7 +174,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                             )}
 
                             {/* Overdue Representations Card */}
-                            {oldRepresentations.length > 0 && (
+                            {overdueRepsByPerson.length > 0 && (
                                 <Card>
                                     <CardHeader>
                                         <div className="flex items-center gap-2">
@@ -159,17 +182,30 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                             <CardTitle>{t.dashboard_old_reps_title || 'Overdue Representation Requests'}</CardTitle>
                                         </div>
                                         <CardDescription>
-                                            {(t.dashboard_old_reps_desc || '{count} representation requests are older than 5 days and require review.').replace('{count}', oldRepresentations.length.toString())}
+                                            {(t.dashboard_old_reps_desc || '{count} representation requests are older than 5 days and require review.').replace('{count}', totalOverdueCount.toString())}
                                         </CardDescription>
                                     </CardHeader>
-                                    <CardContent>
-                                        <div className="flex justify-end">
-                                            <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">
-                                            <Link href={`/${locale}/member-overview`}>
-                                                <Users2 className="mr-2 h-4 w-4" />
-                                                {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
-                                            </Link>
-                                            </Button>
+                                    <CardContent className="p-0">
+                                        <div className="space-y-0">
+                                            {overdueRepsByPerson.map((item, index) => (
+                                                <React.Fragment key={item.personId}>
+                                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
+                                                        <div>
+                                                            <p className="font-semibold">{item.personName}</p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {(t.dashboard_overdue_reps_for_person || "{count} overdue request(s)").replace('{count}', item.count.toString())}
+                                                            </p>
+                                                        </div>
+                                                        <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive w-full sm:w-auto mt-2 sm:mt-0">
+                                                            <Link href={`/${locale}/member-overview/${item.personId}?tab=vertretungen`}>
+                                                                <Users2 className="mr-2 h-4 w-4" />
+                                                                {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
+                                                            </Link>
+                                                        </Button>
+                                                    </div>
+                                                    {index < overdueRepsByPerson.length - 1 && <Separator />}
+                                                </React.Fragment>
+                                            ))}
                                         </div>
                                     </CardContent>
                                 </Card>

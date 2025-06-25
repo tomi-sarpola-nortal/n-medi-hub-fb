@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +51,9 @@ const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: stri
 
 export default function MemberProfileView({ person, trainingHistory, t, locale }: MemberProfileViewProps) {
   const { user: viewer } = useAuth();
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'stammdaten';
+
   const [repsViewLogged, setRepsViewLogged] = useState(false);
 
   useEffect(() => {
@@ -120,7 +124,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                 </div>
             </div>
 
-             <Tabs defaultValue="stammdaten" className="w-full" onValueChange={handleTabChange}>
+             <Tabs defaultValue={defaultTab} className="w-full" onValueChange={handleTabChange}>
                 <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
                     <TabsTrigger value="stammdaten">{t.member_review_stammdaten_tab || "Stammdaten"}</TabsTrigger>
                     <TabsTrigger value="fortbildungen">{t.member_review_fortbildungen_tab || "Fortbildungen"}</TabsTrigger>

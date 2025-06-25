@@ -23,5 +23,6 @@
   "review_registrations_title": "Neue Registrierungen prüfen",
   "review_registrations_desc": "Überprüfen und genehmigen Sie neue Mitgliedsregistrierungen.",
   "review_changes_title": "Datenänderungen prüfen",
-  "review_changes_desc": "Überprüfen und genehmigen Sie Datenänderungen von bestehenden Mitgliedern."
+  "review_changes_desc": "Überprüfen und genehmigen Sie Datenänderungen von bestehenden Mitgliedern.",
+  "dashboard_overdue_reps_for_person": "{count} überfällige Anfrage(n)"
 }

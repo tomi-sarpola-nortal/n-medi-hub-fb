@@ -23,5 +23,6 @@
   "review_registrations_title": "Review New Registrations",
   "review_registrations_desc": "Review and approve new member registrations.",
   "review_changes_title": "Review Data Changes",
-  "review_changes_desc": "Review and approve data changes from existing members."
+  "review_changes_desc": "Review and approve data changes from existing members.",
+  "dashboard_overdue_reps_for_person": "{count} overdue request(s)"
 }
