@@ -16,7 +16,7 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import type { Representation, RepresentationCreationData } from '@/lib/types';
-import { getPersonById } from './personService';
+import { getPersonById, getPersonsByRole } from './personService';
 import { createNotification } from './notificationService';
 import { sendEmail } from './emailService';
 import { getTranslations } from '@/lib/translations';
@@ -70,10 +70,11 @@ export async function createRepresentation(data: RepresentationCreationData, loc
     createdAt: serverTimestamp(),
   });
   
+  const t = getTranslations(locale);
   const representedPerson = await getPersonById(data.representedPersonId);
+  
+  // Notify the person who was represented
   if (representedPerson) {
-      const t = getTranslations(locale);
-      // In-app notification
       if (representedPerson.notificationSettings?.inApp) {
           await createNotification({
               userId: data.representedPersonId,
@@ -82,7 +83,6 @@ export async function createRepresentation(data: RepresentationCreationData, loc
               isRead: false,
           });
       }
-      // Email notification
       if (representedPerson.notificationSettings?.email && representedPerson.email) {
           await sendEmail({
               to: [representedPerson.email],
@@ -94,6 +94,39 @@ export async function createRepresentation(data: RepresentationCreationData, loc
               },
           });
       }
+  }
+
+  // Check if the start date is overdue and notify LK members
+  const fiveDaysAgo = new Date();
+  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+  if (new Date(data.startDate) < fiveDaysAgo) {
+      const chamberMembers = await getPersonsByRole('lk_member');
+      const notificationPromises = chamberMembers.map(async (member) => {
+          if (member.notificationSettings?.inApp) {
+              await createNotification({
+                  userId: member.id,
+                  message: t.notification_overdue_representation_submitted
+                      .replace('{representedPersonName}', data.representedPersonName)
+                      .replace('{representingPersonName}', data.representingPersonName),
+                  link: `/member-overview/${data.representedPersonId}?tab=vertretungen`,
+                  isRead: false,
+              });
+          }
+          if (member.notificationSettings?.email && member.email) {
+              await sendEmail({
+                  to: [member.email],
+                  message: {
+                      subject: t.email_subject_overdue_representation_submitted,
+                      html: t.email_body_overdue_representation_submitted
+                          .replace('{targetName}', member.name)
+                          .replace('{representedPersonName}', data.representedPersonName)
+                          .replace('{representingPersonName}', data.representingPersonName),
+                  }
+              });
+          }
+      });
+      await Promise.all(notificationPromises);
   }
 
   return docRef.id;

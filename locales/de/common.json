@@ -27,6 +27,7 @@
   "notification_new_data_change_review": "\"{actorName}\" hat Datenänderungen zur Überprüfung eingereicht.",
   "notification_data_change_approved": "Ihre kürzlichen Datenänderungen wurden genehmigt.",
   "notification_data_change_rejected": "Ihre kürzlichen Datenänderungen wurden abgelehnt.",
+  "notification_overdue_representation_submitted": "Eine Vertretung für {representedPersonName} mit einem vergangenen Startdatum wurde von {representingPersonName} eingereicht und muss überprüft werden.",
 
   "email_subject_new_representation": "Neue Vertretungsanfrage",
   "email_body_new_representation": "Sehr geehrte/r {targetName},<br><br>eine neue Vertretungsanfrage wurde von {actorName} für Sie eingereicht. Bitte melden Sie sich im Portal an, um sie zu überprüfen.<br><br>Vielen Dank.",
@@ -34,6 +35,9 @@
   "email_body_representation_approved": "Sehr geehrte/r {targetName},<br><br>Ihre Vertretungsanfrage für {actorName} wurde genehmigt.<br><br>Vielen Dank.",
   "email_subject_representation_declined": "Vertretung abgelehnt",
   "email_body_representation_declined": "Sehr geehrte/r {targetName},<br><br>Ihre Vertretungsanfrage für {actorName} wurde abgelehnt.<br><br>Vielen Dank.",
+  
+  "email_subject_overdue_representation_submitted": "Überfällige Vertretung Eingereicht",
+  "email_body_overdue_representation_submitted": "Sehr geehrte/r {targetName},<br><br>eine Vertretung für {representedPersonName} von {representingPersonName} wurde mit einem Startdatum eingereicht, das mehr als 5 Tage in der Vergangenheit liegt. Bitte melden Sie sich im Portal an, um sie zu überprüfen.<br><br>Vielen Dank.",
 
   "email_subject_new_registration": "Neue Mitgliedsregistrierung zur Prüfung",
   "email_body_new_registration": "Sehr geehrte/r {targetName},<br><br>eine neue Mitgliedsregistrierung für {actorName} steht zur Prüfung bereit. Bitte melden Sie sich im Portal an.<br><br>Vielen Dank.",
