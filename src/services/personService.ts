@@ -262,6 +262,8 @@ export async function reviewPerson(
     const person = await getPersonById(personId);
     if (!person) throw new Error("Person not found");
 
+    const baseDetails = `Decision: ${decision}. Justification: ${justification || 'N/A'}`;
+
     // Create Audit Log
     const logData: AuditLogCreationData = {
         userId: auditor.id,
@@ -274,16 +276,16 @@ export async function reviewPerson(
         impactedPersonName: person.name,
         operation: 'update',
         fieldName: 'status', // Default field being changed
-        details: `Decision: ${decision}. Justification: ${justification || 'N/A'}`
+        details: baseDetails
     };
 
     if (person.status === 'active' && person.pendingData) {
         // Data change review
         logData.fieldName = Object.keys(person.pendingData);
-        logData.details = `Data change review. Decision: ${decision}.`;
+        logData.details = `Data change review. ${baseDetails}`;
     } else if (person.status === 'pending') {
         // New registration review
-        logData.details = `New registration review. Decision: ${decision}.`;
+        logData.details = `New registration review. ${baseDetails}`;
     }
 
     await createAuditLog(logData);
@@ -383,3 +385,6 @@ export async function getPersonsToReview(limitValue?: number): Promise<Person[]>
 
     return limitValue ? sortedPersons.slice(0, limitValue) : sortedPersons;
 }
+
+
+    
