@@ -124,12 +124,12 @@ export default function DeveloperPage() {
                 <CardContent>
                     <div className="flex flex-wrap gap-4">
                         <Button asChild variant="outline">
-                            <Link href="/prompt_history.md" target="_blank">
+                            <Link href="/docs/project-history.md" target="_blank">
                                 {t.developer_module_show_project_history_button || "Show Project History"}
                             </Link>
                         </Button>
                          <Button asChild variant="outline">
-                            <Link href="/prompt_history.md" target="_blank">
+                            <Link href="/docs/prompt-history.md" target="_blank">
                                 {t.developer_module_show_prompt_history_button || "Show Prompt History"}
                             </Link>
                         </Button>
