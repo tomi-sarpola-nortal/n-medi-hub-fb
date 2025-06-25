@@ -88,14 +88,14 @@ export default function UserDataReviewPage() {
                 </div>
             </div>
 
-            <Card>
+            <Card className="bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-800">
                 <CardHeader>
                     <CardDescription>{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</CardDescription>
                     <CardDescription className="!mt-1">{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
                 </CardHeader>
                 <CardContent>
                      <div className="mt-6 border rounded-lg">
-                        <div className="grid grid-cols-4 gap-4 px-4 py-2 font-semibold text-muted-foreground bg-muted/50 border-b">
+                        <div className="grid grid-cols-4 gap-4 px-4 py-2 font-semibold text-muted-foreground bg-black/5 dark:bg-white/5 border-b">
                             <div className="col-span-1">{t.member_review_column_field || "Field"}</div>
                             <div className="col-span-1">{t.member_review_old_data || "Old"}</div>
                             <div className="col-span-1">{t.member_review_new_data || "New"}</div>
