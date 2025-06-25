@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -90,7 +89,7 @@ export function AppSidebar() {
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-4">
         <Link href={`/${locale}/dashboard`} className="flex items-center gap-3 overflow-hidden">
-          <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
+          <Logo iconSize={190} />
         </Link>
       </SidebarHeader>
 

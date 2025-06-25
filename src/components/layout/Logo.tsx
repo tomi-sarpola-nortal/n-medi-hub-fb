@@ -6,11 +6,9 @@ import { cn } from '@/lib/utils';
 interface LogoProps {
   className?: string;
   iconSize?: number;
-  portalText: string;
-  hidePortalText?: boolean;
 }
 
-export default function Logo({ className, iconSize = 80, portalText, hidePortalText = false }: LogoProps) {
+export default function Logo({ className, iconSize = 80 }: LogoProps) {
   return (
     <div className={cn("flex flex-col items-start", className)}>
       <Image
@@ -21,13 +19,6 @@ export default function Logo({ className, iconSize = 80, portalText, hidePortalT
         className="h-auto"
         priority
       />
-      {!hidePortalText && (
-        <p className="text-sm text-muted-foreground mt-2">
-            {portalText}
-        </p>
-      )}
     </div>
   );
 }
-
-    

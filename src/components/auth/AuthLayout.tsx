@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -65,7 +64,7 @@ export default function AuthLayout({
       <header className="py-6 px-4 sm:px-8 border-b border-border">
         <div className="container mx-auto flex items-center justify-between">
           <Link href={`/${locale}/`}>
-            <Logo iconSize={190} portalText={t.login_logo_text_portal || "Portal"} />
+            <Logo iconSize={190} />
           </Link>
           <div className="flex items-center gap-4">
             {showBackButton && (
