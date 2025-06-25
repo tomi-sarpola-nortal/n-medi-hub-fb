@@ -37,6 +37,12 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null); // Store ID of rep being updated
   const { toast } = useToast();
   const { user: auditor } = useAuth();
+  
+  const fiveDaysAgo = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 5);
+    return d;
+  }, []);
 
   const fetchRepresentations = async () => {
     setIsLoading(true);
@@ -49,9 +55,6 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
       setRepresentations(sortedReps);
 
       // Check for old pending requests FOR THIS MEMBER based on start date
-      const fiveDaysAgo = new Date();
-      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-
       const oldPending = data.wasRepresented.filter(r => 
           r.status === 'pending' && 
           new Date(r.startDate) < fiveDaysAgo
@@ -137,13 +140,21 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                 <TableHead>{t.member_overview_rep_table_header_other_person || "Other Person"}</TableHead>
                 <TableHead className="text-right">{t.representations_table_header_duration || "Duration"}</TableHead>
                 <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
+                <TableHead>{t.representations_table_header_created_date || "Created Date"}</TableHead>
                 <TableHead className="text-right">{t.member_list_table_header_action || "Action"}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {representations.length > 0 ? representations.map((rep) => (
+              {representations.length > 0 ? representations.map((rep) => {
+                const isStartDateOverdue = rep.status === 'pending' && new Date(rep.startDate) < fiveDaysAgo;
+                const isCreateDateOverdue = rep.status === 'pending' && rep.createdAt && new Date(rep.createdAt) < fiveDaysAgo;
+
+                return (
                 <TableRow key={rep.id}>
-                  <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
+                  <TableCell className="font-medium whitespace-pre-wrap">
+                    {formatPeriod(rep.startDate, rep.endDate)}
+                    {isStartDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                  </TableCell>
                   <TableCell>
                     {rep.representingPersonId === member.id 
                         ? (t.member_overview_rep_type_performed || 'Performed') 
@@ -157,6 +168,10 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     <RepresentationStatusBadge status={rep.status}>
                         {t[`representations_status_${rep.status}`] || rep.status}
                     </RepresentationStatusBadge>
+                  </TableCell>
+                  <TableCell>
+                    {rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}
+                    {isCreateDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
                   </TableCell>
                   <TableCell className="text-right">
                     {rep.status === 'pending' && rep.representedPersonId === member.id ? (
@@ -185,9 +200,10 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     )}
                   </TableCell>
                 </TableRow>
-              )) : (
+                );
+              }) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     {t.member_overview_rep_no_reps_found || "No representations found for this member."}
                   </TableCell>
                 </TableRow>
