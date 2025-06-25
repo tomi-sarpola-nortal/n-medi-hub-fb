@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAuth } from '@/context/auth-context';
@@ -76,12 +75,12 @@ export default function SettingsPage() {
         )}
 
         {hasPendingDataChange && !isPendingRegistration && (
-           <Alert variant="default" className="bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200">
+           <Alert variant="default" className="bg-blue-50 border-blue-300 dark:bg-blue-950 dark:border-blue-800">
              <div className="flex items-start gap-4">
                 <AlertTriangle className="h-4 w-4 !text-blue-600 dark:!text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
                   <div>
-                    <AlertTitle>{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
+                    <AlertTitle className="text-blue-800 dark:text-blue-200">{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
                     <AlertDescription className="text-sm text-muted-foreground">
                       {t.settings_pending_changes_desc || "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."}
                     </AlertDescription>
