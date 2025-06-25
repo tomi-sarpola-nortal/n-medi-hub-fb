@@ -29,19 +29,32 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
         const fetchDashboardData = async () => {
             setIsLoading(true);
             try {
-                const [allPersons, oldReps] = await Promise.all([
+                const results = await Promise.allSettled([
                     getAllPersons(),
                     getOldPendingRepresentations(5)
                 ]);
-                
-                const members = allPersons
-                    .filter(p => p.status === 'pending' || !!p.pendingData)
-                    .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
-                    .slice(0, 5); // Apply limit here
-                setMembersToReview(members);
-                setOldRepresentations(oldReps);
+
+                const allPersonsResult = results[0];
+                const oldRepsResult = results[1];
+
+                if (allPersonsResult.status === 'fulfilled') {
+                    const members = allPersonsResult.value
+                        .filter(p => p.status === 'pending' || !!p.pendingData)
+                        .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
+                        .slice(0, 5);
+                    setMembersToReview(members);
+                } else {
+                    console.error("Failed to fetch persons for review:", allPersonsResult.reason);
+                }
+
+                if (oldRepsResult.status === 'fulfilled') {
+                    setOldRepresentations(oldRepsResult.value);
+                } else {
+                     console.error("Failed to fetch overdue representations:", oldRepsResult.reason);
+                }
+
             } catch (error) {
-                console.error("Failed to fetch dashboard data:", error);
+                console.error("An unexpected error occurred while fetching dashboard data:", error);
             } finally {
                 setIsLoading(false);
             }
