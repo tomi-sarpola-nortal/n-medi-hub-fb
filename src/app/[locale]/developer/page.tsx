@@ -123,7 +123,7 @@ export default function DeveloperPage() {
                 </CardHeader>
                 <CardContent>
                     <Button asChild variant="outline">
-                        <Link href="/project-history.md" target="_blank">
+                        <Link href="/docs/project-history.md" target="_blank">
                             {t.developer_module_show_markup_button || "Show Markup File"}
                         </Link>
                     </Button>
