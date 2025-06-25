@@ -27,7 +27,12 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   }
   db = getFirestore(app);
   auth = getAuth(app);
-  storage = getStorage(app);
+  
+  if (firebaseConfig.storageBucket) {
+    storage = getStorage(app);
+  } else {
+    console.warn("Firebase Storage configuration is missing `storageBucket`. File uploads will fail. Ensure NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET is set in your environment file.");
+  }
 } else {
     // This warning will appear in the browser's console if the .env file is not set up
     console.warn("Firebase configuration is incomplete or missing from .env file. Firebase services will be unavailable.");
