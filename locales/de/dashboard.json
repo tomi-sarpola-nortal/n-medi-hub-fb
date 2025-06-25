@@ -19,5 +19,9 @@
   "perform_review_button": "PRÜFUNG VORNEHMEN",
   "dashboard_old_reps_title": "Überfällige Vertretungsanfragen",
   "dashboard_old_reps_desc": "{count} Vertretungsanfragen sind älter als 5 Tage und müssen überprüft werden.",
-  "dashboard_old_reps_button": "VERTRETUNGEN PRÜFEN"
+  "dashboard_old_reps_button": "VERTRETUNGEN PRÜFEN",
+  "review_registrations_title": "Neue Registrierungen prüfen",
+  "review_registrations_desc": "Überprüfen und genehmigen Sie neue Mitgliedsregistrierungen.",
+  "review_changes_title": "Datenänderungen prüfen",
+  "review_changes_desc": "Überprüfen und genehmigen Sie Datenänderungen von bestehenden Mitgliedern."
 }

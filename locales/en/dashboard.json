@@ -19,5 +19,9 @@
   "perform_review_button": "PERFORM REVIEW",
   "dashboard_old_reps_title": "Overdue Representation Requests",
   "dashboard_old_reps_desc": "{count} representation requests are older than 5 days and require review.",
-  "dashboard_old_reps_button": "REVIEW REPRESENTATIONS"
+  "dashboard_old_reps_button": "REVIEW REPRESENTATIONS",
+  "review_registrations_title": "Review New Registrations",
+  "review_registrations_desc": "Review and approve new member registrations.",
+  "review_changes_title": "Review Data Changes",
+  "review_changes_desc": "Review and approve data changes from existing members."
 }
