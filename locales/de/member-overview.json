@@ -107,5 +107,6 @@
   "member_profile_reset_password_success_title": "E-Mail gesendet",
   "member_profile_reset_password_success_desc": "E-Mail zum Zurücksetzen des Passworts wurde erfolgreich an {email} gesendet.",
   "member_profile_reset_password_error_title": "Aktion fehlgeschlagen",
-  "member_profile_reset_password_error_desc": "Die E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
+  "member_profile_reset_password_error_desc": "Die E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+  "member_review_new_registration_alert_text": "Diese neue Mitgliedsregistrierung wartet auf Genehmigung. Bitte überprüfen Sie die übermittelten Daten."
 }

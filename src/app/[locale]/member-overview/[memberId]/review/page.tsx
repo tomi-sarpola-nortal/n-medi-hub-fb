@@ -152,23 +152,64 @@ export default function DataReviewPage() {
   }
 
   const renderRegistrationReview = () => (
-      <>
-        {/* Same UI as before for registration review */}
-        <div className="space-y-8">
-            <section>
-                <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
+      <div className="space-y-8">
+        <Card>
+            <CardHeader><CardTitle className="text-xl font-headline">{t.member_review_personal_data_title || "Personal Data"}</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                     <DataRow label={t.register_step2_label_title || "Title"} value={person.title} />
                     <DataRow label={t.register_step2_label_firstName || "First Name"} value={person.firstName} />
                     <DataRow label={t.register_step2_label_lastName || "Last Name"} value={person.lastName} />
+                    <DataRow label={t.register_step2_label_dateOfBirth || "Date of Birth"} value={person.dateOfBirth} />
+                    <DataRow label={t.register_step2_label_placeOfBirth || "Place of Birth"} value={person.placeOfBirth} />
+                    <DataRow label={t.register_step2_label_nationality || "Nationality"} value={person.nationality} />
+                    <DataRow label={t.member_review_residential_address || "Residential Address"} value={`${person.streetAddress}, ${person.postalCode} ${person.city}`} />
+                    <DataRow label={t.register_step2_label_phoneNumber || "Phone Number"} value={person.phoneNumber} />
+                    <DataRow label={t.register_label_email || "Email"} value={person.email} />
                 </div>
-            </section>
-        </div>
-      </>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader><CardTitle className="text-xl font-headline">{t.member_review_prof_qual_title || "Professional Qualifications"}</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+                    <DataRow label={t.register_step4_label_prof_title || "Professional Title"} value={person.currentProfessionalTitle} />
+                    <DataRow label={t.register_step4_label_specializations || "Specializations"} value={person.specializations?.join(', ')} />
+                    <DataRow label={t.register_step4_label_languages || "Languages"} value={person.languages?.join(', ')} />
+                    <DataRow label={t.register_step4_label_graduation_date || "Graduation Date"} value={person.graduationDate} />
+                    <DataRow label={t.register_step4_label_university || "University"} value={person.university} />
+                    <DataRow label={t.register_step4_label_approbation_number || "Approbation Number"} value={person.approbationNumber} />
+                    <DataRow label={t.register_step4_label_approbation_date || "Approbation Date"} value={person.approbationDate} />
+                 </div>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader><CardTitle className="text-xl font-headline">{t.member_review_practice_info_title || "Practice Information"}</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+                    <DataRow label={t.register_step5_label_practiceName || "Practice Name"} value={person.practiceName} />
+                    <DataRow label={t.member_review_practice_address || "Practice Address"} value={`${person.practiceStreetAddress}, ${person.practicePostalCode} ${person.practiceCity}`} />
+                    <DataRow label={t.register_step5_label_practicePhoneNumber || "Practice Phone"} value={person.practicePhoneNumber} />
+                    <DataRow label={t.register_step5_label_practiceFaxNumber || "Practice Fax"} value={person.practiceFaxNumber} />
+                    <DataRow label={t.register_step5_label_practiceEmail || "Practice Email"} value={person.practiceEmail} />
+                    <DataRow label={t.register_step5_label_practiceWebsite || "Practice Website"} value={person.practiceWebsite} />
+                    <DataRow label={t.register_step5_label_healthInsuranceContracts || "Health Insurance Contracts"} value={person.healthInsuranceContracts?.join(', ')} />
+                </div>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader><CardTitle className="text-xl font-headline">{t.member_review_documents_title || "Documents"}</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <DocumentRow label={t.register_step2_label_idDocument || "ID Card or Passport"} docName={person.idDocumentName} docUrl={person.idDocumentUrl} />
+                <DocumentRow label={t.register_step4_label_diploma || "Diploma Certificate"} docName={person.diplomaName} docUrl={person.diplomaUrl} />
+                <DocumentRow label={t.register_step4_label_approbation_cert || "Approbation Certificate"} docName={person.approbationCertificateName} docUrl={person.approbationCertificateUrl} />
+                <DocumentRow label={t.register_step4_label_specialist_recognition || "Specialist Recognition"} docName={person.specialistRecognitionName} docUrl={person.specialistRecognitionUrl} />
+            </CardContent>
+        </Card>
+      </div>
   );
 
   const renderDataChangeReview = () => {
-    // Helper to format values for display
     const formatValue = (value: any) => {
         if (value === null || value === undefined || value === '') return <span className="italic text-muted-foreground">empty</span>;
         if (Array.isArray(value)) return value.join(', ');

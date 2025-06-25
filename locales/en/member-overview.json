@@ -107,5 +107,6 @@
   "member_profile_reset_password_success_title": "Email Sent",
   "member_profile_reset_password_success_desc": "Password reset email sent successfully to {email}.",
   "member_profile_reset_password_error_title": "Action Failed",
-  "member_profile_reset_password_error_desc": "Could not send the password reset email. Please try again later."
+  "member_profile_reset_password_error_desc": "Could not send the password reset email. Please try again later.",
+  "member_review_new_registration_alert_text": "This new member registration is awaiting approval. Please review the submitted data."
 }

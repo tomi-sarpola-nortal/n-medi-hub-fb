@@ -96,6 +96,9 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
       'rejected': 'member_list_status_inactive',
   };
 
+  const needsReview = person.status === 'pending' || !!person.pendingData;
+  const isNewRegistration = person.status === 'pending' && !person.pendingData;
+
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-6 p-4 md:p-8">
@@ -149,11 +152,16 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                         </CardContent>
                     </Card>
 
-                    {person.status === 'pending' && (
+                    {needsReview && (
                         <div className="mt-6 p-4 bg-amber-50 border border-amber-300 rounded-md flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <AlertTriangle className="h-8 w-8 text-amber-500 flex-shrink-0"/>
                             <div className="flex-grow">
-                                <p className="font-medium">{t.member_review_alert_text || "This member has recently submitted changes to their master data. Please review them. You can still see the last approved data here."}</p>
+                                <p className="font-medium">
+                                    {isNewRegistration 
+                                        ? (t.member_review_new_registration_alert_text || "This new member registration is awaiting approval. Please review the submitted data.") 
+                                        : (t.member_review_alert_text || "This member has recently submitted changes to their master data. Please review them. You can still see the last approved data here.")
+                                    }
+                                </p>
                             </div>
                             <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto mt-2 sm:mt-0">
                             <Link href={`/${locale}/member-overview/${person.id}/review`}>{t.member_review_alert_button || "PERFORM REVIEW"}</Link>
