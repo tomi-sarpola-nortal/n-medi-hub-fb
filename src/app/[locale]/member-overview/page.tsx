@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,6 +49,7 @@ interface AugmentedPerson extends Person {
 
 export default function MemberOverviewPage() {
   const params = useParams();
+  const router = useRouter();
   const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const { toast } = useToast();
 
@@ -273,7 +274,11 @@ export default function MemberOverviewPage() {
                         </TableHeader>
                         <TableBody>
                             {filteredMembers.length > 0 ? filteredMembers.map(member => (
-                                <TableRow key={member.id}>
+                                <TableRow 
+                                    key={member.id}
+                                    className="cursor-pointer"
+                                    onClick={() => router.push(`/${locale}/member-overview/${member.id}`)}
+                                >
                                     <TableCell>{member.dentistId || '-'}</TableCell>
                                     <TableCell className="font-medium">{member.name}</TableCell>
                                     <TableCell>
@@ -285,18 +290,22 @@ export default function MemberOverviewPage() {
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    className="h-8 w-8 p-0"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
                                                     <span className="sr-only">Open menu</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem asChild>
-                                                    <Link href={`/${locale}/member-overview/${member.id}`}>{t.member_list_table_action_view_profile || "View Profile"}</Link>
+                                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); router.push(`/${locale}/member-overview/${member.id}`); }}>
+                                                    {t.member_list_table_action_view_profile || "View Profile"}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
-                                                    onClick={() => setPersonToDeactivate(member)}
+                                                    onClick={(e) => { e.stopPropagation(); setPersonToDeactivate(member); }}
                                                     disabled={member.status !== 'active'}
                                                     className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                                                 >

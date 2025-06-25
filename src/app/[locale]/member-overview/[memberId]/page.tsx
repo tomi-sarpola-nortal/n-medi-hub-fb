@@ -14,6 +14,7 @@ import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import MemberRepresentationsTab from '@/components/member-overview/MemberRepresentationsTab';
+import MemberInactiveAction from '@/components/member-overview/MemberInactiveAction';
 
 interface MemberReviewPageProps {
   params: { memberId: string; locale: string };
@@ -184,6 +185,20 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
                             </Card>
                         </div>
                     </div>
+
+                    {person.status === 'active' && (
+                        <Card className="border-destructive mt-6">
+                            <CardHeader>
+                                <div className="flex items-center gap-3">
+                                <AlertTriangle className="h-6 w-6 text-destructive" />
+                                <CardTitle className="text-destructive">{t.settings_danger_zone_title || "Danger Zone"}</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <MemberInactiveAction member={person} t={t} />
+                            </CardContent>
+                        </Card>
+                    )}
                 </TabsContent>
                 <TabsContent value="fortbildungen" className="mt-6">
                     <Card>
