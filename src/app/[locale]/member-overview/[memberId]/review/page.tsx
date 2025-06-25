@@ -124,7 +124,7 @@ export default function DataReviewPage() {
   }, [person]);
 
 
-  const pageTitle = (person?.pendingData ? t.member_review_page_title_review : "Registrierung prüfen") || "Review";
+  const pageTitle = t.member_review_page_title_review || "Review Submission";
 
   if (isLoading || !person || !t) {
     return (
@@ -220,7 +220,7 @@ export default function DataReviewPage() {
                         <span className="mx-1">/</span>
                         <Link href={`/${locale}/member-overview/${memberId}`} className="hover:underline">{person.name}</Link>
                         <span className="mx-1">/</span>
-                        <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Review Data Change"}</span>
+                        <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Review Submission"}</span>
                     </div>
                 </div>
             </div>
@@ -290,4 +290,3 @@ export default function DataReviewPage() {
     </AppLayout>
   );
 }
-

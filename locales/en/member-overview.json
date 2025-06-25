@@ -56,7 +56,7 @@
   "member_review_residential_address": "Residential Address",
   "member_review_email_address": "Email Address",
   "member_review_practice_address": "Practice Address",
-  "member_review_page_title_review": "Review Data Change",
+  "member_review_page_title_review": "Review Submission",
   "member_review_page_subtitle": "Please check the data for completeness and correctness.",
   "member_review_info_section_title": "Information for Review",
   "member_review_info_name": "First and Last Name",
@@ -73,7 +73,7 @@
   "member_review_confirm_checkbox": "I confirm that I have checked the data carefully.",
   "member_review_cancel_button": "CANCEL",
   "member_review_submit_button": "SUBMIT REVIEW",
-  "member_review_breadcrumb_review": "Review Data Change",
+  "member_review_breadcrumb_review": "Review Submission",
   "member_review_no_pending": "No pending member reviews at the moment.",
   "member_overview_rep_table_header_type": "Type",
   "member_overview_rep_table_header_other_person": "Other Person",
@@ -97,4 +97,3 @@
   "member_review_status_updated": "Updated",
   "member_review_status_no_change": "No Change"
 }
-

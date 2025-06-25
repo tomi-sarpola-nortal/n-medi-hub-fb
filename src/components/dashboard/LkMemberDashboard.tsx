@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { getPendingPersons } from '@/services/personService';
+import { getPersonsToReview } from '@/services/personService';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import StateChamberInfo from './StateChamberInfo';
@@ -22,18 +22,18 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
     const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(() => {
-        const fetchPendingMembers = async () => {
+        const fetchMembersToReview = async () => {
             try {
-                const pendingMembers = await getPendingPersons(5);
-                setMembersToReview(pendingMembers);
+                const members = await getPersonsToReview(5);
+                setMembersToReview(members);
             } catch (error) {
-                console.error("Failed to fetch pending members:", error);
+                console.error("Failed to fetch members for review:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchPendingMembers();
+        fetchMembersToReview();
     }, []);
 
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
@@ -65,8 +65,11 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
                                                 <div>
                                                     <p className="font-semibold text-base">{member.name}</p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : ''} | {t.data_change_label || 'Data Change'}
+                                                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
+                                                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">
+                                                            {member.pendingData ? (t.data_change_label || "Data Change") : (t.member_list_status_pending || "New Registration")}
+                                                        </span>
                                                     </p>
                                                 </div>
                                                 <Button asChild className="w-full sm:w-auto mt-2 sm:mt-0">

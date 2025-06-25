@@ -36,9 +36,8 @@ export async function deletePersonById(personId: string): Promise<{ success: boo
 
 export async function requestDataChange(personId: string, updates: Partial<Person>): Promise<{ success: boolean; message: string }> {
   try {
-    // We only want to store the changes, not overwrite the whole document
-    // So we'll pass the updates directly to a 'pendingData' field
-    await updatePerson(personId, { pendingData: updates });
+    // Store the changes in 'pendingData' and set a flag for easier querying
+    await updatePerson(personId, { pendingData: updates, hasPendingChanges: true });
     return { success: true, message: 'Your changes have been submitted for review.' };
   } catch (error) {
     console.error('Error requesting data change:', error);

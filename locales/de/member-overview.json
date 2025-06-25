@@ -56,7 +56,7 @@
   "member_review_residential_address": "Wohnadresse",
   "member_review_email_address": "E-Mail-Adresse",
   "member_review_practice_address": "Adresse der Ordination",
-  "member_review_page_title_review": "Datenänderung prüfen",
+  "member_review_page_title_review": "Einreichung prüfen",
   "member_review_page_subtitle": "Bitte überprüfen Sie die Daten nach Vollständigkeit und Richtigkeit.",
   "member_review_info_section_title": "Informationen zur Prüfung",
   "member_review_info_name": "Vor- und Nachname",
@@ -73,7 +73,7 @@
   "member_review_confirm_checkbox": "Ich bestätige die Daten sorgfältig geprüft zu haben.",
   "member_review_cancel_button": "ABBRECHEN",
   "member_review_submit_button": "PRÜFUNG ABSENDEN",
-  "member_review_breadcrumb_review": "Datenänderung prüfen",
+  "member_review_breadcrumb_review": "Einreichung prüfen",
   "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen.",
   "member_overview_rep_table_header_type": "Art",
   "member_overview_rep_table_header_other_person": "Beteiligte Person",
@@ -97,4 +97,3 @@
   "member_review_status_updated": "Geändert",
   "member_review_status_no_change": "Keine Änderung"
 }
-

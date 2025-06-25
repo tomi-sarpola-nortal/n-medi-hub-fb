@@ -138,6 +138,7 @@ export interface Person {
 
   // Pending data changes
   pendingData?: Partial<Person>;
+  hasPendingChanges?: boolean;
 
   createdAt?: string; 
   updatedAt?: string; 
@@ -159,7 +160,7 @@ export interface RegistrationFormData {
   dentistId?: string;
   avatarUrl?: string; 
   status?: 'pending' | 'active' | 'inactive' | 'rejected'; 
-  otpEnabled?: boolean; 
+  otpEnabled?: boolean; // Default to false
   
   // Step 3
   title?: string;

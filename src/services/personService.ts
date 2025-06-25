@@ -20,6 +20,7 @@ import {
   orderBy,
   limit,
   deleteField,
+  or,
 } from 'firebase/firestore';
 
 const PERSONS_COLLECTION = 'persons';
@@ -118,6 +119,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
 
     // Pending data changes
     pendingData: data.pendingData,
+    hasPendingChanges: data.hasPendingChanges,
 
     createdAt: createdAtTimestamp?.toDate().toISOString(),
     updatedAt: updatedAtTimestamp?.toDate().toISOString(),
@@ -261,9 +263,9 @@ export async function reviewPerson(
     if (person.status === 'active' && person.pendingData) {
         if (decision === 'approve') {
             const updatesToApply = person.pendingData;
-            await updatePerson(personId, { ...updatesToApply, pendingData: deleteField() as any, rejectionReason: deleteField() as any });
+            await updatePerson(personId, { ...updatesToApply, pendingData: deleteField() as any, hasPendingChanges: deleteField() as any, rejectionReason: deleteField() as any });
         } else { // deny or reject
-            await updatePerson(personId, { pendingData: deleteField() as any, rejectionReason: justification });
+            await updatePerson(personId, { pendingData: deleteField() as any, hasPendingChanges: deleteField() as any, rejectionReason: justification });
         }
         return;
     }
@@ -288,6 +290,8 @@ export async function reviewPerson(
                 updates.rejectionReason = justification;
                 break;
         }
+        // Also clear the hasPendingChanges flag if it exists for some reason
+        updates.hasPendingChanges = deleteField() as any;
         await updatePerson(personId, updates);
         return;
     }
@@ -296,19 +300,24 @@ export async function reviewPerson(
 }
 
 /**
- * Retrieves persons with a 'pending' status.
- * @param limitValue - The maximum number of pending persons to retrieve.
+ * Retrieves persons needing review: new registrations OR those with data changes.
+ * @param limitValue - The maximum number of persons to retrieve.
  * @returns An array of Person objects.
  */
-export async function getPendingPersons(limitValue?: number): Promise<Person[]> {
+export async function getPersonsToReview(limitValue?: number): Promise<Person[]> {
     'use server';
     checkDb();
     const personsCollection = collection(db, PERSONS_COLLECTION);
     
+    // This OR query will require a composite index in Firestore.
+    // Firestore usually provides a link in the error console to create it automatically.
     let q = query(
         personsCollection,
-        where('role', '==', 'dentist'),
-        where('status', '==', 'pending')
+        or(
+            where('status', '==', 'pending'),
+            where('hasPendingChanges', '==', true)
+        ),
+        orderBy('updatedAt', 'desc')
     );
 
     if (limitValue) {
@@ -318,7 +327,3 @@ export async function getPendingPersons(limitValue?: number): Promise<Person[]> 
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(snapshotToPerson);
 }
-
-
-// Ensure PersonCreationData in types/index.ts is updated to include all these fields too.
-// The createPerson function now expects a more comprehensive personData object.
