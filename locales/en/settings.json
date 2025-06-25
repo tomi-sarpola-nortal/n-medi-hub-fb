@@ -30,5 +30,7 @@
   "settings_delete_success_desc": "Your account has been permanently deleted.",
   "settings_delete_error_title": "Deletion Failed",
   "settings_pending_approval_title": "Account Pending Approval",
-  "settings_pending_approval_alert": "Your account is pending approval. You can review and edit your submitted data or delete your account. Access to other portal features is disabled until your registration is approved."
+  "settings_pending_approval_alert": "Your account is pending approval. You can review and edit your submitted data or delete your account. Access to other portal features is disabled until your registration is approved.",
+  "settings_pending_changes_title": "Changes Pending Review",
+  "settings_pending_changes_desc": "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."
 }

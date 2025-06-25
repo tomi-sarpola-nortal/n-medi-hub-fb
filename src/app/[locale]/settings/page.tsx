@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAuth } from '@/context/auth-context';
@@ -76,9 +75,9 @@ export default function SettingsPage() {
         {hasPendingDataChange && !isPendingRegistration && (
            <Alert variant="default" className="bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200">
             <AlertTriangle className="h-4 w-4 !text-blue-600 dark:!text-blue-400" />
-            <AlertTitle>{"Änderungen zur Überprüfung ausstehend"}</AlertTitle>
+            <AlertTitle>{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
             <AlertDescription>
-              {"Ihre letzten Datenänderungen wurden zur Überprüfung eingereicht. Sie können die Formulare erst wieder bearbeiten, nachdem die Änderungen genehmigt oder abgelehnt wurden."}
+              {t.settings_pending_changes_desc || "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."}
             </AlertDescription>
           </Alert>
         )}

@@ -30,5 +30,7 @@
   "settings_delete_success_desc": "Ihr Konto wurde dauerhaft gelöscht.",
   "settings_delete_error_title": "Löschen fehlgeschlagen",
   "settings_pending_approval_title": "Konto wartet auf Genehmigung",
-  "settings_pending_approval_alert": "Ihr Konto wartet auf die Genehmigung. Sie können Ihre übermittelten Daten überprüfen, bearbeiten oder Ihr Konto löschen. Der Zugriff auf andere Portalfunktionen ist bis zur Genehmigung Ihrer Registrierung deaktiviert."
+  "settings_pending_approval_alert": "Ihr Konto wartet auf die Genehmigung. Sie können Ihre übermittelten Daten überprüfen, bearbeiten oder Ihr Konto löschen. Der Zugriff auf andere Portalfunktionen ist bis zur Genehmigung Ihrer Registrierung deaktiviert.",
+  "settings_pending_changes_title": "Änderungen zur Überprüfung ausstehend",
+  "settings_pending_changes_desc": "Ihre letzten Datenänderungen wurden zur Überprüfung eingereicht. Sie können die Formulare erst wieder bearbeiten, nachdem die Änderungen genehmigt oder abgelehnt wurden."
 }
