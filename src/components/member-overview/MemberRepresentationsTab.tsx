@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
-import type { Representation, Person } from '@/lib/types';
+import type { Representation, Person, UserRole } from '@/lib/types';
 import { getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,8 @@ import { Loader2, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
 import { RepresentationStatusBadge } from '@/components/representations/RepresentationStatusBadge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/context/auth-context';
+import { logGeneralAudit } from '@/app/actions/auditActions';
 
 interface MemberRepresentationsTabProps {
   member: Person;
@@ -34,6 +36,7 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null); // Store ID of rep being updated
   const { toast } = useToast();
+  const { user: auditor } = useAuth();
 
   const fetchRepresentations = async () => {
     setIsLoading(true);
@@ -68,9 +71,28 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
   }, [member.id]);
 
   const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
+    if (!auditor) {
+      toast({ title: t.toast_error_title || "Error", description: "Auditor not found.", variant: 'destructive' });
+      return;
+    }
+    
     setIsSubmitting(representationId);
     try {
         await updateRepresentationStatus(representationId, status);
+
+        const rep = representations.find(r => r.id === representationId);
+        
+        if (rep) {
+            await logGeneralAudit({
+                auditor: { id: auditor.id, name: auditor.name, role: auditor.role as UserRole, chamber: auditor.stateChamberId || 'wien' },
+                impacted: { id: member.id, name: member.name },
+                operation: 'update',
+                collectionName: 'representations',
+                fieldName: 'status',
+                details: `Representation status for ${rep.representingPersonName} changed to '${status}'.`,
+            });
+        }
+
         toast({
             title: t.toast_success_title || "Success",
             description: `Representation has been ${status}.`,
@@ -137,7 +159,7 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     </RepresentationStatusBadge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {rep.status === 'pending' ? (
+                    {rep.status === 'pending' && rep.representedPersonId === member.id ? (
                       <div className="flex gap-2 justify-end">
                         <Button
                           size="sm"
