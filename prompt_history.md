@@ -1,34 +1,34 @@
 # Project Development History
 
-This document outlines the features and changes implemented during the development session.
+This document outlines the features and changes implemented during the development session, in chronological order.
 
-## Core UI & Layout
-- **Sidebar Enhancements**:
-  - The user profile section in the sidebar is now a clickable link that navigates to the `/settings` page.
-  - The user's avatar was updated to use a standard `UserCircle` icon for a consistent look.
-- **Dashboard UI Fix**:
-  - Corrected a text-wrapping issue on the "Your State Chamber" information card to prevent long email addresses from overflowing.
-
-## Representations Module
+### Representations Module
+- **New Representation Page - Initial Simplification**:
+  - The dentist selection combobox was replaced with a simple dropdown.
+  - The 'Calculated Duration (hours)' field was removed to streamline the form.
+  - Default start and end times were set to 11:00 AM and 12:00 PM.
+  - Time inputs were refined to use separate dropdowns for hours and 15-minute intervals (00, 15, 30, 45).
+- **New Representation Page - Enhanced Functionality**:
+  - The simple dentist dropdown was replaced with a searchable pop-up dialog, allowing users to find a dentist by name or ID.
+  - A "Previously Represented" list was added to the right side of the form, allowing for quick selection of recently represented dentists.
 - **Representations Overview Page**:
-  - The main table was split into two distinct tables: one for "Representations Received" and another for "Representations Performed".
-  - The "Enter New Representation" button was logically moved to the header of the "Performed" table.
-- **New Representation Page**:
-  - **Dentist Selection**: Replaced the initial combobox with a more user-friendly dialog popup. This dialog allows searching for dentists by name or ID.
-  - **Form Simplification**: Removed the "Calculated Duration" field to streamline the form.
-  - **Time Input**:
-    - Default start and end times are now set to 11:00 AM and 12:00 PM respectively.
-    - Time inputs were updated to use separate dropdowns for hours and 15-minute intervals for minutes (00, 15, 30, 45).
-  - **Quick Select Feature**: Added a "Previously Represented" list on the right side of the form. Clicking a name from this list populates the main form's "Represented Dentist" field, speeding up data entry.
-- **Bug Fixes**:
-  - Resolved a race condition where clicking on a dentist in the selection list would not register due to the component unmounting too quickly.
-  - Fixed a runtime error caused by a missing `Label` component import.
+  - The main table was split into two distinct tables: one for representations received from others, and another for representations performed for others.
+  - The "Enter New Representation" button was moved to be logically associated with the "performed" table.
+  - The redundant "Type" column was removed from the tables.
 
-## Documents Module
-- **Search Functionality**:
-  - Implemented a search bar on the Documents page. Users can now filter the document list in real-time by searching for a document's title or publisher.
+### Core UI & Layout
+- **Sidebar & Dashboard UI Fixes**:
+  - The user's profile picture in the sidebar was replaced with a standard `UserCircle` icon.
+  - A text-wrapping issue was fixed on the "Your State Chamber" info card on the dashboard page.
 
-## Member Management Module
+### Documents Module
+- **Search Functionality**: A search bar was added to the Documents page, allowing users to filter documents in real-time by title or publisher.
+
+### Member Management Module
 - **Member Detail Page**:
-  - Activated and implemented the "Trainings" tab to display the selected member's complete training history.
-  - Activated and implemented the "Representations" tab to display a full history of representations performed by or for the selected member.
+  - The "Trainings" tab was implemented to display the selected member's complete training history.
+  - The "Representations" tab was implemented to show a full history of representations performed by or for the selected member, including actions for pending requests.
+
+### Developer Module & Documentation
+- **Developer Page**: Buttons were added to the developer page to view the project and prompt history.
+- **History Tracking**: This file was created and updated to serve as the project's development log.
