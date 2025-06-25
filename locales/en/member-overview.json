@@ -81,7 +81,11 @@
   "member_overview_rep_type_received": "Received",
   "member_overview_rep_action_confirm": "Confirm",
   "member_overview_rep_action_decline": "Decline",
-  "member_overview_rep_no_reps_found": "No representations found for this member."
+  "member_overview_rep_no_reps_found": "No representations found for this member.",
+  "member_list_table_action_view_profile": "View Profile",
+  "member_list_table_action_set_inactive": "Set Inactive",
+  "member_list_deactivate_dialog_title": "Are you sure?",
+  "member_list_deactivate_dialog_desc": "This will set user {memberName} to 'inactive'. They will lose access to the portal but their data will be preserved. This action can be reversed.",
+  "member_list_deactivate_dialog_confirm": "Set Inactive",
+  "member_list_deactivate_dialog_cancel": "Cancel"
 }
-
-    

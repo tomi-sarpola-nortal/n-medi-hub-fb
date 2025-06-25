@@ -9,12 +9,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Search, Loader2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { PlusCircle, Search, Loader2, MoreHorizontal } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { getAllPersons } from '@/services/personService';
 import { getAllRepresentations } from '@/services/representationService';
+import { setPersonStatus } from '@/app/actions/memberActions';
+import { useToast } from '@/hooks/use-toast';
 import type { Person } from '@/lib/types';
 import { format } from 'date-fns';
 
@@ -46,50 +50,68 @@ interface AugmentedPerson extends Person {
 export default function MemberOverviewPage() {
   const params = useParams();
   const locale = typeof params.locale === 'string' ? params.locale : 'en';
+  const { toast } = useToast();
 
   const [t, setT] = useState<Record<string, string>>({});
   const [augmentedPersons, setAugmentedPersons] = useState<AugmentedPerson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [personToDeactivate, setPersonToDeactivate] = useState<AugmentedPerson | null>(null);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [pointsFilter, setPointsFilter] = useState('all');
   const [repsFilter, setRepsFilter] = useState('all');
 
+  const fetchAndProcessData = async () => {
+    setIsLoading(true);
+    try {
+      const [persons, allReps] = await Promise.all([
+          getAllPersons(),
+          getAllRepresentations(),
+      ]);
+
+      const repHoursMap = new Map<string, number>();
+      allReps.forEach(rep => {
+          if (rep.status === 'confirmed') {
+              const currentHours = repHoursMap.get(rep.representedPersonId) || 0;
+              repHoursMap.set(rep.representedPersonId, currentHours + rep.durationHours);
+          }
+      });
+
+      const augmented = persons.map(person => ({
+          ...person,
+          totalRepHours: repHoursMap.get(person.id) || 0,
+      }));
+
+      setAugmentedPersons(augmented);
+    } catch (error) {
+      console.error("Failed to fetch member data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setT(getClientTranslations(locale));
-    
-    const fetchAndProcessData = async () => {
-      setIsLoading(true);
-      try {
-        const [persons, allReps] = await Promise.all([
-            getAllPersons(),
-            getAllRepresentations(),
-        ]);
-
-        const repHoursMap = new Map<string, number>();
-        allReps.forEach(rep => {
-            if (rep.status === 'confirmed') {
-                const currentHours = repHoursMap.get(rep.representedPersonId) || 0;
-                repHoursMap.set(rep.representedPersonId, currentHours + rep.durationHours);
-            }
-        });
-
-        const augmented = persons.map(person => ({
-            ...person,
-            totalRepHours: repHoursMap.get(person.id) || 0,
-        }));
-
-        setAugmentedPersons(augmented);
-      } catch (error) {
-        console.error("Failed to fetch member data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     fetchAndProcessData();
   }, [locale]);
+
+  const handleDeactivateConfirm = async () => {
+    if (!personToDeactivate) return;
+
+    setIsSubmitting(true);
+    const result = await setPersonStatus(personToDeactivate.id, 'inactive');
+
+    if (result.success) {
+        toast({ title: "Success", description: result.message });
+        await fetchAndProcessData(); // Refetch data to update UI
+    } else {
+        toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    setPersonToDeactivate(null);
+    setIsSubmitting(false);
+  };
 
   const membersToReview = useMemo(() => {
     return augmentedPersons.filter(p => p.status === 'pending');
@@ -246,7 +268,7 @@ export default function MemberOverviewPage() {
                                 <TableHead>{t.member_list_table_header_last_update || "Last Data Confirmation"}</TableHead>
                                 <TableHead>{t.member_list_table_header_training_points || "Training Points"}</TableHead>
                                 <TableHead>{t.member_list_table_header_rep_hours || "Rep. Hours"}</TableHead>
-                                <TableHead>{t.member_list_table_header_action || "Action"}</TableHead>
+                                <TableHead className="text-right">{t.member_list_table_header_action || "Action"}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -260,10 +282,28 @@ export default function MemberOverviewPage() {
                                     <TableCell>{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                     <TableCell>{member.educationPoints || 0}</TableCell>
                                     <TableCell>{member.totalRepHours.toFixed(1)} h</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/${locale}/member-overview/${member.id}`}>{t.member_list_table_action_button || "VIEW"}</Link>
-                                        </Button>
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/${locale}/member-overview/${member.id}`}>{t.member_list_table_action_view_profile || "View Profile"}</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    onClick={() => setPersonToDeactivate(member)}
+                                                    disabled={member.status !== 'active'}
+                                                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                                >
+                                                    {t.member_list_table_action_set_inactive || "Set Inactive"}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             )) : (
@@ -276,9 +316,28 @@ export default function MemberOverviewPage() {
                 </CardContent>
             </Card>
 
+            <AlertDialog open={!!personToDeactivate} onOpenChange={(open) => !open && setPersonToDeactivate(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t.member_list_deactivate_dialog_title || "Are you sure?"}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {(t.member_list_deactivate_dialog_desc || "This will set user {memberName} to 'inactive'. They will lose access to the portal but their data will be preserved. This action can be reversed.")
+                                .replace('{memberName}', personToDeactivate?.name || 'this user')}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setPersonToDeactivate(null)} disabled={isSubmitting}>
+                            {t.member_list_deactivate_dialog_cancel || "Cancel"}
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeactivateConfirm} disabled={isSubmitting} className="bg-destructive hover:bg-destructive/90">
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t.member_list_deactivate_dialog_confirm || "Set Inactive"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     </AppLayout>
   )
 }
-
-    

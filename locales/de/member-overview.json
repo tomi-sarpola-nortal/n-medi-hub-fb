@@ -81,7 +81,11 @@
   "member_overview_rep_type_received": "Vertreten worden",
   "member_overview_rep_action_confirm": "Bestätigen",
   "member_overview_rep_action_decline": "Ablehnen",
-  "member_overview_rep_no_reps_found": "Für dieses Mitglied wurden keine Vertretungen gefunden."
+  "member_overview_rep_no_reps_found": "Für dieses Mitglied wurden keine Vertretungen gefunden.",
+  "member_list_table_action_view_profile": "Profil ansehen",
+  "member_list_table_action_set_inactive": "Auf Inaktiv setzen",
+  "member_list_deactivate_dialog_title": "Sind Sie sicher?",
+  "member_list_deactivate_dialog_desc": "Dies setzt den Benutzer {memberName} auf 'inaktiv'. Er verliert den Zugang zum Portal, aber seine Daten bleiben erhalten. Diese Aktion kann rückgängig gemacht werden.",
+  "member_list_deactivate_dialog_confirm": "Auf Inaktiv setzen",
+  "member_list_deactivate_dialog_cancel": "Abbrechen"
 }
-
-    
