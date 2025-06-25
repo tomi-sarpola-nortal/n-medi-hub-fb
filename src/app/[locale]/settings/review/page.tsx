@@ -88,10 +88,10 @@ export default function UserDataReviewPage() {
                 </div>
             </div>
 
-            <Card className="bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-800">
-                <CardHeader>
+            <Card>
+                <CardHeader className="bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-800">
                     <CardDescription>{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</CardDescription>
-                    <CardDescription className="!mt-1">{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
+                    <CardDescription>{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
                 </CardHeader>
                 <CardContent>
                      <div className="mt-6 border rounded-lg">
@@ -131,3 +131,4 @@ export default function UserDataReviewPage() {
     </AppLayout>
   );
 }
+
