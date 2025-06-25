@@ -65,5 +65,12 @@
   "member_review_cancel_button": "ABBRECHEN",
   "member_review_submit_button": "PRÜFUNG ABSENDEN",
   "member_review_breadcrumb_review": "Datenänderung prüfen",
-  "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen."
+  "member_review_no_pending": "Zurzeit gibt es keine ausstehenden Mitgliederüberprüfungen.",
+  "member_overview_rep_table_header_type": "Art",
+  "member_overview_rep_table_header_other_person": "Beteiligte Person",
+  "member_overview_rep_type_performed": "Durchgeführt",
+  "member_overview_rep_type_received": "Vertreten worden",
+  "member_overview_rep_action_confirm": "Bestätigen",
+  "member_overview_rep_action_decline": "Ablehnen",
+  "member_overview_rep_no_reps_found": "Für dieses Mitglied wurden keine Vertretungen gefunden."
 }

@@ -9,8 +9,8 @@ import { useAuth } from "@/context/auth-context";
 import { useRouter, useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { getAllPersons } from "@/services/personService";
-import { createRepresentation } from "@/services/representationService";
-import type { Person } from "@/lib/types";
+import { createRepresentation, getRepresentationsForUser } from "@/services/representationService";
+import type { Person, Representation } from "@/lib/types";
 import { set } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +62,7 @@ export default function NewRepresentationPage() {
 
     const [t, setT] = useState<Record<string, string>>({});
     const [dentists, setDentists] = useState<Person[]>([]);
+    const [recentDentists, setRecentDentists] = useState<{ id: string, name: string }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -81,31 +82,56 @@ export default function NewRepresentationPage() {
 
     useEffect(() => {
         setT(getClientTranslations(locale));
-        async function fetchDentists() {
+        async function fetchData() {
+            if (!user) return;
             setIsLoading(true);
             try {
-                const allPersons = await getAllPersons();
-                const availableDentists = allPersons.filter(p => p.id !== user?.id && p.status === 'active' && p.role === 'dentist');
+                const [allPersons, representationData] = await Promise.all([
+                    getAllPersons(),
+                    getRepresentationsForUser(user.id)
+                ]);
+
+                // For the main selector dialog
+                const availableDentists = allPersons.filter(p => p.id !== user.id && p.status === 'active' && p.role === 'dentist');
                 setDentists(availableDentists);
+
+                // For the quick select list
+                const uniqueRecent = new Map<string, { id: string; name: string }>();
+                representationData.performed.forEach(rep => {
+                    if (!uniqueRecent.has(rep.representedPersonId)) {
+                        const personDetails = allPersons.find(p => p.id === rep.representedPersonId);
+                        uniqueRecent.set(rep.representedPersonId, { 
+                            id: rep.representedPersonId, 
+                            name: personDetails?.name || rep.representedPersonName 
+                        });
+                    }
+                });
+                setRecentDentists(Array.from(uniqueRecent.values()).slice(0, 5));
+
             } catch (error) {
-                toast({ title: "Error", description: "Could not fetch dentists.", variant: "destructive" });
+                console.error("Failed to fetch data:", error);
+                toast({ title: "Error", description: "Could not fetch necessary data.", variant: "destructive" });
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         }
-        if (user) {
-            fetchDentists();
-        }
+        
+        fetchData();
     }, [user, locale, toast]);
 
     useEffect(() => {
         const dentistId = form.getValues("representedDentistId");
-        if (dentistId && dentists.length > 0) {
+        if (dentistId) {
             const dentist = dentists.find(d => d.id === dentistId);
             if (dentist) {
                 setSelectedDentistName(dentist.name);
+            } else {
+                // Check if it's in the recent list
+                const recent = recentDentists.find(d => d.id === dentistId);
+                if (recent) setSelectedDentistName(recent.name);
             }
         }
-    }, [dentists, form]);
+    }, [dentists, recentDentists, form]);
 
     const onSubmit = async (data: FormValues) => {
         if (!user) return;
@@ -169,7 +195,7 @@ export default function NewRepresentationPage() {
     
     return (
         <AppLayout pageTitle={pageTitle} locale={locale}>
-            <div className="flex-1 space-y-6 p-4 md:p-8 max-w-2xl mx-auto">
+            <div className="flex-1 space-y-6 p-4 md:p-8 max-w-5xl mx-auto">
                  <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                        <Link href={`/${locale}/representations`}>
@@ -188,140 +214,175 @@ export default function NewRepresentationPage() {
                     </div>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-xl">{t.new_representation_card_title || "Enter Representation Details"}</CardTitle>
-                        <CardDescription>{t.new_representation_card_desc || "Select the dentist you represented and the time period."}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                 <FormField
-                                    control={form.control}
-                                    name="representedDentistId"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
-                                            <FormControl>
-                                                <Button
-                                                    variant="outline"
-                                                    type="button"
-                                                    className="w-full justify-start text-left font-normal h-10"
-                                                    onClick={() => setIsDialogOpen(true)}
-                                                >
-                                                    {field.value && selectedDentistName ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <UserCheck className="h-4 w-4 text-primary" />
-                                                            <span>{selectedDentistName}</span>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div className="lg:col-span-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline text-xl">{t.new_representation_card_title || "Enter Representation Details"}</CardTitle>
+                                <CardDescription>{t.new_representation_card_desc || "Select the dentist you represented and the time period."}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                        <FormField
+                                            control={form.control}
+                                            name="representedDentistId"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>{t.new_representation_form_dentist_label || "Represented Dentist"}</FormLabel>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            type="button"
+                                                            className="w-full justify-start text-left font-normal h-10"
+                                                            onClick={() => setIsDialogOpen(true)}
+                                                        >
+                                                            {field.value && selectedDentistName ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <UserCheck className="h-4 w-4 text-primary" />
+                                                                    <span>{selectedDentistName}</span>
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-muted-foreground">{t.select_dentist_button_placeholder || "Select a dentist..."}</span>
+                                                            )}
+                                                        </Button>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        
+                                        <FormField
+                                            control={form.control}
+                                            name="date"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>{t.new_representation_form_date_label || "Date"}</FormLabel>
+                                                    <DatePickerInput
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        disabled={(date) => date > new Date()}
+                                                    />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="startTime"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>{t.new_representation_form_start_time_label || "Start Time"}</FormLabel>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <Select
+                                                                onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
+                                                                value={(field.value || '11:00').split(':')[0]}
+                                                            >
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {hours.map((hour) => (
+                                                                        <SelectItem key={`start-h-${hour}`} value={hour}>{hour}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <Select
+                                                                onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
+                                                                value={(field.value || '11:00').split(':')[1]}
+                                                            >
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {minutes.map((minute) => (
+                                                                        <SelectItem key={`start-m-${minute}`} value={minute}>{minute}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
                                                         </div>
-                                                    ) : (
-                                                        <span className="text-muted-foreground">{t.select_dentist_button_placeholder || "Select a dentist..."}</span>
-                                                    )}
-                                                </Button>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                
-                                <FormField
-                                    control={form.control}
-                                    name="date"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>{t.new_representation_form_date_label || "Date"}</FormLabel>
-                                            <DatePickerInput
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                disabled={(date) => date > new Date()}
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
                                             />
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                            <FormField
+                                                control={form.control}
+                                                name="endTime"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>{t.new_representation_form_end_time_label || "End Time"}</FormLabel>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <Select
+                                                                onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
+                                                                value={(field.value || '12:00').split(':')[0]}
+                                                            >
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {hours.map((hour) => (
+                                                                        <SelectItem key={`end-h-${hour}`} value={hour}>{hour}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <Select
+                                                                onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
+                                                                value={(field.value || '12:00').split(':')[1]}
+                                                            >
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {minutes.map((minute) => (
+                                                                        <SelectItem key={`end-m-${minute}`} value={minute}>{minute}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                     <FormField
-                                        control={form.control}
-                                        name="startTime"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{t.new_representation_form_start_time_label || "Start Time"}</FormLabel>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <Select
-                                                        onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
-                                                        value={(field.value || '11:00').split(':')[0]}
-                                                    >
-                                                        <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
-                                                        <SelectContent>
-                                                            {hours.map((hour) => (
-                                                                <SelectItem key={`start-h-${hour}`} value={hour}>{hour}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <Select
-                                                        onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
-                                                        value={(field.value || '11:00').split(':')[1]}
-                                                    >
-                                                        <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
-                                                        <SelectContent>
-                                                            {minutes.map((minute) => (
-                                                                <SelectItem key={`start-m-${minute}`} value={minute}>{minute}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                     <FormField
-                                        control={form.control}
-                                        name="endTime"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{t.new_representation_form_end_time_label || "End Time"}</FormLabel>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                     <Select
-                                                        onValueChange={(h) => field.onChange(`${h}:${(field.value || '00:00').split(':')[1]}`)}
-                                                        value={(field.value || '12:00').split(':')[0]}
-                                                    >
-                                                        <FormControl><SelectTrigger><SelectValue placeholder="Hour" /></SelectTrigger></FormControl>
-                                                        <SelectContent>
-                                                            {hours.map((hour) => (
-                                                                <SelectItem key={`end-h-${hour}`} value={hour}>{hour}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <Select
-                                                        onValueChange={(m) => field.onChange(`${(field.value || '00:00').split(':')[0]}:${m}`)}
-                                                        value={(field.value || '12:00').split(':')[1]}
-                                                    >
-                                                        <FormControl><SelectTrigger><SelectValue placeholder="Minute" /></SelectTrigger></FormControl>
-                                                        <SelectContent>
-                                                            {minutes.map((minute) => (
-                                                                <SelectItem key={`end-m-${minute}`} value={minute}>{minute}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                        <div className="flex justify-end gap-4 pt-4">
+                                            <Button type="button" variant="outline" onClick={() => router.back()}>{t.new_representation_form_cancel_button || "Cancel"}</Button>
+                                            <Button type="submit" disabled={isSubmitting}>
+                                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                {t.new_representation_form_save_button || "Save Representation"}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </Form>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                                <div className="flex justify-end gap-4 pt-4">
-                                    <Button type="button" variant="outline" onClick={() => router.back()}>{t.new_representation_form_cancel_button || "Cancel"}</Button>
-                                    <Button type="submit" disabled={isSubmitting}>
-                                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        {t.new_representation_form_save_button || "Save Representation"}
-                                    </Button>
-                                </div>
-                            </form>
-                        </Form>
-                    </CardContent>
-                </Card>
+                    <div className="lg:col-span-1">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline text-lg">{t.new_representation_recent_dentists_title || "Quick Select"}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {recentDentists.length > 0 ? (
+                                    <div className="space-y-1">
+                                        {recentDentists.map(dentist => (
+                                            <Button
+                                                key={dentist.id}
+                                                variant="ghost"
+                                                className="w-full justify-start text-left h-auto py-2"
+                                                onClick={() => {
+                                                    form.setValue("representedDentistId", dentist.id, { shouldValidate: true });
+                                                    setSelectedDentistName(dentist.name);
+                                                }}
+                                            >
+                                                {dentist.name}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground text-center py-4">
+                                        {t.new_representation_no_recent_dentists || "No recent representations found."}
+                                    </p>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
             </div>
             <SelectDentistDialog
                 isOpen={isDialogOpen}

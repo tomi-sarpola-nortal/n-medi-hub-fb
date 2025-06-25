@@ -15,5 +15,7 @@
   "state_noe": "Lower Austria",
   "state_ooe": "Upper Austria",
   "state_bayern": "Bavaria",
-  "state_bw": "Baden-Württemberg"
+  "state_bw": "Baden-Württemberg",
+  "toast_success_title": "Success",
+  "toast_error_title": "Error"
 }

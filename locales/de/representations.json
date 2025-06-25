@@ -41,5 +41,8 @@
   "select_dentist_dialog_desc": "Suchen Sie nach einem Zahnarzt nach Name oder ID und wählen Sie ihn aus.",
   "select_dentist_search_placeholder": "Suche nach Name oder ID...",
   "select_dentist_button_placeholder": "Zahnarzt auswählen...",
-  "no_dentists_found": "Keine Zahnärzte gefunden."
+  "no_dentists_found": "Keine Zahnärzte gefunden.",
+  
+  "new_representation_recent_dentists_title": "Schnellauswahl",
+  "new_representation_no_recent_dentists": "Keine kürzlichen Vertretungen gefunden."
 }

@@ -41,5 +41,8 @@
   "select_dentist_dialog_desc": "Search for a dentist by name or ID and select them.",
   "select_dentist_search_placeholder": "Search by name or ID...",
   "select_dentist_button_placeholder": "Select a dentist...",
-  "no_dentists_found": "No dentists found."
+  "no_dentists_found": "No dentists found.",
+
+  "new_representation_recent_dentists_title": "Quick Select",
+  "new_representation_no_recent_dentists": "No recent representations found."
 }

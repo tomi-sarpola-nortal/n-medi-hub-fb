@@ -13,6 +13,7 @@ import type { Person } from '@/lib/types';
 import { getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
+import MemberRepresentationsTab from '@/components/member-overview/MemberRepresentationsTab';
 
 interface MemberReviewPageProps {
   params: { memberId: string; locale: string };
@@ -86,7 +87,7 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
                 <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
                     <TabsTrigger value="stammdaten">{t.member_review_stammdaten_tab || "Stammdaten"}</TabsTrigger>
                     <TabsTrigger value="fortbildungen">{t.member_review_fortbildungen_tab || "Fortbildungen"}</TabsTrigger>
-                    <TabsTrigger value="vertretungen" disabled>{t.member_review_vertretungen_tab || "Vertretungen"}</TabsTrigger>
+                    <TabsTrigger value="vertretungen">{t.member_review_vertretungen_tab || "Vertretungen"}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="stammdaten" className="mt-6">
                     <Card>
@@ -222,12 +223,10 @@ export default async function MemberReviewPage({ params }: MemberReviewPageProps
                     </Card>
                 </TabsContent>
                 <TabsContent value="vertretungen" className="mt-6">
-                    {/* Placeholder for representations */}
+                    <MemberRepresentationsTab member={person} t={t} />
                 </TabsContent>
              </Tabs>
         </div>
     </AppLayout>
   );
 }
-
-    

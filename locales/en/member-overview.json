@@ -65,5 +65,12 @@
   "member_review_cancel_button": "CANCEL",
   "member_review_submit_button": "SUBMIT REVIEW",
   "member_review_breadcrumb_review": "Review Data Change",
-  "member_review_no_pending": "No pending member reviews at the moment."
+  "member_review_no_pending": "No pending member reviews at the moment.",
+  "member_overview_rep_table_header_type": "Type",
+  "member_overview_rep_table_header_other_person": "Other Person",
+  "member_overview_rep_type_performed": "Performed",
+  "member_overview_rep_type_received": "Received",
+  "member_overview_rep_action_confirm": "Confirm",
+  "member_overview_rep_action_decline": "Decline",
+  "member_overview_rep_no_reps_found": "No representations found for this member."
 }

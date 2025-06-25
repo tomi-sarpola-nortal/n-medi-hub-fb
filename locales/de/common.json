@@ -15,5 +15,7 @@
   "state_noe": "Niederösterreich",
   "state_ooe": "Oberösterreich",
   "state_bayern": "Bayern",
-  "state_bw": "Baden-Württemberg"
+  "state_bw": "Baden-Württemberg",
+  "toast_success_title": "Erfolg",
+  "toast_error_title": "Fehler"
 }
