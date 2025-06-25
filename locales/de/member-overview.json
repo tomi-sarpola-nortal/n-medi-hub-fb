@@ -95,5 +95,6 @@
   "member_review_column_field": "Feld",
   "member_review_column_status": "Status",
   "member_review_status_updated": "Geändert",
-  "member_review_status_no_change": "Keine Änderung"
+  "member_review_status_no_change": "Keine Änderung",
+  "member_review_type_new_registration": "Neue Registrierung"
 }

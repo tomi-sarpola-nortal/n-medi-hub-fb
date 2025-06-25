@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -197,7 +196,7 @@ export default function MemberOverviewPage() {
                                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                                         {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                         <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">
-                                            {member.pendingData ? (t.data_change_label || "Data Change") : "New Registration"}
+                                            {member.pendingData ? (t.data_change_label || "Data Change") : (t.member_review_type_new_registration || "New Registration")}
                                         </span>
                                     </p>
                                 </div>

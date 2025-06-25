@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -7,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { FilePen, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { getPersonsToReview } from '@/services/personService';
+import { getAllPersons } from '@/services/personService';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import StateChamberInfo from './StateChamberInfo';
@@ -25,7 +24,11 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
     React.useEffect(() => {
         const fetchMembersToReview = async () => {
             try {
-                const members = await getPersonsToReview(5);
+                const allPersons = await getAllPersons();
+                const members = allPersons
+                    .filter(p => p.status === 'pending' || !!p.pendingData)
+                    .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
+                    .slice(0, 5); // Apply limit here
                 setMembersToReview(members);
             } catch (error) {
                 console.error("Failed to fetch members for review:", error);
@@ -69,7 +72,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                                                         {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                                         <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">
-                                                            {member.pendingData ? (t.data_change_label || "Data Change") : (t.member_list_status_pending || "New Registration")}
+                                                            {member.pendingData ? (t.data_change_label || "Data Change") : (t.member_review_type_new_registration || "New Registration")}
                                                         </span>
                                                     </p>
                                                 </div>
