@@ -87,5 +87,9 @@
   "member_list_deactivate_dialog_title": "Sind Sie sicher?",
   "member_list_deactivate_dialog_desc": "Dies setzt den Benutzer {memberName} auf 'inaktiv'. Er verliert den Zugang zum Portal, aber seine Daten bleiben erhalten. Diese Aktion kann rückgängig gemacht werden.",
   "member_list_deactivate_dialog_confirm": "Auf Inaktiv setzen",
-  "member_list_deactivate_dialog_cancel": "Abbrechen"
+  "member_list_deactivate_dialog_cancel": "Abbrechen",
+  "member_list_delete_user_button": "Benutzer löschen",
+  "member_list_delete_dialog_title": "Sind Sie absolut sicher?",
+  "member_list_delete_dialog_desc": "Dadurch wird der Benutzer {memberName} und alle zugehörigen Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "member_list_delete_dialog_confirm": "Benutzer löschen"
 }

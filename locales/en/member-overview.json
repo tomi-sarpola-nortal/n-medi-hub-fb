@@ -87,5 +87,9 @@
   "member_list_deactivate_dialog_title": "Are you sure?",
   "member_list_deactivate_dialog_desc": "This will set user {memberName} to 'inactive'. They will lose access to the portal but their data will be preserved. This action can be reversed.",
   "member_list_deactivate_dialog_confirm": "Set Inactive",
-  "member_list_deactivate_dialog_cancel": "Cancel"
+  "member_list_deactivate_dialog_cancel": "Cancel",
+  "member_list_delete_user_button": "Delete User",
+  "member_list_delete_dialog_title": "Are you absolutely sure?",
+  "member_list_delete_dialog_desc": "This will permanently delete the user {memberName} and all associated data. This action cannot be undone.",
+  "member_list_delete_dialog_confirm": "Delete User"
 }
