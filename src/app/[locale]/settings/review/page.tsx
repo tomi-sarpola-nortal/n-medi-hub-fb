@@ -90,8 +90,8 @@ export default function UserDataReviewPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-xl font-headline">{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</CardTitle>
-                    <CardDescription>{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
+                    <CardDescription>{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</CardDescription>
+                    <CardDescription className="!mt-1">{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
                 </CardHeader>
                 <CardContent>
                      <div className="mt-6 border rounded-lg">
