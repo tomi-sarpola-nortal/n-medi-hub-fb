@@ -75,8 +75,8 @@ export default function MemberOverviewPage() {
       const statusMatch = statusFilter === 'all' || person.status === statusFilter;
       
       const searchMatch = !searchTerm ||
-        person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        person.dentistId?.toLowerCase().includes(searchTerm.toLowerCase());
+        (person.name && person.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (person.dentistId && person.dentistId.toLowerCase().includes(searchTerm.toLowerCase()));
       
       return statusMatch && searchMatch;
     });
