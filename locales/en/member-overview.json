@@ -108,5 +108,11 @@
   "member_profile_reset_password_success_desc": "Password reset email sent successfully to {email}.",
   "member_profile_reset_password_error_title": "Action Failed",
   "member_profile_reset_password_error_desc": "Could not send the password reset email. Please try again later.",
-  "member_review_new_registration_alert_text": "This new member registration is awaiting approval. Please review the submitted data."
+  "member_review_new_registration_alert_text": "This new member registration is awaiting approval. Please review the submitted data.",
+  "create_member_page_title": "Create New Member",
+  "create_member_page_desc": "Fill in the details for the new member. They will receive an email to set their password.",
+  "create_member_success_toast": "User created successfully. A password reset email has been sent.",
+  "create_member_error_toast": "Failed to create user.",
+  "create_member_submit_button": "Create Member and Send Invite",
+  "create_member_breadcrumb_create": "Create"
 }

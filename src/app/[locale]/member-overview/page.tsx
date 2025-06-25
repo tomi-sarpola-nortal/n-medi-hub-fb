@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -176,9 +177,11 @@ export default function MemberOverviewPage() {
                         <span className="font-medium text-foreground">{t.member_overview_breadcrumb_current || "Member Overview"}</span>
                     </div>
                 </div>
-                <Button className="flex items-center gap-2">
-                    <PlusCircle className="h-5 w-5"/>
-                    <span className="hidden sm:inline">{t.member_overview_create_new_button || "CREATE NEW MEMBER"}</span>
+                <Button asChild className="flex items-center gap-2">
+                    <Link href={`/${locale}/member-overview/create`}>
+                        <PlusCircle className="h-5 w-5"/>
+                        <span className="hidden sm:inline">{t.member_overview_create_new_button || "CREATE NEW MEMBER"}</span>
+                    </Link>
                 </Button>
             </div>
 
