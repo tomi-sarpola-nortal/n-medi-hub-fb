@@ -203,9 +203,14 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
                                                         <div>
                                                             <p className="font-semibold">{item.personName}</p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {(t.dashboard_overdue_reps_for_person || "{count} overdue request(s)").replace('{count}', item.count.toString())}
-                                                            </p>
+                                                             <div className="flex items-center gap-2 mt-1">
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {(t.dashboard_overdue_reps_for_person || "{count} overdue request(s)").replace('{count}', item.count.toString())}
+                                                                </p>
+                                                                <Badge className="border border-destructive bg-destructive text-destructive-foreground">
+                                                                    {t.representations_label_overdue || "overdue"}
+                                                                </Badge>
+                                                            </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${item.personId}?tab=vertretungen`}>
