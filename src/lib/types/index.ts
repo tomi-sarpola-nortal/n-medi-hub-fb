@@ -92,6 +92,12 @@ export interface Person {
   approved?: boolean;
   educationPoints?: number;
 
+  // Notification preferences
+  notificationSettings: {
+    inApp: boolean;
+    email: boolean;
+  };
+
   // Personal Data from Step 3
   title?: string;
   firstName?: string;
@@ -294,3 +300,14 @@ export interface AuditLog {
 }
 
 export type AuditLogCreationData = Omit<AuditLog, 'id' | 'timestamp'>;
+
+export interface Notification {
+  id: string;
+  userId: string;
+  message: string;
+  link: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export type NotificationCreationData = Omit<Notification, 'id' | 'createdAt'>;

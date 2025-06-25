@@ -16,6 +16,8 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import type { Representation, RepresentationCreationData } from '@/lib/types';
+import { getPersonById } from './personService';
+import { createNotification } from './notificationService';
 
 
 const REPRESENTATIONS_COLLECTION = 'representations';
@@ -64,6 +66,18 @@ export async function createRepresentation(data: RepresentationCreationData): Pr
     ...data,
     createdAt: serverTimestamp(),
   });
+  
+  // Notify the person who was represented
+  const representedPerson = await getPersonById(data.representedPersonId);
+  if (representedPerson?.notificationSettings?.inApp) {
+      await createNotification({
+          userId: data.representedPersonId,
+          message: `"${data.representingPersonName}" has submitted a new representation for you.`,
+          link: '/representations',
+          isRead: false,
+      });
+  }
+
   return docRef.id;
 }
 
@@ -147,6 +161,21 @@ export async function updateRepresentationStatus(representationId: string, statu
     }
     
     await updateDoc(representationRef, updateData);
+
+    // Notify the person who performed the representation
+    const repDoc = await getDocs(query(collection(db, REPRESENTATIONS_COLLECTION), where('__name__', '==', representationId)));
+    if (!repDoc.empty) {
+        const repData = snapshotToRepresentation(repDoc.docs[0]);
+        const representingPerson = await getPersonById(repData.representingPersonId);
+        if (representingPerson?.notificationSettings?.inApp) {
+            await createNotification({
+                userId: repData.representingPersonId,
+                message: `Your representation for "${repData.representedPersonName}" has been ${status}.`,
+                link: '/representations',
+                isRead: false,
+            });
+        }
+    }
 }
 
 /**

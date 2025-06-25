@@ -17,5 +17,14 @@
   "state_bayern": "Bavaria",
   "state_bw": "Baden-Württemberg",
   "toast_success_title": "Success",
-  "toast_error_title": "Error"
+  "toast_error_title": "Error",
+  "notification_new_representation": "\"{actorName}\" has submitted a new representation for you.",
+  "notification_representation_approved": "Your representation for \"{targetName}\" has been approved.",
+  "notification_representation_declined": "Your representation for \"{targetName}\" has been declined.",
+  "notification_new_registration_review": "A new registration for \"{targetName}\" is ready for review.",
+  "notification_registration_approved": "Congratulations! Your registration has been approved.",
+  "notification_registration_rejected": "There has been an update on your registration review.",
+  "notification_new_data_change_review": "\"{actorName}\" has submitted data changes for review.",
+  "notification_data_change_approved": "Your recent data changes have been approved.",
+  "notification_data_change_rejected": "Your recent data changes have been rejected."
 }

@@ -23,6 +23,7 @@ import {
   or,
 } from 'firebase/firestore';
 import { createAuditLog } from './auditLogService';
+import { createNotification } from './notificationService';
 
 
 const PERSONS_COLLECTION = 'persons';
@@ -75,6 +76,7 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     // Add missing fields to make it a complete user representation
     approved: data.approved,
     educationPoints: data.educationPoints,
+    notificationSettings: data.notificationSettings || { inApp: true, email: false },
 
     // Personal Data from Step 3
     title: data.title,
@@ -152,6 +154,23 @@ export async function createPerson(
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+
+  // If this is a new registration, notify LK members
+  if (personData.status === 'pending') {
+    const chamberMembers = await getPersonsByRole('lk_member');
+    const notificationPromises = chamberMembers.map(member => {
+        if (member.notificationSettings?.inApp) {
+            return createNotification({
+                userId: member.id,
+                message: `A new registration for "${personData.name}" is ready for review.`,
+                link: `/member-overview/${uid}/review`,
+                isRead: false,
+            });
+        }
+        return Promise.resolve();
+    });
+    await Promise.all(notificationPromises);
+  }
 }
 
 /**
@@ -246,6 +265,18 @@ export async function getAllPersons(): Promise<Person[]> {
 }
 
 /**
+ * Retrieves all persons with a specific role.
+ * @param role The role to filter by.
+ * @returns An array of Person objects.
+ */
+export async function getPersonsByRole(role: UserRole): Promise<Person[]> {
+  checkDb();
+  const q = query(collection(db, PERSONS_COLLECTION), where('role', '==', role));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(snapshotToPerson);
+}
+
+/**
  * Processes a review for a pending person registration or data change.
  * @param personId The ID of the person to review.
  * @param decision The review decision: 'approve', 'deny', or 'reject'.
@@ -279,12 +310,13 @@ export async function reviewPerson(
         details: baseDetails
     };
 
-    if (person.status === 'active' && person.pendingData) {
-        // Data change review
-        logData.fieldName = Object.keys(person.pendingData);
+    const isNewRegistration = person.status === 'pending';
+    const isDataChange = person.status === 'active' && person.pendingData;
+
+    if (isDataChange) {
+        logData.fieldName = Object.keys(person.pendingData!);
         logData.details = `Data change review. ${baseDetails}`;
-    } else if (person.status === 'pending') {
-        // New registration review
+    } else if (isNewRegistration) {
         logData.details = `New registration review. ${baseDetails}`;
     }
 
@@ -292,19 +324,23 @@ export async function reviewPerson(
 
 
     // Perform the update logic
-    // Case 1: Reviewing a data change for an active user
-    if (person.status === 'active' && person.pendingData) {
+    if (isDataChange) {
         if (decision === 'approve') {
-            const updatesToApply = person.pendingData;
+            const updatesToApply = person.pendingData!;
             await updatePerson(personId, { ...updatesToApply, pendingData: deleteField() as any, hasPendingChanges: deleteField() as any, rejectionReason: deleteField() as any });
+            if (person.notificationSettings?.inApp) {
+                await createNotification({ userId: person.id, message: "Your recent data changes have been approved.", link: `/settings`, isRead: false });
+            }
         } else { // deny or reject
             await updatePerson(personId, { pendingData: deleteField() as any, hasPendingChanges: deleteField() as any, rejectionReason: justification });
+            if (person.notificationSettings?.inApp) {
+                await createNotification({ userId: person.id, message: `Your recent data changes have been rejected.`, link: `/settings/review`, isRead: false });
+            }
         }
         return;
     }
 
-    // Case 2: Reviewing a new registration
-    if (person.status === 'pending') {
+    if (isNewRegistration) {
         const updates: Partial<Person> = {};
         switch (decision) {
             case 'approve':
@@ -313,17 +349,25 @@ export async function reviewPerson(
                     updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
                 }
                 updates.rejectionReason = deleteField() as any;
+                if (person.notificationSettings?.inApp) {
+                    await createNotification({ userId: person.id, message: "Congratulations! Your registration has been approved.", link: `/dashboard`, isRead: false });
+                }
                 break;
             case 'deny':
                 updates.status = 'inactive';
                 updates.rejectionReason = justification;
+                 if (person.notificationSettings?.inApp) {
+                    await createNotification({ userId: person.id, message: `There has been an update on your registration review.`, link: `/settings`, isRead: false });
+                }
                 break;
             case 'reject':
                 updates.status = 'rejected';
                 updates.rejectionReason = justification;
+                 if (person.notificationSettings?.inApp) {
+                    await createNotification({ userId: person.id, message: `There has been an update on your registration review.`, link: `/settings`, isRead: false });
+                }
                 break;
         }
-        // Also clear the hasPendingChanges flag if it exists for some reason
         updates.hasPendingChanges = deleteField() as any;
         await updatePerson(personId, updates);
         return;
@@ -385,6 +429,3 @@ export async function getPersonsToReview(limitValue?: number): Promise<Person[]>
 
     return limitValue ? sortedPersons.slice(0, limitValue) : sortedPersons;
 }
-
-
-    

@@ -17,5 +17,14 @@
   "state_bayern": "Bayern",
   "state_bw": "Baden-Württemberg",
   "toast_success_title": "Erfolg",
-  "toast_error_title": "Fehler"
+  "toast_error_title": "Fehler",
+  "notification_new_representation": "\"{actorName}\" hat eine neue Vertretung für Sie eingereicht.",
+  "notification_representation_approved": "Ihre Vertretung für \"{targetName}\" wurde genehmigt.",
+  "notification_representation_declined": "Ihre Vertretung für \"{targetName}\" wurde abgelehnt.",
+  "notification_new_registration_review": "Eine neue Registrierung für \"{targetName}\" wartet auf Überprüfung.",
+  "notification_registration_approved": "Herzlichen Glückwunsch! Ihre Registrierung wurde genehmigt.",
+  "notification_registration_rejected": "Es gibt ein Update zu Ihrer Registrierungsprüfung.",
+  "notification_new_data_change_review": "\"{actorName}\" hat Datenänderungen zur Überprüfung eingereicht.",
+  "notification_data_change_approved": "Ihre kürzlichen Datenänderungen wurden genehmigt.",
+  "notification_data_change_rejected": "Ihre kürzlichen Datenänderungen wurden abgelehnt."
 }

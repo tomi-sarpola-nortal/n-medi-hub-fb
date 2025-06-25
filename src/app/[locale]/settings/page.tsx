@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from '@/context/auth-context';
@@ -8,6 +9,7 @@ import PersonalDataForm from '@/components/settings/PersonalDataForm';
 import ProfessionalQualificationsForm from '@/components/settings/ProfessionalQualificationsForm';
 import PracticeInformationForm from '@/components/settings/PracticeInformationForm';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
+import NotificationSettingsForm from '@/components/settings/NotificationSettingsForm';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -117,6 +119,14 @@ export default function SettingsPage() {
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
                 <PracticeInformationForm user={user} t={t} isDisabled={isFormDisabled} />
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="item-4">
+            <AccordionTrigger className="font-headline text-lg">{t.settings_notification_title || "Notification Settings"}</AccordionTrigger>
+            <AccordionContent>
+                <p className="text-sm text-muted-foreground mb-4">{t.settings_notification_desc || "Choose how you want to be notified."}</p>
+                <NotificationSettingsForm user={user} t={t} isDisabled={isFormDisabled} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

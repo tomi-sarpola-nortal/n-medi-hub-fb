@@ -1,8 +1,9 @@
 
 'use server';
 
-import { updatePerson, deletePerson, getPersonById } from '@/services/personService';
+import { updatePerson, getPersonsByRole } from '@/services/personService';
 import type { Person } from '@/lib/types';
+import { createNotification } from '@/services/notificationService';
 import { FieldValue } from 'firebase/firestore';
 
 
@@ -34,10 +35,27 @@ export async function deletePersonById(personId: string): Promise<{ success: boo
   }
 }
 
-export async function requestDataChange(personId: string, updates: Partial<Person>): Promise<{ success: boolean; message: string }> {
+export async function requestDataChange(personId: string, updates: Partial<Person>, actor: Person): Promise<{ success: boolean; message: string }> {
   try {
     // Store the changes in 'pendingData' and set a flag for easier querying
     await updatePerson(personId, { pendingData: updates, hasPendingChanges: true });
+    
+    // Notify all Landeskammer members
+    const chamberMembers = await getPersonsByRole('lk_member');
+    const notificationPromises = chamberMembers.map(member => {
+        if (member.notificationSettings?.inApp) {
+            return createNotification({
+                userId: member.id,
+                message: `"${actor.name}" has submitted data changes for review.`,
+                link: `/member-overview/${personId}/review`,
+                isRead: false,
+            });
+        }
+        return Promise.resolve();
+    });
+    
+    await Promise.all(notificationPromises);
+
     return { success: true, message: 'Your changes have been submitted for review.' };
   } catch (error) {
     console.error('Error requesting data change:', error);

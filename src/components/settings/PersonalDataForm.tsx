@@ -54,7 +54,7 @@ interface PersonalDataFormProps {
 
 export default function PersonalDataForm({ user, t, isDisabled = false }: PersonalDataFormProps) {
   const { toast } = useToast();
-  const { setUser } = useAuth();
+  const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(user.idDocumentName || null);
 
@@ -77,6 +77,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   });
 
   const onSubmit = async (data: PersonalDataFormInputs) => {
+    if (!authUser) return;
     setIsLoading(true);
     try {
       const { idDocument, ...restOfData } = data;
@@ -95,7 +96,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
         updateData.idDocumentName = fileToUpload.name;
       }
 
-      const result = await requestDataChange(user.id, updateData);
+      const result = await requestDataChange(user.id, updateData, authUser);
 
       if (result.success) {
         // Optimistically update the user context to reflect the pending state
