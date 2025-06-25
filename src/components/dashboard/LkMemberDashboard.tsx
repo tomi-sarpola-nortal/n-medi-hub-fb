@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { FilePen, Loader2, Users2, ShieldAlert } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { getAllPersons } from '@/services/personService';
 import { getOldPendingRepresentations } from '@/services/representationService';
 import Link from 'next/link';
@@ -105,7 +106,10 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                             {registrationsToReview.length > 0 && (
                                 <Card className="shadow-lg">
                                     <CardHeader>
-                                        <CardTitle className="font-headline text-xl">{t.review_registrations_title || 'Review New Registrations'}</CardTitle>
+                                        <div className="flex items-center gap-2">
+                                            <FilePen className="h-5 w-5 text-primary" />
+                                            <CardTitle className="font-headline text-xl">{t.review_registrations_title || 'Review New Registrations'}</CardTitle>
+                                        </div>
                                         <CardDescription>{t.review_registrations_desc || 'Review and approve new member registrations.'}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-0">
@@ -115,12 +119,14 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
                                                         <div>
                                                             <p className="font-semibold text-base">{member.name}</p>
-                                                            <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                                                {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
-                                                                <span className="bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-200 px-2 py-0.5 rounded-full text-xs font-medium">
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
+                                                                </p>
+                                                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/60 dark:text-orange-200 dark:border-orange-800">
                                                                     {t.member_review_type_new_registration || "New Registration"}
-                                                                </span>
-                                                            </p>
+                                                                </Badge>
+                                                            </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
@@ -141,7 +147,10 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                             {changesToReview.length > 0 && (
                                 <Card className="shadow-lg">
                                     <CardHeader>
-                                        <CardTitle className="font-headline text-xl">{t.review_changes_title || 'Review Data Changes'}</CardTitle>
+                                        <div className="flex items-center gap-2">
+                                            <FilePen className="h-5 w-5 text-primary" />
+                                            <CardTitle className="font-headline text-xl">{t.review_changes_title || 'Review Data Changes'}</CardTitle>
+                                        </div>
                                         <CardDescription>{t.review_changes_desc || 'Review and approve data changes from existing members.'}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-0">
@@ -151,12 +160,14 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
                                                         <div>
                                                             <p className="font-semibold text-base">{member.name}</p>
-                                                            <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                                                {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
-                                                                <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/60 dark:text-yellow-200 px-2 py-0.5 rounded-full text-xs font-medium">
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
+                                                                </p>
+                                                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/60 dark:text-yellow-200 dark:border-yellow-800">
                                                                     {t.data_change_label || "Data Change"}
-                                                                </span>
-                                                            </p>
+                                                                </Badge>
+                                                            </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
