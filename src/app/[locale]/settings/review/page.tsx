@@ -1,9 +1,8 @@
-
 "use client";
 
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
@@ -89,12 +88,13 @@ export default function UserDataReviewPage() {
             </div>
 
             <Card>
-                <CardHeader className="bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-800">
-                    <CardDescription>{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</CardDescription>
-                    <CardDescription>{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <div className="mt-6 border rounded-lg">
+                <CardContent className="p-6 space-y-6">
+                    <div className="bg-amber-50 border border-amber-300 dark:bg-amber-950/20 dark:border-amber-800 rounded-lg p-4">
+                        <p className="text-sm text-muted-foreground">{t.settings_pending_changes_desc || "Your recent data changes have been submitted for review."}</p>
+                        <p className="text-sm text-muted-foreground mt-2">{t.member_review_info_change_date || "Date of Data Change"}: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}</p>
+                    </div>
+
+                     <div className="border rounded-lg">
                         <div className="grid grid-cols-4 gap-4 px-4 py-2 font-semibold text-muted-foreground bg-black/5 dark:bg-white/5 border-b">
                             <div className="col-span-1">{t.member_review_column_field || "Field"}</div>
                             <div className="col-span-1">{t.member_review_old_data || "Old"}</div>
@@ -117,7 +117,7 @@ export default function UserDataReviewPage() {
                             <p className="text-muted-foreground text-center p-4">No changes were found in the submission.</p>
                         )}
                     </div>
-                    <div className="flex justify-end mt-8">
+                    <div className="flex justify-end">
                         <Button asChild>
                             <Link href={`/${locale}/settings`}>
                                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -131,4 +131,3 @@ export default function UserDataReviewPage() {
     </AppLayout>
   );
 }
-
