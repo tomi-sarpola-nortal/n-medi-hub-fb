@@ -75,8 +75,9 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
   }, [member.id]);
 
   const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
-    if (!auditor) {
-      toast({ title: t.toast_error_title || "Error", description: "Auditor not found.", variant: 'destructive' });
+    const rep = representations.find(r => r.id === representationId);
+    if (!auditor || !rep) {
+      toast({ title: t.toast_error_title || "Error", description: "Auditor or representation not found.", variant: 'destructive' });
       return;
     }
     
@@ -84,18 +85,16 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
     try {
         await updateRepresentationStatus(representationId, status);
 
-        const rep = representations.find(r => r.id === representationId);
+        const impactedPerson = { id: rep.representedPersonId, name: rep.representedPersonName };
         
-        if (rep) {
-            await logGeneralAudit({
-                auditor: { id: auditor.id, name: auditor.name, role: auditor.role as UserRole, chamber: auditor.stateChamberId || 'wien' },
-                impacted: { id: member.id, name: member.name },
-                operation: 'update',
-                collectionName: 'representations',
-                fieldName: 'status',
-                details: `Representation status for ${rep.representingPersonName} changed to '${status}'.`,
-            });
-        }
+        await logGeneralAudit({
+            auditor: { id: auditor.id, name: auditor.name, role: auditor.role as UserRole, chamber: auditor.stateChamberId || 'wien' },
+            impacted: impactedPerson,
+            operation: 'update',
+            collectionName: 'representations',
+            fieldName: 'status',
+            details: `Representation status for ${rep.representingPersonName} changed to '${status}' by ${auditor.name}.`,
+        });
 
         toast({
             title: t.toast_success_title || "Success",
@@ -149,6 +148,7 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
               {representations.length > 0 ? representations.map((rep) => {
                 const isStartDateOverdue = rep.status === 'pending' && new Date(rep.startDate) < fiveDaysAgo;
                 const isCreateDateOverdue = rep.createdAt && rep.status === 'pending' && new Date(rep.createdAt) < fiveDaysAgo;
+                const showActions = rep.status === 'pending' && (auditor?.id === rep.representedPersonId || auditor?.role === 'lk_member');
 
                 return (
                 <TableRow key={rep.id}>
@@ -156,7 +156,7 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     <div className="flex items-center gap-2">
                       <span>{formatPeriod(rep.startDate, rep.endDate)}</span>
                       {isStartDateOverdue && (
-                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
+                        <Badge variant="destructive" className="border border-destructive bg-destructive text-destructive-foreground">
                           {t.representations_label_overdue || "overdue"}
                         </Badge>
                       )}
@@ -180,14 +180,14 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     <div className="flex items-center gap-2">
                       <span>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</span>
                       {isCreateDateOverdue && (
-                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
+                        <Badge variant="destructive" className="border border-destructive bg-destructive text-destructive-foreground">
                           {t.representations_label_overdue || "overdue"}
                         </Badge>
                       )}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {rep.status === 'pending' && rep.representedPersonId === member.id ? (
+                    {showActions ? (
                       <div className="flex gap-2 justify-end">
                         <Button
                           size="sm"
