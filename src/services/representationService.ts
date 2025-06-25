@@ -162,8 +162,8 @@ export async function getAllRepresentations(): Promise<Representation[]> {
 
 
 /**
- * Fetches all pending representation requests older than a certain number of days.
- * @param daysOld The number of days old a request must be to be included.
+ * Fetches all pending representation requests older than a certain number of days based on their START DATE.
+ * @param daysOld The number of days old a request's start date must be to be included.
  * @returns An array of old, pending Representation objects.
  */
 export async function getOldPendingRepresentations(daysOld: number = 5): Promise<Representation[]> {
@@ -175,8 +175,8 @@ export async function getOldPendingRepresentations(daysOld: number = 5): Promise
 
   const q = query(representationsRef, 
     where('status', '==', 'pending'),
-    where('createdAt', '<=', thresholdDate),
-    orderBy('createdAt', 'asc') // Oldest first
+    where('startDate', '<=', thresholdDate.toISOString()),
+    orderBy('startDate', 'asc') // Oldest first
   );
   
   const querySnapshot = await getDocs(q);

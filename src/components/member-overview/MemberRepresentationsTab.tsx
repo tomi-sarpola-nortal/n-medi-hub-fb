@@ -45,12 +45,13 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
       const sortedReps = uniqueReps.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
       setRepresentations(sortedReps);
 
-      // Check for old pending requests FOR THIS MEMBER
-      const now = new Date();
-      const fiveDaysAgo = new Date(now.setDate(now.getDate() - 5));
+      // Check for old pending requests FOR THIS MEMBER based on start date
+      const fiveDaysAgo = new Date();
+      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
       const oldPending = data.wasRepresented.filter(r => 
           r.status === 'pending' && 
-          new Date(r.createdAt) < fiveDaysAgo
+          new Date(r.startDate) < fiveDaysAgo
       );
       setHasOldRequests(oldPending.length > 0);
 
