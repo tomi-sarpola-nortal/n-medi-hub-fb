@@ -355,7 +355,8 @@ export default function NewRepresentationPage() {
                     <div className="lg:col-span-1">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="font-headline text-lg">{t.new_representation_recent_dentists_title || "Quick Select"}</CardTitle>
+                                <CardTitle className="font-headline text-lg">{t.new_representation_recent_dentists_title || "Previously Represented"}</CardTitle>
+                                <CardDescription>{t.new_representation_recent_dentists_desc || "Select a dentist from your recent representations."}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {recentDentists.length > 0 ? (

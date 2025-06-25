@@ -43,6 +43,7 @@
   "select_dentist_button_placeholder": "Zahnarzt auswählen...",
   "no_dentists_found": "Keine Zahnärzte gefunden.",
   
-  "new_representation_recent_dentists_title": "Schnellauswahl",
+  "new_representation_recent_dentists_title": "Zuletzt vertreten",
+  "new_representation_recent_dentists_desc": "Wählen Sie einen Zahnarzt aus Ihren letzten Vertretungen aus.",
   "new_representation_no_recent_dentists": "Keine kürzlichen Vertretungen gefunden."
 }

@@ -43,6 +43,7 @@
   "select_dentist_button_placeholder": "Select a dentist...",
   "no_dentists_found": "No dentists found.",
 
-  "new_representation_recent_dentists_title": "Quick Select",
+  "new_representation_recent_dentists_title": "Previously Represented",
+  "new_representation_recent_dentists_desc": "Select a dentist from your recent representations.",
   "new_representation_no_recent_dentists": "No recent representations found."
 }
