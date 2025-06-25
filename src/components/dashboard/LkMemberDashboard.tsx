@@ -12,7 +12,6 @@ import { getOldPendingRepresentations } from '@/services/representationService';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import StateChamberInfo from './StateChamberInfo';
-import { cn } from '@/lib/utils';
 
 interface LkMemberDashboardProps {
     user: Person;
@@ -30,16 +29,13 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
         const fetchDashboardData = async () => {
             setIsLoading(true);
             try {
-                const results = await Promise.allSettled([
+                const [allPersonsResult, oldRepsResult] = await Promise.allSettled([
                     getAllPersons(),
                     getOldPendingRepresentations(5)
                 ]);
 
-                const allPersonsResult = results[0];
-                const oldRepsResult = results[1];
-
                 if (allPersonsResult.status === 'fulfilled') {
-                     const allReviewable = allPersonsResult.value
+                    const allReviewable = allPersonsResult.value
                         .filter(p => p.status === 'pending' || !!p.pendingData)
                         .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
 
@@ -160,19 +156,21 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                     <CardHeader>
                                         <div className="flex items-center gap-2">
                                             <ShieldAlert className="h-5 w-5 text-destructive" />
-                                            <CardTitle className="text-destructive">{t.dashboard_old_reps_title || 'Overdue Representation Requests'}</CardTitle>
+                                            <CardTitle>{t.dashboard_old_reps_title || 'Overdue Representation Requests'}</CardTitle>
                                         </div>
-                                        <CardDescription className="text-destructive/80">
+                                        <CardDescription>
                                             {(t.dashboard_old_reps_desc || '{count} representation requests are older than 5 days and require review.').replace('{count}', oldRepresentations.length.toString())}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">
-                                        <Link href={`/${locale}/member-overview`}>
-                                            <Users2 className="mr-2 h-4 w-4" />
-                                            {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
-                                        </Link>
-                                        </Button>
+                                        <div className="flex justify-end">
+                                            <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">
+                                            <Link href={`/${locale}/member-overview`}>
+                                                <Users2 className="mr-2 h-4 w-4" />
+                                                {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
+                                            </Link>
+                                            </Button>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             )}
