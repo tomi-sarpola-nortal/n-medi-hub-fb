@@ -14,6 +14,7 @@ import { RepresentationStatusBadge } from '@/components/representations/Represen
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/auth-context';
 import { logGeneralAudit } from '@/app/actions/auditActions';
+import { Badge } from '@/components/ui/badge';
 
 interface MemberRepresentationsTabProps {
   member: Person;
@@ -147,13 +148,19 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
             <TableBody>
               {representations.length > 0 ? representations.map((rep) => {
                 const isStartDateOverdue = rep.status === 'pending' && new Date(rep.startDate) < fiveDaysAgo;
-                const isCreateDateOverdue = rep.status === 'pending' && rep.createdAt && new Date(rep.createdAt) < fiveDaysAgo;
+                const isCreateDateOverdue = rep.createdAt && rep.status === 'pending' && new Date(rep.createdAt) < fiveDaysAgo;
 
                 return (
                 <TableRow key={rep.id}>
                   <TableCell className="font-medium whitespace-pre-wrap">
-                    {formatPeriod(rep.startDate, rep.endDate)}
-                    {isStartDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                    <div className="flex items-center gap-2">
+                      <span>{formatPeriod(rep.startDate, rep.endDate)}</span>
+                      {isStartDateOverdue && (
+                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                          {t.representations_label_overdue || "overdue"}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {rep.representingPersonId === member.id 
@@ -170,8 +177,14 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
                     </RepresentationStatusBadge>
                   </TableCell>
                   <TableCell>
-                    {rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}
-                    {isCreateDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                    <div className="flex items-center gap-2">
+                      <span>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</span>
+                      {isCreateDateOverdue && (
+                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                          {t.representations_label_overdue || "overdue"}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     {rep.status === 'pending' && rep.representedPersonId === member.id ? (

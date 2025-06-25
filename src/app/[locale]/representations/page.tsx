@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import ConfirmRepresentationCard from '@/components/representations/ConfirmRepresentationCard';
+import { Badge } from '@/components/ui/badge';
 
 const getClientTranslations = (locale: string) => {
     try {
@@ -220,13 +221,19 @@ export default function RepresentationsPage() {
                             <TableBody>
                                 {performedRepresentations.length > 0 ? performedRepresentations.map((rep) => {
                                     const isStartDateOverdue = rep.status === 'pending' && new Date(rep.startDate) < fiveDaysAgo;
-                                    const isCreateDateOverdue = rep.status === 'pending' && new Date(rep.createdAt) < fiveDaysAgo;
+                                    const isCreateDateOverdue = rep.createdAt ? rep.status === 'pending' && new Date(rep.createdAt) < fiveDaysAgo : false;
 
                                     return (
                                         <TableRow key={rep.id}>
                                             <TableCell className="font-medium whitespace-pre-wrap">
-                                                {formatPeriod(rep.startDate, rep.endDate)}
-                                                {isStartDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                                                <div className="flex items-center gap-2">
+                                                    <span>{formatPeriod(rep.startDate, rep.endDate)}</span>
+                                                    {isStartDateOverdue && (
+                                                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                                                            {t.representations_label_overdue || "overdue"}
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell>{rep.representedPersonName}</TableCell>
                                             <TableCell>{rep.durationHours} Stunden</TableCell>
@@ -237,8 +244,14 @@ export default function RepresentationsPage() {
                                             </TableCell>
                                             <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                             <TableCell>
-                                                {rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}
-                                                {isCreateDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                                                <div className="flex items-center gap-2">
+                                                  <span>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</span>
+                                                  {isCreateDateOverdue && (
+                                                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                                                            {t.representations_label_overdue || "overdue"}
+                                                        </Badge>
+                                                  )}
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     )
