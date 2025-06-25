@@ -8,6 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
 import type { Representation } from '@/lib/types';
 import { format } from 'date-fns';
+import { useParams } from 'next/navigation';
+import { updateRepresentationStatus } from '@/services/representationService';
+import { useToast } from '@/hooks/use-toast';
 
 const formatPeriod = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
@@ -66,7 +69,7 @@ const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Represen
 interface ConfirmRepresentationCardProps {
     requests: Representation[];
     t: Record<string, string>;
-    onStatusChange: (id: string, status: 'confirmed' | 'declined') => void;
+    onStatusChange: (representationId: string, status: 'confirmed' | 'declined') => void;
     className?: string;
 }
 
@@ -84,7 +87,7 @@ export default function ConfirmRepresentationCard({ requests, t, onStatusChange,
                         {index < requests.length - 1 && <Separator className="my-4"/>}
                     </div>
                 )) : (
-                     <p className="text-sm text-muted-foreground text-center py-4">{t.member_review_no_pending || "No pending member reviews at the moment."}</p>
+                     <p className="text-sm text-muted-foreground text-center py-4">No pending member reviews at the moment.</p>
                 )}
             </CardContent>
         </Card>

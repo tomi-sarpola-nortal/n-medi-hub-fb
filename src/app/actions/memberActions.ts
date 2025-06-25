@@ -4,6 +4,8 @@
 import { updatePerson, getPersonsByRole } from '@/services/personService';
 import type { Person } from '@/lib/types';
 import { createNotification } from '@/services/notificationService';
+import { sendEmail } from '@/services/emailService';
+import { getTranslations } from '@/lib/translations';
 import { FieldValue } from 'firebase/firestore';
 
 
@@ -35,23 +37,34 @@ export async function deletePersonById(personId: string): Promise<{ success: boo
   }
 }
 
-export async function requestDataChange(personId: string, updates: Partial<Person>, actor: Person): Promise<{ success: boolean; message: string }> {
+export async function requestDataChange(personId: string, updates: Partial<Person>, actor: Person, locale: string): Promise<{ success: boolean; message: string }> {
   try {
     // Store the changes in 'pendingData' and set a flag for easier querying
     await updatePerson(personId, { pendingData: updates, hasPendingChanges: true });
     
-    // Notify all Landeskammer members
+    const t = getTranslations(locale);
     const chamberMembers = await getPersonsByRole('lk_member');
-    const notificationPromises = chamberMembers.map(member => {
+    
+    const notificationPromises = chamberMembers.map(async (member) => {
         if (member.notificationSettings?.inApp) {
-            return createNotification({
+            await createNotification({
                 userId: member.id,
-                message: `"${actor.name}" has submitted data changes for review.`,
+                message: t.notification_new_data_change_review.replace('{actorName}', actor.name),
                 link: `/member-overview/${personId}/review`,
                 isRead: false,
             });
         }
-        return Promise.resolve();
+        if (member.notificationSettings?.email && member.email) {
+            await sendEmail({
+                to: [member.email],
+                message: {
+                    subject: t.email_subject_new_data_change_review,
+                    html: t.email_body_new_data_change_review
+                          .replace('{targetName}', member.name)
+                          .replace('{actorName}', actor.name)
+                }
+            });
+        }
     });
     
     await Promise.all(notificationPromises);

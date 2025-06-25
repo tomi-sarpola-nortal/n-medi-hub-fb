@@ -13,7 +13,7 @@
   "settings_notification_in_app_label": "In-App-Benachrichtigungen",
   "settings_notification_in_app_desc": "Erhalten Sie Benachrichtigungen direkt im Portal.",
   "settings_notification_email_label": "E-Mail-Benachrichtigungen",
-  "settings_notification_email_desc": "Erhalten Sie Benachrichtigungen per E-Mail (bald verfügbar).",
+  "settings_notification_email_desc": "Erhalten Sie Benachrichtigungen per E-Mail.",
   "settings_button_save": "Änderungen speichern",
   "settings_save_success_title": "Informationen gespeichert",
   "settings_save_error_title": "Speichern fehlgeschlagen",

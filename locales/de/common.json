@@ -26,5 +26,26 @@
   "notification_registration_rejected": "Es gibt ein Update zu Ihrer Registrierungsprüfung.",
   "notification_new_data_change_review": "\"{actorName}\" hat Datenänderungen zur Überprüfung eingereicht.",
   "notification_data_change_approved": "Ihre kürzlichen Datenänderungen wurden genehmigt.",
-  "notification_data_change_rejected": "Ihre kürzlichen Datenänderungen wurden abgelehnt."
+  "notification_data_change_rejected": "Ihre kürzlichen Datenänderungen wurden abgelehnt.",
+
+  "email_subject_new_representation": "Neue Vertretungsanfrage",
+  "email_body_new_representation": "Sehr geehrte/r {targetName},<br><br>eine neue Vertretungsanfrage wurde von {actorName} für Sie eingereicht. Bitte melden Sie sich im Portal an, um sie zu überprüfen.<br><br>Vielen Dank.",
+  "email_subject_representation_approved": "Vertretung genehmigt",
+  "email_body_representation_approved": "Sehr geehrte/r {targetName},<br><br>Ihre Vertretungsanfrage für {actorName} wurde genehmigt.<br><br>Vielen Dank.",
+  "email_subject_representation_declined": "Vertretung abgelehnt",
+  "email_body_representation_declined": "Sehr geehrte/r {targetName},<br><br>Ihre Vertretungsanfrage für {actorName} wurde abgelehnt.<br><br>Vielen Dank.",
+
+  "email_subject_new_registration": "Neue Mitgliedsregistrierung zur Prüfung",
+  "email_body_new_registration": "Sehr geehrte/r {targetName},<br><br>eine neue Mitgliedsregistrierung für {actorName} steht zur Prüfung bereit. Bitte melden Sie sich im Portal an.<br><br>Vielen Dank.",
+  "email_subject_registration_approved": "Ihre Registrierung wurde genehmigt",
+  "email_body_registration_approved": "Sehr geehrte/r {targetName},<br><br>Herzlichen Glückwunsch! Ihre Registrierung bei der Zahnärztekammer wurde genehmigt. Sie können nun alle Funktionen des Portals nutzen.<br><br>Vielen Dank.",
+  "email_subject_registration_rejected": "Aktualisierung zu Ihrer Registrierung",
+  "email_body_registration_rejected": "Sehr geehrte/r {targetName},<br><br>es gibt eine Aktualisierung bezüglich Ihres Registrierungsantrags. Bitte melden Sie sich im Portal an, um weitere Details zu erfahren.<br><br>Vielen Dank.",
+
+  "email_subject_new_data_change_review": "Datenänderungsantrag zur Prüfung",
+  "email_body_new_data_change_review": "Sehr geehrte/r {targetName},<br><br>das Mitglied {actorName} hat Datenänderungen zur Prüfung eingereicht. Bitte melden Sie sich im Portal an.<br><br>Vielen Dank.",
+  "email_subject_data_change_approved": "Ihre Datenänderungen wurden genehmigt",
+  "email_body_data_change_approved": "Sehr geehrte/r {targetName},<br><br>Ihre kürzlich eingereichten Datenänderungen wurden genehmigt und sind nun aktiv.<br><br>Vielen Dank.",
+  "email_subject_data_change_rejected": "Aktualisierung Ihrer Datenänderungen",
+  "email_body_data_change_rejected": "Sehr geehrte/r {targetName},<br><br>es gibt eine Aktualisierung bezüglich Ihres Antrags auf Datenänderung. Bitte melden Sie sich im Portal an, um weitere Details zu erfahren.<br><br>Vielen Dank."
 }

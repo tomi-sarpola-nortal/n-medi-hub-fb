@@ -95,14 +95,14 @@ export default function NotificationSettingsForm({ user, t, isDisabled = false }
               <div className="space-y-0.5">
                 <FormLabel className="text-base">{t.settings_notification_email_label || "Email Notifications"}</FormLabel>
                 <FormDescription>
-                  {t.settings_notification_email_desc || "Receive notifications via email (coming soon)."}
+                  {t.settings_notification_email_desc || "Receive notifications via email."}
                 </FormDescription>
               </div>
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
-                  disabled={true} // Feature not yet implemented
+                  disabled={isDisabled}
                 />
               </FormControl>
             </FormItem>

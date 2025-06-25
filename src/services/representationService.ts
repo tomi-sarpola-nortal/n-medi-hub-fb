@@ -18,6 +18,8 @@ import {
 import type { Representation, RepresentationCreationData } from '@/lib/types';
 import { getPersonById } from './personService';
 import { createNotification } from './notificationService';
+import { sendEmail } from './emailService';
+import { getTranslations } from '@/lib/translations';
 
 
 const REPRESENTATIONS_COLLECTION = 'representations';
@@ -57,9 +59,10 @@ const snapshotToRepresentation = (snapshot: any): Representation => {
 /**
  * Creates a new representation document.
  * @param data The data for the new representation.
+ * @param locale The locale for email translations.
  * @returns The ID of the newly created document.
  */
-export async function createRepresentation(data: RepresentationCreationData): Promise<string> {
+export async function createRepresentation(data: RepresentationCreationData, locale: string): Promise<string> {
   checkDb();
   const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
   const docRef = await addDoc(representationsRef, {
@@ -67,15 +70,30 @@ export async function createRepresentation(data: RepresentationCreationData): Pr
     createdAt: serverTimestamp(),
   });
   
-  // Notify the person who was represented
   const representedPerson = await getPersonById(data.representedPersonId);
-  if (representedPerson?.notificationSettings?.inApp) {
-      await createNotification({
-          userId: data.representedPersonId,
-          message: `"${data.representingPersonName}" has submitted a new representation for you.`,
-          link: '/representations',
-          isRead: false,
-      });
+  if (representedPerson) {
+      const t = getTranslations(locale);
+      // In-app notification
+      if (representedPerson.notificationSettings?.inApp) {
+          await createNotification({
+              userId: data.representedPersonId,
+              message: t.notification_new_representation.replace('{actorName}', data.representingPersonName),
+              link: '/representations',
+              isRead: false,
+          });
+      }
+      // Email notification
+      if (representedPerson.notificationSettings?.email && representedPerson.email) {
+          await sendEmail({
+              to: [representedPerson.email],
+              message: {
+                  subject: t.email_subject_new_representation,
+                  html: t.email_body_new_representation
+                        .replace('{targetName}', representedPerson.name)
+                        .replace('{actorName}', data.representingPersonName),
+              },
+          });
+      }
   }
 
   return docRef.id;
@@ -149,8 +167,9 @@ export async function getRepresentationsForUser(userId: string): Promise<{
  * Updates the status of a representation request.
  * @param representationId The ID of the representation document.
  * @param status The new status: 'confirmed' or 'declined'.
+ * @param locale The locale for email translations.
  */
-export async function updateRepresentationStatus(representationId: string, status: 'confirmed' | 'declined'): Promise<void> {
+export async function updateRepresentationStatus(representationId: string, status: 'confirmed' | 'declined', locale: string): Promise<void> {
     checkDb();
     const representationRef = doc(db, REPRESENTATIONS_COLLECTION, representationId);
     
@@ -162,18 +181,37 @@ export async function updateRepresentationStatus(representationId: string, statu
     
     await updateDoc(representationRef, updateData);
 
-    // Notify the person who performed the representation
+    // Get the representation data to find the other user
     const repDoc = await getDocs(query(collection(db, REPRESENTATIONS_COLLECTION), where('__name__', '==', representationId)));
     if (!repDoc.empty) {
         const repData = snapshotToRepresentation(repDoc.docs[0]);
         const representingPerson = await getPersonById(repData.representingPersonId);
-        if (representingPerson?.notificationSettings?.inApp) {
-            await createNotification({
-                userId: repData.representingPersonId,
-                message: `Your representation for "${repData.representedPersonName}" has been ${status}.`,
-                link: '/representations',
-                isRead: false,
-            });
+        
+        if (representingPerson) {
+            const t = getTranslations(locale);
+            const notificationKey = status === 'confirmed' ? 'notification_representation_approved' : 'notification_representation_declined';
+            const subjectKey = status === 'confirmed' ? 'email_subject_representation_approved' : 'email_subject_representation_declined';
+            const bodyKey = status === 'confirmed' ? 'email_body_representation_approved' : 'email_body_representation_declined';
+
+            if (representingPerson.notificationSettings?.inApp) {
+                await createNotification({
+                    userId: repData.representingPersonId,
+                    message: t[notificationKey].replace('{targetName}', repData.representedPersonName),
+                    link: '/representations',
+                    isRead: false,
+                });
+            }
+            if (representingPerson.notificationSettings?.email && representingPerson.email) {
+                await sendEmail({
+                    to: [representingPerson.email],
+                    message: {
+                        subject: t[subjectKey],
+                        html: t[bodyKey]
+                            .replace('{targetName}', representingPerson.name)
+                            .replace('{actorName}', repData.representedPersonName),
+                    }
+                });
+            }
         }
     }
 }

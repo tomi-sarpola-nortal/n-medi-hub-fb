@@ -13,7 +13,7 @@
   "settings_notification_in_app_label": "In-App Notifications",
   "settings_notification_in_app_desc": "Receive notifications directly within the portal.",
   "settings_notification_email_label": "Email Notifications",
-  "settings_notification_email_desc": "Receive notifications via email (coming soon).",
+  "settings_notification_email_desc": "Receive notifications via email.",
   "settings_button_save": "Save Changes",
   "settings_save_success_title": "Information Saved",
   "settings_save_error_title": "Save Failed",

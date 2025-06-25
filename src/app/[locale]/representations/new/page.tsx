@@ -161,7 +161,7 @@ export default function NewRepresentationPage() {
                 endDate: endDate.toISOString(),
                 durationHours: calculatedDuration,
                 status: 'pending'
-            });
+            }, locale);
 
             toast({
                 title: t.new_representation_success_toast_title || "Representation Saved",
