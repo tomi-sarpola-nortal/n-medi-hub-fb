@@ -96,5 +96,7 @@
   "member_review_column_status": "Status",
   "member_review_status_updated": "Geändert",
   "member_review_status_no_change": "Keine Änderung",
-  "member_review_type_new_registration": "Neue Registrierung"
+  "member_review_type_new_registration": "Neue Registrierung",
+  "member_overview_review_registration_button": "Registrierung prüfen",
+  "member_overview_review_changes_button": "Änderungen prüfen"
 }

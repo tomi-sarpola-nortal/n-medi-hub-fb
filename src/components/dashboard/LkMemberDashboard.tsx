@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -10,6 +11,7 @@ import { getAllPersons } from '@/services/personService';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import StateChamberInfo from './StateChamberInfo';
+import { cn } from '@/lib/utils';
 
 interface LkMemberDashboardProps {
     user: Person;
@@ -64,28 +66,36 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                 </div>
                             ) : membersToReview.length > 0 ? (
                                 <div className="space-y-0">
-                                    {membersToReview.map((member, index) => (
-                                        <React.Fragment key={member.id}>
-                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-                                                <div>
-                                                    <p className="font-semibold text-base">{member.name}</p>
-                                                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
-                                                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">
-                                                            {member.pendingData ? (t.data_change_label || "Data Change") : (t.member_review_type_new_registration || "New Registration")}
-                                                        </span>
-                                                    </p>
+                                    {membersToReview.map((member, index) => {
+                                        const isDataChange = !!member.pendingData;
+                                        return (
+                                            <React.Fragment key={member.id}>
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
+                                                    <div>
+                                                        <p className="font-semibold text-base">{member.name}</p>
+                                                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                                            {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
+                                                            <span className={cn(
+                                                                "px-2 py-0.5 rounded-full text-xs font-medium",
+                                                                isDataChange
+                                                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/60 dark:text-yellow-200"
+                                                                : "bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-200"
+                                                            )}>
+                                                                {isDataChange ? (t.data_change_label || "Data Change") : (t.member_review_type_new_registration || "New Registration")}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                        <Link href={`/${locale}/member-overview/${member.id}/review`}>
+                                                            <FilePen className="mr-2 h-4 w-4" />
+                                                            {isDataChange ? (t.member_overview_review_changes_button || 'Review Changes') : (t.member_overview_review_registration_button || 'Review Registration')}
+                                                        </Link>
+                                                    </Button>
                                                 </div>
-                                                <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
-                                                    <Link href={`/${locale}/member-overview/${member.id}/review`}>
-                                                        <FilePen className="mr-2 h-4 w-4" />
-                                                        {t.perform_review_button || 'PERFORM REVIEW'}
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                            {index < membersToReview.length - 1 && <Separator />}
-                                        </React.Fragment>
-                                    ))}
+                                                {index < membersToReview.length - 1 && <Separator />}
+                                            </React.Fragment>
+                                        )
+                                    })}
                                 </div>
                              ) : (
                                 <div className="p-6 text-center text-muted-foreground">
