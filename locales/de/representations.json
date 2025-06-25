@@ -12,6 +12,8 @@
   "representations_table_header_duration": "Dauer",
   "representations_table_header_status": "Status",
   "representations_table_header_confirmation_date": "Bestätigungsdatum",
+  "representations_table_header_created_date": "Erstellt am",
+  "representations_label_overdue": "überfällig",
   "representations_status_confirmed": "Bestätigt",
   "representations_status_pending": "Eingetragen",
   "representations_status_declined": "Abgelehnt",

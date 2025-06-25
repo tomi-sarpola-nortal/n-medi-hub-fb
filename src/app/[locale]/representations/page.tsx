@@ -55,6 +55,12 @@ export default function RepresentationsPage() {
         wasRepresented: Representation[],
     }>({ performed: [], pendingConfirmation: [], wasRepresented: [] });
 
+    const fiveDaysAgo = useMemo(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 5);
+        return d;
+    }, []);
+
     useEffect(() => {
         setT(getClientTranslations(locale));
     }, [locale]);
@@ -159,6 +165,7 @@ export default function RepresentationsPage() {
                                     <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
                                     <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
                                     <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
+                                    <TableHead>{t.representations_table_header_created_date || "Created Date"}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -173,10 +180,11 @@ export default function RepresentationsPage() {
                                             </RepresentationStatusBadge>
                                         </TableCell>
                                         <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
+                                        <TableCell>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</TableCell>
                                     </TableRow>
                                 )) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">No representations found.</TableCell>
+                                        <TableCell colSpan={6} className="h-24 text-center">No representations found.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -206,24 +214,37 @@ export default function RepresentationsPage() {
                                     <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
                                     <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
                                     <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
+                                    <TableHead>{t.representations_table_header_created_date || "Created Date"}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {performedRepresentations.length > 0 ? performedRepresentations.map((rep) => (
-                                    <TableRow key={rep.id}>
-                                        <TableCell className="font-medium whitespace-pre-wrap">{formatPeriod(rep.startDate, rep.endDate)}</TableCell>
-                                        <TableCell>{rep.representedPersonName}</TableCell>
-                                        <TableCell>{rep.durationHours} Stunden</TableCell>
-                                        <TableCell>
-                                            <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending' | 'declined'}>
-                                                {t[`representations_status_${rep.status}`] || rep.status}
-                                            </RepresentationStatusBadge>
-                                        </TableCell>
-                                        <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
-                                    </TableRow>
-                                )) : (
+                                {performedRepresentations.length > 0 ? performedRepresentations.map((rep) => {
+                                    const isStartDateOverdue = rep.status === 'pending' && new Date(rep.startDate) < fiveDaysAgo;
+                                    const isCreateDateOverdue = rep.status === 'pending' && new Date(rep.createdAt) < fiveDaysAgo;
+
+                                    return (
+                                        <TableRow key={rep.id}>
+                                            <TableCell className="font-medium whitespace-pre-wrap">
+                                                {formatPeriod(rep.startDate, rep.endDate)}
+                                                {isStartDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                                            </TableCell>
+                                            <TableCell>{rep.representedPersonName}</TableCell>
+                                            <TableCell>{rep.durationHours} Stunden</TableCell>
+                                            <TableCell>
+                                                <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending' | 'declined'}>
+                                                    {t[`representations_status_${rep.status}`] || rep.status}
+                                                </RepresentationStatusBadge>
+                                            </TableCell>
+                                            <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
+                                            <TableCell>
+                                                {rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}
+                                                {isCreateDateOverdue && <span className="block mt-1 text-xs font-semibold text-destructive uppercase">({t.representations_label_overdue || "overdue"})</span>}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                }) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">No representations found.</TableCell>
+                                        <TableCell colSpan={6} className="h-24 text-center">No representations found.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
