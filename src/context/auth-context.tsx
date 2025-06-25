@@ -132,9 +132,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     try {
         await sendPasswordResetEmail(auth, email);
+        console.log(`Password reset email initiated successfully from the app for: ${email}`);
         return { success: true };
     } catch (error: any) {
-        console.error("Password reset error:", error);
+        console.error("Firebase SDK Password Reset Error:", {
+            code: error.code,
+            message: error.message,
+        });
         return { success: false, error: error.message };
     }
   };
