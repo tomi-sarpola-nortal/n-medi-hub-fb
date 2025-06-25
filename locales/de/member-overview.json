@@ -98,5 +98,6 @@
   "member_review_status_no_change": "Keine Änderung",
   "member_review_type_new_registration": "Neue Registrierung",
   "member_overview_review_registration_button": "Registrierung prüfen",
-  "member_overview_review_changes_button": "Änderungen prüfen"
+  "member_overview_review_changes_button": "Änderungen prüfen",
+  "member_overview_rep_tab_overdue_alert": "Dieses Mitglied hat ausstehende Vertretungsanfragen, die älter als 5 Tage sind."
 }

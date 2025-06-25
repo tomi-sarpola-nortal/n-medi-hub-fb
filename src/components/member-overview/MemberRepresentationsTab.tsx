@@ -8,9 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
 import { RepresentationStatusBadge } from '@/components/representations/RepresentationStatusBadge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface MemberRepresentationsTabProps {
   member: Person;
@@ -29,6 +30,7 @@ const formatPeriod = (startDate: string, endDate: string) => {
 
 export default function MemberRepresentationsTab({ member, t }: MemberRepresentationsTabProps) {
   const [representations, setRepresentations] = useState<Representation[]>([]);
+  const [hasOldRequests, setHasOldRequests] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null); // Store ID of rep being updated
   const { toast } = useToast();
@@ -42,6 +44,16 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
       const uniqueReps = Array.from(new Map(allReps.map(item => [item.id, item])).values());
       const sortedReps = uniqueReps.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
       setRepresentations(sortedReps);
+
+      // Check for old pending requests FOR THIS MEMBER
+      const now = new Date();
+      const fiveDaysAgo = new Date(now.setDate(now.getDate() - 5));
+      const oldPending = data.wasRepresented.filter(r => 
+          r.status === 'pending' && 
+          new Date(r.createdAt) < fiveDaysAgo
+      );
+      setHasOldRequests(oldPending.length > 0);
+
     } catch (error) {
       console.error("Failed to fetch member representations:", error);
       toast({ title: t.toast_error_title || "Error", description: "Could not fetch representations.", variant: "destructive" });
@@ -79,6 +91,14 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
     <Card>
       <CardHeader>
         <CardTitle>{t.member_review_vertretungen_tab || "Representations"}</CardTitle>
+        {hasOldRequests && (
+            <Alert variant="destructive" className="mt-4">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertDescription>
+                   {t.member_overview_rep_tab_overdue_alert || "This member has pending representation requests that are older than 5 days."}
+                </AlertDescription>
+            </Alert>
+        )}
       </CardHeader>
       <CardContent>
         {isLoading ? (

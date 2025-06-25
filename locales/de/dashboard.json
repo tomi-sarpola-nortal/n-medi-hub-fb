@@ -16,5 +16,8 @@
   "confirm_reps_decline_button": "ABLEHNEN",
   "review_members_title": "Mitglieder überprüfen",
   "review_members_desc": "Hier können Sie Datenänderungen von Mitgliedern überprüfen.",
-  "perform_review_button": "PRÜFUNG VORNEHMEN"
+  "perform_review_button": "PRÜFUNG VORNEHMEN",
+  "dashboard_old_reps_title": "Überfällige Vertretungsanfragen",
+  "dashboard_old_reps_desc": "{count} Vertretungsanfragen sind älter als 5 Tage und müssen überprüft werden.",
+  "dashboard_old_reps_button": "VERTRETUNGEN PRÜFEN"
 }

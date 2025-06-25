@@ -13,6 +13,7 @@ import {
   serverTimestamp,
   type Timestamp,
   or,
+  orderBy,
 } from 'firebase/firestore';
 import type { Representation, RepresentationCreationData } from '@/lib/types';
 
@@ -157,4 +158,27 @@ export async function getAllRepresentations(): Promise<Representation[]> {
     const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
     const snapshot = await getDocs(representationsRef);
     return snapshot.docs.map(snapshotToRepresentation);
+}
+
+
+/**
+ * Fetches all pending representation requests older than a certain number of days.
+ * @param daysOld The number of days old a request must be to be included.
+ * @returns An array of old, pending Representation objects.
+ */
+export async function getOldPendingRepresentations(daysOld: number = 5): Promise<Representation[]> {
+  checkDb();
+  const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
+  
+  const thresholdDate = new Date();
+  thresholdDate.setDate(thresholdDate.getDate() - daysOld);
+
+  const q = query(representationsRef, 
+    where('status', '==', 'pending'),
+    where('createdAt', '<=', thresholdDate),
+    orderBy('createdAt', 'asc') // Oldest first
+  );
+  
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(snapshotToRepresentation);
 }

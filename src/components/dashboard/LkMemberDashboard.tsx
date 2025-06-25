@@ -2,12 +2,13 @@
 "use client";
 
 import * as React from 'react';
-import type { Person } from '@/lib/types';
+import type { Person, Representation } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FilePen, Loader2 } from 'lucide-react';
+import { FilePen, Loader2, Users2, ShieldAlert } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { getAllPersons } from '@/services/personService';
+import { getOldPendingRepresentations } from '@/services/representationService';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import StateChamberInfo from './StateChamberInfo';
@@ -21,25 +22,32 @@ interface LkMemberDashboardProps {
 
 export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboardProps) {
     const [membersToReview, setMembersToReview] = React.useState<Person[]>([]);
+    const [oldRepresentations, setOldRepresentations] = React.useState<Representation[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(() => {
-        const fetchMembersToReview = async () => {
+        const fetchDashboardData = async () => {
+            setIsLoading(true);
             try {
-                const allPersons = await getAllPersons();
+                const [allPersons, oldReps] = await Promise.all([
+                    getAllPersons(),
+                    getOldPendingRepresentations(5)
+                ]);
+                
                 const members = allPersons
                     .filter(p => p.status === 'pending' || !!p.pendingData)
                     .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
                     .slice(0, 5); // Apply limit here
                 setMembersToReview(members);
+                setOldRepresentations(oldReps);
             } catch (error) {
-                console.error("Failed to fetch members for review:", error);
+                console.error("Failed to fetch dashboard data:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchMembersToReview();
+        fetchDashboardData();
     }, []);
 
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
@@ -53,7 +61,30 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
             
             <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
                 {/* Main Content: Member Review */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Overdue Representations Card */}
+                     {oldRepresentations.length > 0 && (
+                        <Card className="border-destructive/50 bg-destructive/5">
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <ShieldAlert className="h-5 w-5 text-destructive" />
+                                    <CardTitle className="text-destructive">{t.dashboard_old_reps_title || 'Overdue Representation Requests'}</CardTitle>
+                                </div>
+                                <CardDescription className="text-destructive/80">
+                                    {(t.dashboard_old_reps_desc || '{count} representation requests are older than 5 days and require review.').replace('{count}', oldRepresentations.length.toString())}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">
+                                <Link href={`/${locale}/member-overview`}>
+                                    <Users2 className="mr-2 h-4 w-4" />
+                                    {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
+                                </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     <Card className="shadow-lg">
                         <CardHeader>
                             <CardTitle className="font-headline text-xl">{t.review_members_title || 'Review Members'}</CardTitle>

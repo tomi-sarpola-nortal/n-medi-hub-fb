@@ -16,5 +16,8 @@
   "confirm_reps_decline_button": "DECLINE",
   "review_members_title": "Review Members",
   "review_members_desc": "Here you can review data changes from members.",
-  "perform_review_button": "PERFORM REVIEW"
+  "perform_review_button": "PERFORM REVIEW",
+  "dashboard_old_reps_title": "Overdue Representation Requests",
+  "dashboard_old_reps_desc": "{count} representation requests are older than 5 days and require review.",
+  "dashboard_old_reps_button": "REVIEW REPRESENTATIONS"
 }

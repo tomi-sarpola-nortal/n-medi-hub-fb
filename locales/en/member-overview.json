@@ -98,5 +98,6 @@
   "member_review_status_no_change": "No Change",
   "member_review_type_new_registration": "New Registration",
   "member_overview_review_registration_button": "Review Registration",
-  "member_overview_review_changes_button": "Review Changes"
+  "member_overview_review_changes_button": "Review Changes",
+  "member_overview_rep_tab_overdue_alert": "This member has pending representation requests that are older than 5 days."
 }
