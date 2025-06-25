@@ -129,7 +129,7 @@ export default function DeveloperPage() {
                             </Link>
                         </Button>
                          <Button asChild variant="outline">
-                            <Link href="/docs/prompt-history.md" target="_blank">
+                            <Link href="/docs/prompt_history.md" target="_blank">
                                 {t.developer_module_show_prompt_history_button || "Show Prompt History"}
                             </Link>
                         </Button>

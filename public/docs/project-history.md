@@ -4,55 +4,47 @@ This document outlines the features and changes implemented in the Dental Chambe
 
 ---
 
-### 1. Initial Project Setup & Core Layout
-- **Scaffolding**: The project was initialized with a Next.js, ShadCN, and Tailwind CSS stack.
-- **Firebase Integration**: Core Firebase services (Auth, Firestore, Storage) were integrated from the beginning to handle backend operations.
-- **Core Layout & Navigation**: An application layout with a persistent sidebar and a header was established. The initial navigation structure was configured for different user roles.
+### 1. Initial Setup & Core Layout
+- **Project Initialization**: The project started as a standard Next.js application with TypeScript, ShadCN UI, and Tailwind CSS.
+- **Firebase Integration**: Firebase was configured and integrated to handle backend services like authentication, Firestore database, and storage. An authentication context (`AuthContext`) was created to manage user sessions across the application.
+- **Core Layout & Navigation**: A primary application layout was built, featuring a persistent sidebar for navigation and a header. The initial structure for role-based navigation was defined in `src/config/nav.ts`.
 
 ---
 
-### 2. Authentication & Internationalization
-- **Authentication**: A complete authentication flow was built, including the login page and the `AuthContext` for managing user sessions with Firebase.
-- **Internationalization (i18n)**: The project was refactored to support English (`en`) and German (`de`). This included adding `next-intl` for routing (`[locale]` directories), creating translation files, and updating components to use localized strings.
+### 2. Authentication & Registration
+- **Login Page**: A login page was created with email and password fields, including basic validation and error handling that links to the authentication context.
+- **Multi-Step Registration Workflow**: A comprehensive, step-by-step registration process was implemented for new dentists, guiding them through:
+    1.  **Account Creation**: Email validation and password setup.
+    2.  **Personal Data**: Collecting user details and an ID document upload.
+    3.  **Professional Qualifications**: Gathering educational and professional credentials with multiple document uploads.
+    4.  **Practice Information**: Input for clinic details.
+    5.  **Final Review**: A summary page for the user to review all entered data.
+    6.  **Success Page**: A confirmation screen after successful submission.
+- **Data & File Handling**: The workflow uses client-side session storage to persist form data between steps and uploads all documents to a temporary location in Firebase Storage, moving them to a permanent user-specific folder upon final submission.
 
 ---
 
-### 3. Multi-Step Registration Workflow
-- **Step-by-Step Process**: A comprehensive, multi-step registration process was implemented for new dentists, guiding them through:
-    1.  Account Creation (Email & Password)
-    2.  Personal Data Entry
-    3.  Professional Qualifications
-    4.  Practice Information
-    5.  Final Review & Submission
-- **File Uploads**: Functionality was added to allow users to upload necessary documents (ID, diplomas, etc.) during registration, which are securely stored in Firebase Storage.
-- **Data Persistence**: A temporary client-side store was implemented to persist form data between registration steps.
+### 3. Role-Based Functionality
+- **Dashboards**: Separate, tailored dashboard views were created for `dentist` and `lk_member` roles, presenting the most relevant information and actions for each user type. This includes training progress for dentists and pending member reviews for chamber members.
+- **Member Management (LK Member)**:
+    - An overview page was built for Chamber Members to view, search, and filter all registered members.
+    - A member detail page was created with a tabbed interface to display comprehensive user data, including their training history and representations.
+    - A dedicated review page was implemented, allowing chamber members to approve, deny, or reject new member registrations or data changes.
 
 ---
 
-### 4. Core Application Features & Pages
-- **Role-Based Dashboards**: Separate dashboard views were created for `dentist` and `lk_member` roles, displaying relevant information and actions for each.
-- **Education/Trainings Page**: A page was developed for dentists to view their continuing education points, including progress toward ZFD and Specialist Diplomas, and a detailed training history table.
-- **Member Overview (LK Member)**: A feature was built for Chamber Members to view, search, and filter a list of all dentists. It includes a section to review pending applications.
-- **Member Detail & Review Pages**: Chamber Members can view a detailed profile for each dentist (with tabs for Master Data, Trainings, and Representations) and access a specific review page to approve or reject pending applications or data changes.
+### 4. Application Modules
+- **Document Templates**: A page was developed for users to browse, filter, and download documents. For chamber members, this page includes functionality to upload new templates and delete existing ones. Search functionality was added to filter documents by title or publisher.
+- **Education/Trainings Page**: A page was created for dentists to view their continuing education status, including progress visualizations for ZFD points and a detailed, sortable history of their completed training.
+- **"My Representations" Module**: This page was built to manage peer representations. It was enhanced through several iterations:
+    - **Initial Version**: A single table to show all representations.
+    - **Refactor for Clarity**: The page was split into two distinct tables: one for "Representations Received" and another for "Representations Performed".
+    - **Dedicated Confirmation**: A prominent card was added for dentists to easily confirm or decline pending requests.
+    - **Enhanced "New Representation" Form**: The form was improved by replacing a simple dropdown with a searchable pop-up dialog and adding a "Previously Represented" list for quick selection.
 
 ---
 
-### 5. "My Representations" Module
-- **Separated Tables**: The "My Representations" page was refactored to use two distinct tables for clarity: one for "Representations Received" and another for "Representations Performed".
-- **Confirmation Flow**: A dedicated card was added for dentists to easily confirm or decline pending representation requests from other dentists.
-- **"New Representation" Workflow**: The form for adding a new representation was enhanced with several UX improvements:
-    - **Searchable Dentist Selection**: A pop-up dialog was created, allowing users to search for dentists by name or ID.
-    - **"Previously Represented" List**: A "quick select" list was added, showing recently represented dentists to speed up form entry.
-
----
-
-### 6. UI/UX Refinements
-- **Standardized Profile Icon**: The user avatar in the sidebar was changed to a standard `UserCircle` icon for a more consistent UI.
-- **Dashboard Card Fix**: The "Your State Chamber" info card was updated to ensure long text (like email addresses) wraps correctly and does not overflow.
-- **Documents Page Search**: A search input was added to the "Document Templates" page, enabling users to filter documents by title or publisher.
-
----
-
-### 7. Developer & Project Documentation
-- **Developer Module**: A dedicated page was created for development and testing tools, including database seeders.
-- **History Documentation**: Project and prompt history files were created and organized into a `/public/docs/` directory. The Developer Module page was updated with buttons to correctly link to these files.
+### 5. UI/UX & Documentation
+- **UI Refinements**: Various UI/UX improvements were made, including standardizing the user avatar to an icon and fixing text wrapping on dashboard cards.
+- **Developer Module**: A dedicated page was created for development tools, including database seeders and links to project documentation.
+- **Project Documentation**: This project history file and a detailed prompt history log were created and organized into the `/public/docs/` directory to document the development process.
