@@ -68,7 +68,7 @@ export default function DashboardPage() {
       case 'dentist':
         return <DentistDashboard user={user} t={t!} />;
       case 'lk_member':
-        return <LkMemberDashboard user={user} t={t!} />;
+        return <LkMemberDashboard user={user} t={t!} locale={locale} />;
       // Add other roles here in the future
       default:
         // Fallback to a default view or dentist view if preferred

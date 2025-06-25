@@ -5,7 +5,7 @@ import * as React from 'react';
 import type { Person } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { FilePen, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { getPersonsToReview } from '@/services/personService';
 import Link from 'next/link';
@@ -15,9 +15,10 @@ import StateChamberInfo from './StateChamberInfo';
 interface LkMemberDashboardProps {
     user: Person;
     t: Record<string, string>;
+    locale: string;
 }
 
-export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
+export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboardProps) {
     const [membersToReview, setMembersToReview] = React.useState<Person[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
 
@@ -72,8 +73,9 @@ export default function LkMemberDashboard({ user, t }: LkMemberDashboardProps) {
                                                         </span>
                                                     </p>
                                                 </div>
-                                                <Button asChild className="w-full sm:w-auto mt-2 sm:mt-0">
-                                                    <Link href={`/member-overview/${member.id}/review`}>
+                                                <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                    <Link href={`/${locale}/member-overview/${member.id}/review`}>
+                                                        <FilePen className="mr-2 h-4 w-4" />
                                                         {t.perform_review_button || 'PERFORM REVIEW'}
                                                     </Link>
                                                 </Button>
