@@ -99,5 +99,13 @@
   "member_review_type_new_registration": "New Registration",
   "member_overview_review_registration_button": "Review Registration",
   "member_overview_review_changes_button": "Review Changes",
-  "member_overview_rep_tab_overdue_alert": "This member has pending representation requests that are older than 5 days."
+  "member_overview_rep_tab_overdue_alert": "This member has pending representation requests that are older than 5 days.",
+  "member_profile_reset_password_button": "Reset Password",
+  "member_profile_reset_password_dialog_title": "Are you sure you want to reset the password?",
+  "member_profile_reset_password_dialog_desc": "This will send a password reset link to {email}. The user will be prompted to choose a new password upon clicking the link.",
+  "member_profile_reset_password_dialog_confirm": "Send Reset Link",
+  "member_profile_reset_password_success_title": "Email Sent",
+  "member_profile_reset_password_success_desc": "Password reset email sent successfully to {email}.",
+  "member_profile_reset_password_error_title": "Action Failed",
+  "member_profile_reset_password_error_desc": "Could not send the password reset email. Please try again later."
 }

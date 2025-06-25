@@ -11,6 +11,7 @@ import {
   signOut, 
   onAuthStateChanged,
   deleteUser,
+  sendPasswordResetEmail,
   type User as FirebaseUser // Alias to avoid naming conflict
 } from 'firebase/auth';
 import { getPersonById, deletePerson } from '@/services/personService';
@@ -22,6 +23,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   deleteUserAccount: () => Promise<{ success: boolean; error?: string }>;
+  sendPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<Person | null>>; // Exposing setUser for flexibility e.g. profile updates
 }
@@ -123,6 +125,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     }
   };
+  
+  const sendPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    if (!auth) {
+        return { success: false, error: "Firebase is not configured." };
+    }
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return { success: true };
+    } catch (error: any) {
+        console.error("Password reset error:", error);
+        return { success: false, error: error.message };
+    }
+  };
 
   const deleteUserAccount = async (): Promise<{ success: boolean; error?: string }> => {
     if (!auth?.currentUser || !user) {
@@ -183,7 +198,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, deleteUserAccount, loading, setUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, sendPasswordReset, deleteUserAccount, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

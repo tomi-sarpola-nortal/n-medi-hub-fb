@@ -99,5 +99,13 @@
   "member_review_type_new_registration": "Neue Registrierung",
   "member_overview_review_registration_button": "Registrierung prüfen",
   "member_overview_review_changes_button": "Änderungen prüfen",
-  "member_overview_rep_tab_overdue_alert": "Dieses Mitglied hat ausstehende Vertretungsanfragen, die älter als 5 Tage sind."
+  "member_overview_rep_tab_overdue_alert": "Dieses Mitglied hat ausstehende Vertretungsanfragen, die älter als 5 Tage sind.",
+  "member_profile_reset_password_button": "Passwort zurücksetzen",
+  "member_profile_reset_password_dialog_title": "Sind Sie sicher, dass Sie das Passwort zurücksetzen möchten?",
+  "member_profile_reset_password_dialog_desc": "Dadurch wird ein Link zum Zurücksetzen des Passworts an {email} gesendet. Der Benutzer wird aufgefordert, ein neues Passwort zu wählen, nachdem er auf den Link geklickt hat.",
+  "member_profile_reset_password_dialog_confirm": "Link zum Zurücksetzen senden",
+  "member_profile_reset_password_success_title": "E-Mail gesendet",
+  "member_profile_reset_password_success_desc": "E-Mail zum Zurücksetzen des Passworts wurde erfolgreich an {email} gesendet.",
+  "member_profile_reset_password_error_title": "Aktion fehlgeschlagen",
+  "member_profile_reset_password_error_desc": "Die E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
 }

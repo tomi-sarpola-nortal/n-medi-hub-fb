@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { format } from 'date-fns';
 import MemberRepresentationsTab from '@/components/member-overview/MemberRepresentationsTab';
 import MemberInactiveAction from '@/components/member-overview/MemberInactiveAction';
+import ResetPasswordButton from '@/components/member-overview/ResetPasswordButton';
 import { useAuth } from '@/context/auth-context';
 import { logGeneralAudit } from '@/app/actions/auditActions';
 
@@ -175,6 +177,9 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                                     <DataRow label={t.member_review_residential_address || "Wohnadresse"} value={`${person.streetAddress}, ${person.postalCode} ${person.city}`} />
                                     <DataRow label={t.register_step2_label_phoneNumber || "Telefonnummer"} value={person.phoneNumber} />
                                     <DataRow label={t.member_review_email_address || "E-Mail-Adresse"} value={person.email} />
+                                    {viewer && viewer.role === 'lk_member' && (
+                                        <ResetPasswordButton person={person} t={t} />
+                                    )}
                                 </CardContent>
                             </Card>
 
