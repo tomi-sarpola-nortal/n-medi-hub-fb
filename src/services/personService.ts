@@ -301,29 +301,56 @@ export async function reviewPerson(
 
 /**
  * Retrieves persons needing review: new registrations OR those with data changes.
+ * This is done with two separate queries to avoid needing a complex composite index.
  * @param limitValue - The maximum number of persons to retrieve.
- * @returns An array of Person objects.
+ * @returns An array of Person objects, sorted by most recently updated.
  */
 export async function getPersonsToReview(limitValue?: number): Promise<Person[]> {
     'use server';
     checkDb();
     const personsCollection = collection(db, PERSONS_COLLECTION);
     
-    // This OR query will require a composite index in Firestore.
-    // Firestore usually provides a link in the error console to create it automatically.
-    let q = query(
+    // Query 1: Get users with 'pending' status
+    const pendingQuery = query(
         personsCollection,
-        or(
-            where('status', '==', 'pending'),
-            where('hasPendingChanges', '==', true)
-        ),
+        where('status', '==', 'pending'),
         orderBy('updatedAt', 'desc')
     );
 
-    if (limitValue) {
-        q = query(q, limit(limitValue));
-    }
+    // Query 2: Get users with pending data changes
+    const changesQuery = query(
+        personsCollection,
+        where('hasPendingChanges', '==', true),
+        orderBy('updatedAt', 'desc')
+    );
 
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(snapshotToPerson);
+    const [pendingSnapshot, changesSnapshot] = await Promise.all([
+        getDocs(pendingQuery),
+        getDocs(changesQuery)
+    ]);
+
+    const personsMap = new Map<string, Person>();
+
+    // Add pending users to the map
+    pendingSnapshot.docs.forEach(doc => {
+        const person = snapshotToPerson(doc);
+        personsMap.set(person.id, person);
+    });
+
+    // Add users with changes to the map (will overwrite duplicates)
+    changesSnapshot.docs.forEach(doc => {
+        const person = snapshotToPerson(doc);
+        personsMap.set(person.id, person);
+    });
+    
+    // Combine, sort, and apply limit
+    const allPersons = Array.from(personsMap.values());
+
+    const sortedPersons = allPersons.sort((a, b) => {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return dateB - dateA; // Descending order
+    });
+
+    return limitValue ? sortedPersons.slice(0, limitValue) : sortedPersons;
 }
