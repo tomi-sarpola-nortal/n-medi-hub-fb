@@ -12,9 +12,9 @@
   "settings_save_success_title": "Information Saved",
   "settings_save_error_title": "Save Failed",
   "settings_save_error_desc": "Could not save your changes. Please try again.",
-  "settings_personal_data_success_desc": "Your personal data has been successfully updated.",
-  "settings_prof_qual_success_desc": "Your professional qualifications have been successfully updated.",
-  "settings_practice_info_success_desc": "Your practice information has been successfully updated.",
+  "settings_personal_data_success_desc": "Your personal data changes have been submitted for review.",
+  "settings_prof_qual_success_desc": "Your professional qualifications changes have been submitted for review.",
+  "settings_practice_info_success_desc": "Your practice information changes have been submitted for review.",
   "settings_danger_zone_title": "Danger Zone",
   "settings_danger_zone_desc": "This action is permanent and cannot be undone.",
   "settings_delete_account_button": "Delete My Account",
@@ -32,5 +32,6 @@
   "settings_pending_approval_title": "Account Pending Approval",
   "settings_pending_approval_alert": "Your account is pending approval. You can review and edit your submitted data or delete your account. Access to other portal features is disabled until your registration is approved.",
   "settings_pending_changes_title": "Changes Pending Review",
-  "settings_pending_changes_desc": "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."
+  "settings_pending_changes_desc": "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected.",
+  "settings_view_changes_button": "View Changes"
 }

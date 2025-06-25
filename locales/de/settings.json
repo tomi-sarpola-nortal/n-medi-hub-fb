@@ -12,9 +12,9 @@
   "settings_save_success_title": "Informationen gespeichert",
   "settings_save_error_title": "Speichern fehlgeschlagen",
   "settings_save_error_desc": "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
-  "settings_personal_data_success_desc": "Ihre persönlichen Daten wurden erfolgreich aktualisiert.",
-  "settings_prof_qual_success_desc": "Ihre beruflichen Qualifikationen wurden erfolgreich aktualisiert.",
-  "settings_practice_info_success_desc": "Ihre Ordinationsinformationen wurden erfolgreich aktualisiert.",
+  "settings_personal_data_success_desc": "Ihre Datenänderungen wurden zur Überprüfung eingereicht.",
+  "settings_prof_qual_success_desc": "Ihre Qualifikationsänderungen wurden zur Überprüfung eingereicht.",
+  "settings_practice_info_success_desc": "Ihre Ordinationsinformationen wurden zur Überprüfung eingereicht.",
   "settings_danger_zone_title": "Gefahrenzone",
   "settings_danger_zone_desc": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden.",
   "settings_delete_account_button": "Mein Konto löschen",
@@ -32,5 +32,6 @@
   "settings_pending_approval_title": "Konto wartet auf Genehmigung",
   "settings_pending_approval_alert": "Ihr Konto wartet auf die Genehmigung. Sie können Ihre übermittelten Daten überprüfen, bearbeiten oder Ihr Konto löschen. Der Zugriff auf andere Portalfunktionen ist bis zur Genehmigung Ihrer Registrierung deaktiviert.",
   "settings_pending_changes_title": "Änderungen zur Überprüfung ausstehend",
-  "settings_pending_changes_desc": "Ihre letzten Datenänderungen wurden zur Überprüfung eingereicht. Sie können die Formulare erst wieder bearbeiten, nachdem die Änderungen genehmigt oder abgelehnt wurden."
+  "settings_pending_changes_desc": "Ihre letzten Datenänderungen wurden zur Überprüfung eingereicht. Sie können die Formulare erst wieder bearbeiten, nachdem die Änderungen genehmigt oder abgelehnt wurden.",
+  "settings_view_changes_button": "Änderungen ansehen"
 }

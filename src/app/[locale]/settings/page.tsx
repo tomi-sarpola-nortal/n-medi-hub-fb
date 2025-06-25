@@ -11,6 +11,8 @@ import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -74,11 +76,22 @@ export default function SettingsPage() {
 
         {hasPendingDataChange && !isPendingRegistration && (
            <Alert variant="default" className="bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200">
-            <AlertTriangle className="h-4 w-4 !text-blue-600 dark:!text-blue-400" />
-            <AlertTitle>{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
-            <AlertDescription>
-              {t.settings_pending_changes_desc || "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."}
-            </AlertDescription>
+             <div className="flex items-start gap-4">
+                <AlertTriangle className="h-4 w-4 !text-blue-600 dark:!text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
+                  <div>
+                    <AlertTitle>{t.settings_pending_changes_title || "Changes Pending Review"}</AlertTitle>
+                    <AlertDescription>
+                      {t.settings_pending_changes_desc || "Your recent data changes have been submitted for review. You cannot edit the forms again until the changes have been approved or rejected."}
+                    </AlertDescription>
+                  </div>
+                  <Button asChild variant="outline" className="border-blue-400 text-blue-800 dark:border-blue-700 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900 w-full sm:w-auto flex-shrink-0">
+                    <Link href={`/${locale}/settings/review`}>
+                      {t.settings_view_changes_button || "View Changes"}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
           </Alert>
         )}
 
