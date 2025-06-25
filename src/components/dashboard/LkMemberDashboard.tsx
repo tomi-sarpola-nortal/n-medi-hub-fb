@@ -207,7 +207,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                 {(t.dashboard_overdue_reps_for_person || "{count} overdue request(s)").replace('{count}', item.count.toString())}
                                                             </p>
                                                         </div>
-                                                        <Button asChild variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive w-full sm:w-auto mt-2 sm:mt-0">
+                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${item.personId}?tab=vertretungen`}>
                                                                 <Users2 className="mr-2 h-4 w-4" />
                                                                 {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
