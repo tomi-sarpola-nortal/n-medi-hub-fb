@@ -8,6 +8,7 @@ import {
   ArrowLeftRight,
   Users,
   Database,
+  History,
 } from "lucide-react";
 
 export const navConfig: Record<UserRole, NavItem[]> = {
@@ -58,6 +59,11 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       title: "sidebar_document_templates",
       href: "/documents",
       icon: FileText,
+    },
+    {
+      title: "sidebar_audit_tools",
+      href: "/audit-tools",
+      icon: History,
     },
     {
       title: "sidebar_settings",

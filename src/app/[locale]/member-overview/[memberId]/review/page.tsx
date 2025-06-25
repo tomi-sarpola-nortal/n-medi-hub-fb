@@ -12,10 +12,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { Person } from '@/lib/types';
+import type { Person, UserRole } from '@/lib/types';
 import { getPersonById, reviewPerson } from '@/services/personService';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
+
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -61,6 +63,7 @@ export default function DataReviewPage() {
   const { memberId, locale } = params;
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [t, setT] = useState<Record<string, string>>({});
   
   const [person, setPerson] = useState<Person | null>(null);
@@ -100,10 +103,22 @@ export default function DataReviewPage() {
         }
         return;
     }
+
+    if (!user) {
+        toast({ title: "Authentication Error", description: "Could not identify the current user.", variant: "destructive" });
+        return;
+    }
     
     setIsSubmitting(true);
     try {
-        await reviewPerson(person.id, reviewDecision as 'approve' | 'deny' | 'reject', justification);
+        const auditor = {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            chamber: user.stateChamberId || 'unknown'
+        };
+
+        await reviewPerson(person.id, reviewDecision as 'approve' | 'deny' | 'reject', justification, auditor);
         toast({ title: "Success", description: "The review has been submitted successfully." });
         router.push(`/${locale}/member-overview`);
     } catch (error) {

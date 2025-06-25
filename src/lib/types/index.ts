@@ -276,3 +276,21 @@ export interface Representation {
 }
 
 export type RepresentationCreationData = Omit<Representation, 'id' | 'createdAt' | 'confirmedAt'>;
+
+export interface AuditLog {
+  id: string;
+  timestamp: string; // ISO string
+  userId: string;
+  userName: string;
+  userRole: UserRole;
+  userChamber: string;
+  collectionName: string;
+  documentId: string;
+  fieldName: string | string[];
+  operation: 'create' | 'read' | 'update' | 'delete';
+  impactedPersonId?: string;
+  impactedPersonName?: string;
+  details?: string;
+}
+
+export type AuditLogCreationData = Omit<AuditLog, 'id' | 'timestamp'>;

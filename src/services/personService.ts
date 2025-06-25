@@ -2,7 +2,7 @@
 'use server';
 
 import { db } from '@/lib/firebaseConfig';
-import type { Person, PersonCreationData } from '@/lib/types';
+import type { Person, PersonCreationData, AuditLogCreationData, UserRole } from '@/lib/types';
 import {
   collection,
   doc,
@@ -22,6 +22,8 @@ import {
   deleteField,
   or,
 } from 'firebase/firestore';
+import { createAuditLog } from './auditLogService';
+
 
 const PERSONS_COLLECTION = 'persons';
 
@@ -252,13 +254,42 @@ export async function getAllPersons(): Promise<Person[]> {
 export async function reviewPerson(
     personId: string, 
     decision: 'approve' | 'deny' | 'reject', 
-    justification?: string
+    justification: string | undefined,
+    auditor: { id: string; name: string; role: UserRole; chamber: string; }
 ): Promise<void> {
     'use server';
     checkDb();
     const person = await getPersonById(personId);
     if (!person) throw new Error("Person not found");
 
+    // Create Audit Log
+    const logData: AuditLogCreationData = {
+        userId: auditor.id,
+        userName: auditor.name,
+        userRole: auditor.role,
+        userChamber: auditor.chamber,
+        collectionName: PERSONS_COLLECTION,
+        documentId: personId,
+        impactedPersonId: personId,
+        impactedPersonName: person.name,
+        operation: 'update',
+        fieldName: 'status', // Default field being changed
+        details: `Decision: ${decision}. Justification: ${justification || 'N/A'}`
+    };
+
+    if (person.status === 'active' && person.pendingData) {
+        // Data change review
+        logData.fieldName = Object.keys(person.pendingData);
+        logData.details = `Data change review. Decision: ${decision}.`;
+    } else if (person.status === 'pending') {
+        // New registration review
+        logData.details = `New registration review. Decision: ${decision}.`;
+    }
+
+    await createAuditLog(logData);
+
+
+    // Perform the update logic
     // Case 1: Reviewing a data change for an active user
     if (person.status === 'active' && person.pendingData) {
         if (decision === 'approve') {
@@ -313,15 +344,13 @@ export async function getPersonsToReview(limitValue?: number): Promise<Person[]>
     // Query 1: Get users with 'pending' status
     const pendingQuery = query(
         personsCollection,
-        where('status', '==', 'pending'),
-        orderBy('updatedAt', 'desc')
+        where('status', '==', 'pending')
     );
 
     // Query 2: Get users with pending data changes
     const changesQuery = query(
         personsCollection,
-        where('hasPendingChanges', '==', true),
-        orderBy('updatedAt', 'desc')
+        where('hasPendingChanges', '==', true)
     );
 
     const [pendingSnapshot, changesSnapshot] = await Promise.all([

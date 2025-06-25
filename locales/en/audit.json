@@ -1,0 +1,15 @@
+
+{
+  "audit_tools_page_title": "Audit Tools",
+  "audit_tools_page_description": "Review the change history and audit logs for the system.",
+  "audit_log_table_title": "Audit Log",
+  "audit_log_table_description": "A record of all significant actions performed in the system.",
+  "audit_log_header_timestamp": "Timestamp",
+  "audit_log_header_user": "User",
+  "audit_log_header_operation": "Operation",
+  "audit_log_header_collection": "Collection",
+  "audit_log_header_field": "Field(s)",
+  "audit_log_header_impacted_person": "Impacted Person",
+  "audit_log_header_details": "Details",
+  "audit_log_no_results": "No audit logs found."
+}
