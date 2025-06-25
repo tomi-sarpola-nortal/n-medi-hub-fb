@@ -105,11 +105,18 @@ Firebase Studio significantly enhances development speed, cost-effectiveness, an
 - "60% complete after two weeks of work" - emphasize rapid progress and efficiency.
 
 #### 4. Key Findings and Recommendations (5 min)
-- **Efficiency & Scalability:** Firebase Studio's ability to produce large-scale features and leverage Next.js boilerplate.
-- **AI-Powered Integrations:** Success with verbal commands for complex integrations.
+- **Efficiency & Scalability:** 
+    - Firebase Studio is abile to produce large-scale features and leverage Next.js boilerplate code.
+- **AI-Powered Integrations:** 
+    - Partially able to use with verbal commands for complex integrations.
+    - Able to manage NoSQL database collections, indexes, queries, data seed scripts.
+    - Issue: Integration of Cloud Functions, Auth, Storage not succesful with verbal commands.
+    - Recommendation: Utilize Firebase Console wizards and templates for integration deployments.
+    - Issue: AI interface becomes very slow when project grows. 
+    - Recommendation: Manage project size by separating test suite and deployment artifacts to own projects. Occasionally clear the prompt history using /clear. Upgrade subscription to increase token limits.
 - **Pair Programming Limitation & Solution:**
-    - Issue: Single prompt session in workspace.
-    - Recommendation: Shift-based development/testing.
+    - Issue: Single prompt session in workspace. Not possible to have two users doing changes.
+    - Recommendation: Shift-based development approach. Role based development where one individual focuses on development while another handles testing.
 - **Testing Workflow & Workspace Management:**
     - Recommendation: Replicate code to separate project workspaces for testing.
     - **Crucial Note:** Prototyper functionality is *not available* in project workspaces created based on existing GitHub repositories.
