@@ -4,9 +4,9 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileText, Loader2, GitMerge } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -20,13 +20,14 @@ import { useRouter, useParams } from 'next/navigation';
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
   try {
-    if (locale === 'de') {
-      return require('../../../../../../locales/de.json');
-    }
-    return require('../../../../../../locales/en.json');
+    const page = locale === 'de' ? require('../../../../../../locales/de/member-overview.json') : require('../../../../../../locales/en/member-overview.json');
+    const register = locale === 'de' ? require('../../../../../../locales/de/register.json') : require('../../../../../../locales/en/register.json');
+    return {...page, ...register};
   } catch (e) {
     console.warn("Translation file not found, falling back to en");
-    return require('../../../../../../locales/en.json');
+    const page = require('../../../../../../locales/en/member-overview.json');
+    const register = require('../../../../../../locales/en/register.json');
+    return {...page, ...register};
   }
 };
 
@@ -55,6 +56,13 @@ const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: stri
     </div>
 );
 
+const DiffRow = ({ field, oldValue, newValue, t }: { field: string; oldValue: any; newValue: any; t: Record<string, string> }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 py-3 border-b">
+        <div className="md:col-span-1 text-sm font-semibold text-muted-foreground">{t[`register_step2_label_${field}`] || t[`register_step4_label_${field}`] || t[`register_step5_label_${field}`] || field}</div>
+        <div className="md:col-span-1 text-sm text-foreground bg-red-100/50 dark:bg-red-900/30 p-2 rounded-md"><span className="font-mono text-xs text-red-500 mr-2">OLD</span>{oldValue || <span className="italic">empty</span>}</div>
+        <div className="md:col-span-1 text-sm text-foreground bg-green-100/50 dark:bg-green-900/30 p-2 rounded-md"><span className="font-mono text-xs text-green-500 mr-2">NEW</span>{newValue || <span className="italic">empty</span>}</div>
+    </div>
+);
 
 export default function DataReviewPage() {
   const params = useParams<{ memberId: string; locale: string }>();
@@ -76,17 +84,16 @@ export default function DataReviewPage() {
     async function fetchPerson() {
         try {
             const fetchedPerson = await getPersonById(memberId);
-            if (fetchedPerson && fetchedPerson.status === 'pending') {
+            if (fetchedPerson && (fetchedPerson.status === 'pending' || !!fetchedPerson.pendingData)) {
                 setPerson(fetchedPerson);
             } else {
-                // Redirect if member not found or not pending review
-                toast({ title: "Review Not Possible", description: "This member is not pending review.", variant: "destructive" });
-                router.replace('/member-overview');
+                toast({ title: "Review Not Possible", description: "This member has no pending registration or data changes.", variant: "destructive" });
+                router.replace(`/${locale}/member-overview`);
             }
         } catch (error) {
             console.error("Failed to fetch person data:", error);
             toast({ title: "Error", description: "Failed to load member data.", variant: "destructive" });
-            router.replace('/member-overview');
+            router.replace(`/${locale}/member-overview`);
         } finally {
             setIsLoading(false);
         }
@@ -106,19 +113,28 @@ export default function DataReviewPage() {
     try {
         await reviewPerson(person.id, reviewDecision as 'approve' | 'deny' | 'reject', justification);
         toast({ title: "Success", description: "The review has been submitted successfully." });
-        router.push('/member-overview');
+        router.push(`/${locale}/member-overview`);
     } catch (error) {
         console.error("Failed to submit review:", error);
-        toast({ title: "Submission Failed", description: "An error occurred while submitting the review.", variant: "destructive" });
+        toast({ title: "Submission Failed", description: (error as Error).message || "An error occurred while submitting the review.", variant: "destructive" });
     } finally {
         setIsSubmitting(false);
     }
   };
 
+  const changedFields = useMemo(() => {
+    if (!person || !person.pendingData) return [];
+    return Object.keys(person.pendingData).map(key => ({
+      field: key,
+      oldValue: (person as any)[key],
+      newValue: (person.pendingData as any)[key],
+    }));
+  }, [person]);
 
-  const pageTitle = t.member_review_page_title_review || "Datenänderung prüfen";
 
-  if (isLoading || !person) {
+  const pageTitle = (person?.pendingData ? t.member_review_page_title_review : "Registrierung prüfen") || "Review";
+
+  if (isLoading || !person || !t) {
     return (
         <AppLayout pageTitle="Loading..." locale={locale}>
             <div className="flex-1 space-y-6 p-4 md:p-8 flex justify-center items-center">
@@ -128,25 +144,66 @@ export default function DataReviewPage() {
     );
   }
 
+  const renderRegistrationReview = () => (
+      <>
+        {/* Same UI as before for registration review */}
+        <div className="space-y-8">
+            <section>
+                <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
+                    <DataRow label={t.register_step2_label_title || "Title"} value={person.title} />
+                    <DataRow label={t.register_step2_label_firstName || "First Name"} value={person.firstName} />
+                    <DataRow label={t.register_step2_label_lastName || "Last Name"} value={person.lastName} />
+                </div>
+            </section>
+        </div>
+      </>
+  );
+
+  const renderDataChangeReview = () => (
+    <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg font-headline">{t.member_review_info_name || "First and Last Name"}</CardTitle>
+                </CardHeader>
+                <CardContent>{person.name}</CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg font-headline">{t.member_review_info_id || "Dentist ID"}</CardTitle>
+                </CardHeader>
+                <CardContent>{person.dentistId || '-'}</CardContent>
+            </Card>
+        </div>
+        
+        <div className="mt-6">
+            {changedFields.map(diff => (
+                <DiffRow key={diff.field} field={diff.field} oldValue={diff.oldValue} newValue={diff.newValue} t={t} />
+            ))}
+        </div>
+    </>
+  );
+
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-6 p-4 md:p-8">
              <div className="flex items-center justify-between">
                 <div>
                      <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                        <Link href={`/member-overview/${memberId}`} className="hidden lg:block">
+                        <Link href={`/${locale}/member-overview/${memberId}`} className="hidden lg:block">
                             <ArrowLeft className="h-6 w-6 text-muted-foreground"/>
                         </Link>
                         {pageTitle}
                     </h1>
                      <div className="text-sm text-muted-foreground mt-2">
-                        <Link href="/dashboard" className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
+                        <Link href={`/${locale}/dashboard`} className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
                         <span className="mx-1">/</span>
-                        <Link href="/member-overview" className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
+                        <Link href={`/${locale}/member-overview`} className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
                         <span className="mx-1">/</span>
-                        <Link href={`/member-overview/${memberId}`} className="hover:underline">{person.name}</Link>
+                        <Link href={`/${locale}/member-overview/${memberId}`} className="hover:underline">{person.name}</Link>
                         <span className="mx-1">/</span>
-                        <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Datenänderung prüfen"}</span>
+                        <span className="font-medium text-foreground">{t.member_review_breadcrumb_review || "Review Data Change"}</span>
                     </div>
                 </div>
             </div>
@@ -157,68 +214,8 @@ export default function DataReviewPage() {
                     <CardDescription>{t.member_review_page_subtitle || "Bitte überprüfen Sie die Daten nach Vollständigkeit und Richtigkeit."}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-8">
-                        {/* Personal Data Section */}
-                        <section>
-                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_personal_data_title || "Persönliche Daten"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
-                                <DataRow label={t.register_step2_label_title || "Title"} value={person.title} />
-                                <DataRow label={t.register_step2_label_firstName || "First Name"} value={person.firstName} />
-                                <DataRow label={t.register_step2_label_lastName || "Last Name"} value={person.lastName} />
-                                <DataRow label={t.register_step2_label_dateOfBirth || "Date of Birth"} value={person.dateOfBirth} />
-                                <DataRow label={t.register_step2_label_placeOfBirth || "Place of Birth"} value={person.placeOfBirth} />
-                                <DataRow label={t.register_step2_label_nationality || "Nationality"} value={person.nationality} />
-                                <DataRow label={t.register_step2_label_streetAddress || "Street and House Number"} value={person.streetAddress} />
-                                <DataRow label={t.register_step2_label_postalCode || "Postal Code"} value={person.postalCode} />
-                                <DataRow label={t.register_step2_label_city || "City"} value={person.city} />
-                                <DataRow label={t.register_step2_label_stateOrProvince || "State/Province"} value={person.stateOrProvince} />
-                                <DataRow label={t.register_step2_label_phoneNumber || "Phone Number"} value={person.phoneNumber} />
-                                <DataRow label={t.member_review_email_address || "Email Address"} value={person.email} />
-                            </div>
-                        </section>
-
-                        {/* Professional Qualifications Section */}
-                        <section>
-                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_prof_qual_title || "Berufliche Qualifikationen"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
-                                <DataRow label={t.register_step4_label_prof_title || "Current Professional Title"} value={person.currentProfessionalTitle} />
-                                <DataRow label={t.register_step4_label_specializations || "Specializations"} value={person.specializations} />
-                                <DataRow label={t.register_step4_label_languages || "Languages"} value={person.languages} />
-                                <DataRow label={t.register_step4_label_graduation_date || "Graduation Date"} value={person.graduationDate} />
-                                <DataRow label={t.register_step4_label_university || "University"} value={person.university} />
-                                <DataRow label={t.register_step4_label_approbation_number || "Approbation Number"} value={person.approbationNumber} />
-                                <DataRow label={t.register_step4_label_approbation_date || "Approbation Date"} value={person.approbationDate} />
-                            </div>
-                        </section>
-
-                         {/* Practice Information Section */}
-                        <section>
-                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_practice_info_title || "Informationen zur Ordination"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8">
-                                <DataRow label={t.register_step5_label_practiceName || "Practice Name"} value={person.practiceName} />
-                                <DataRow label={t.register_step5_label_practiceStreetAddress || "Practice Street Address"} value={person.practiceStreetAddress} />
-                                <DataRow label={t.register_step5_label_practicePostalCode || "Practice Postal Code"} value={person.practicePostalCode} />
-                                <DataRow label={t.register_step5_label_practiceCity || "Practice City"} value={person.practiceCity} />
-                                <DataRow label={t.register_step5_label_practicePhoneNumber || "Practice Phone Number"} value={person.practicePhoneNumber} />
-                                <DataRow label={t.register_step5_label_practiceFaxNumber || "Practice Fax Number"} value={person.practiceFaxNumber} />
-                                <DataRow label={t.register_step5_label_practiceEmail || "Practice Email"} value={person.practiceEmail} />
-                                <DataRow label={t.register_step5_label_practiceWebsite || "Practice Website"} value={person.practiceWebsite} />
-                                <DataRow label={t.register_step5_label_healthInsuranceContracts || "Health Insurance Contracts"} value={person.healthInsuranceContracts} />
-                            </div>
-                        </section>
-                        
-                        {/* Documents Section */}
-                        <section>
-                            <h3 className="text-lg font-semibold font-headline mb-3 text-primary">{t.member_review_documents_title || "Dokumente"}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <DocumentRow label={t.register_step2_label_idDocument || "ID Card or Passport"} docName={person.idDocumentName} docUrl={person.idDocumentUrl} />
-                                <DocumentRow label={t.register_step4_label_diploma || "Diploma/Certificate"} docName={person.diplomaName} docUrl={person.diplomaUrl} />
-                                <DocumentRow label={t.register_step4_label_approbation_cert || "Approbation Certificate"} docName={person.approbationCertificateName} docUrl={person.approbationCertificateUrl} />
-                                <DocumentRow label={t.register_step4_label_specialist_recognition || "Specialist Recognition"} docName={person.specialistRecognitionName} docUrl={person.specialistRecognitionUrl} />
-                            </div>
-                        </section>
-                    </div>
-
+                    {person.pendingData ? renderDataChangeReview() : renderRegistrationReview()}
+                    
                     <Separator className="my-8" />
 
                     <div className="space-y-6">
@@ -264,7 +261,7 @@ export default function DataReviewPage() {
                     </div>
 
                     <div className="flex justify-end gap-4 mt-8">
-                        <Button variant="outline" asChild><Link href={`/member-overview/${memberId}`}>{t.member_review_cancel_button || "ABBRECHEN"}</Link></Button>
+                        <Button variant="outline" asChild><Link href={`/${locale}/member-overview/${memberId}`}>{t.member_review_cancel_button || "ABBRECHEN"}</Link></Button>
                         <Button className="bg-primary hover:bg-primary/90" onClick={handleSubmit} disabled={isSubmitting || !isConfirmed}>
                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             {t.member_review_submit_button || "PRÜFUNG ABSENDEN"}

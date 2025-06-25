@@ -1,8 +1,10 @@
 
 'use server';
 
-import { updatePerson, deletePerson } from '@/services/personService';
+import { updatePerson, deletePerson, getPersonById } from '@/services/personService';
 import type { Person } from '@/lib/types';
+import { FieldValue } from 'firebase/firestore';
+
 
 export async function setPersonStatus(
   personId: string,
@@ -27,6 +29,19 @@ export async function deletePersonById(personId: string): Promise<{ success: boo
     return { success: true, message: `Successfully deleted user's database record.` };
   } catch (error) {
     console.error(`Error deleting user record:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, message: `Error: ${errorMessage}` };
+  }
+}
+
+export async function requestDataChange(personId: string, updates: Partial<Person>): Promise<{ success: boolean; message: string }> {
+  try {
+    // We only want to store the changes, not overwrite the whole document
+    // So we'll pass the updates directly to a 'pendingData' field
+    await updatePerson(personId, { pendingData: updates });
+    return { success: true, message: 'Your changes have been submitted for review.' };
+  } catch (error) {
+    console.error('Error requesting data change:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return { success: false, message: `Error: ${errorMessage}` };
   }

@@ -34,6 +34,9 @@ export interface User {
 
   createdAt?: string; 
   updatedAt?: string; 
+
+  // Field for pending data changes
+  pendingData?: Partial<Person>;
 }
 
 
@@ -133,12 +136,15 @@ export interface Person {
   // Review information
   rejectionReason?: string;
 
+  // Pending data changes
+  pendingData?: Partial<Person>;
+
   createdAt?: string; 
   updatedAt?: string; 
 }
 
 // Data needed to create a new person document in Firestore, after Firebase Auth user is created.
-export type PersonCreationData = Omit<Person, 'id' | 'createdAt' | 'updatedAt'>;
+export type PersonCreationData = Omit<Person, 'id' | 'createdAt' | 'updatedAt' | 'pendingData'>;
 
 // Data structure for the registration form state (in registrationStore.ts)
 // This interface is more for the internal store, PersonCreationData is for Firestore.

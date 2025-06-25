@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { PlusCircle, Search, Loader2, MoreHorizontal } from 'lucide-react';
+import { PlusCircle, Search, Loader2, MoreHorizontal, FilePen } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
@@ -115,7 +115,9 @@ export default function MemberOverviewPage() {
   };
 
   const membersToReview = useMemo(() => {
-    return augmentedPersons.filter(p => p.status === 'pending');
+    return augmentedPersons
+        .filter(p => p.status === 'pending' || !!p.pendingData)
+        .sort((a,b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
   }, [augmentedPersons]);
 
   const filteredMembers = useMemo(() => {
@@ -192,10 +194,18 @@ export default function MemberOverviewPage() {
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div>
                                     <p className="font-semibold">{member.name}</p>
-                                    <p className="text-sm text-muted-foreground">{member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'} | {t.data_change_label || "Data Change"}</p>
+                                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                        {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
+                                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">
+                                            {member.pendingData ? (t.data_change_label || "Data Change") : "New Registration"}
+                                        </span>
+                                    </p>
                                 </div>
                                 <Button asChild variant="outline" className="w-full sm:w-auto">
-                                   <Link href={`/${locale}/member-overview/${member.id}/review`}>{t.member_review_action_button || "PERFORM REVIEW"}</Link>
+                                   <Link href={`/${locale}/member-overview/${member.id}/review`}>
+                                     <FilePen className="mr-2 h-4 w-4" />
+                                     {t.member_review_action_button || "PERFORM REVIEW"}
+                                   </Link>
                                 </Button>
                             </div>
                             {index < membersToReview.length - 1 && <Separator className="mt-4"/>}

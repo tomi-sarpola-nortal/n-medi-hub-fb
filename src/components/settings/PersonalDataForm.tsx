@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
-import { updatePerson } from '@/services/personService';
+import { requestDataChange } from '@/app/actions/memberActions';
 import type { Person } from '@/lib/types';
 import { Loader2, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
@@ -89,31 +89,30 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
       
       const fileToUpload = idDocument?.[0];
       if (fileToUpload) {
-        // If there's an old file URL, try to delete it first.
-        if (user.idDocumentUrl) {
-          await deleteFileByUrl(user.idDocumentUrl);
-        }
-
-        const uploadPath = `users/${user.id}/id_documents`;
+        const uploadPath = `users/${user.id}/id_documents_pending`;
         const downloadURL = await uploadFile(fileToUpload, uploadPath);
         updateData.idDocumentUrl = downloadURL;
         updateData.idDocumentName = fileToUpload.name;
-        setSelectedFileName(fileToUpload.name);
       }
 
-      await updatePerson(user.id, updateData);
-      
-      setUser(prev => prev ? ({ ...prev, ...updateData }) : null);
+      const result = await requestDataChange(user.id, updateData);
 
-      toast({
-        title: t.settings_save_success_title || "Success",
-        description: t.settings_personal_data_success_desc || "Your personal data has been updated.",
-      });
+      if (result.success) {
+        // Optimistically update the user context to reflect the pending state
+        setUser(prev => prev ? ({ ...prev, pendingData: updateData }) : null);
+        toast({
+          title: t.settings_save_success_title || "Success",
+          description: t.settings_personal_data_success_desc || "Your changes have been submitted for review.",
+        });
+      } else {
+        throw new Error(result.message);
+      }
+
     } catch (error) {
-      console.error("Failed to update personal data:", error);
+      console.error("Failed to request data change:", error);
       toast({
         title: t.settings_save_error_title || "Error",
-        description: t.settings_save_error_desc || "Failed to update information. Please try again.",
+        description: (error as Error).message || "Failed to submit changes. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -129,6 +128,8 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
     }
   };
 
+  const isFormDisabled = isDisabled || !!user.pendingData;
+
   return (
     <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -139,7 +140,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                   render={({ field }) => (
                     <FormItem className="md:col-span-1">
                       <FormLabel>{t.register_step2_label_title || "Title"}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isFormDisabled}>
                             <FormControl>
                                 <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                             </FormControl>
@@ -160,7 +161,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
                       <FormLabel>{t.register_step2_label_firstName || "First Name"}*</FormLabel>
-                      <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                      <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -173,7 +174,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_lastName || "Last Name"}*</FormLabel>
-                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -190,7 +191,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                                 <DatePickerInput
                                     value={field.value ? new Date(field.value) : undefined}
                                     onChange={field.onChange}
-                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01") || isDisabled}
+                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01") || isFormDisabled}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -203,7 +204,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_placeOfBirth || "Place of Birth"}*</FormLabel>
-                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                        <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -216,7 +217,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_nationality || "Nationality"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isFormDisabled}>
                         <FormControl>
                         <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                         </FormControl>
@@ -238,7 +239,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_streetAddress || "Street and House Number"}*</FormLabel>
-                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -251,7 +252,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_postalCode || "Postal Code"}*</FormLabel>
-                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                        <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -262,7 +263,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t.register_step2_label_city || "City"}*</FormLabel>
-                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                        <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -275,7 +276,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step2_label_stateOrProvince || "State/Province"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isFormDisabled}>
                         <FormControl>
                         <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                         </FormControl>
@@ -298,7 +299,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step2_label_phoneNumber || "Phone Number"}</FormLabel>
-                    <FormControl><Input type="tel" {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input type="tel" {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -316,7 +317,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                                 htmlFor="idDocument-file"
                                 className={cn(
                                     "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
-                                    !isDisabled && "hover:bg-accent cursor-pointer"
+                                    !isFormDisabled && "hover:bg-accent cursor-pointer"
                                 )}
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
@@ -328,7 +329,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                                 className="hidden"
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 onChange={handleFileChange}
-                                disabled={isDisabled}
+                                disabled={isFormDisabled}
                             />
                         </div>
                     </FormControl>
@@ -337,7 +338,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                 )}
             />
 
-            {!isDisabled && (
+            {!isFormDisabled && (
                 <div className="flex justify-end pt-4">
                     <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

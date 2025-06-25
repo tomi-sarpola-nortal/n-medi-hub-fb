@@ -19,6 +19,7 @@ import {
   type QueryDocumentSnapshot,
   orderBy,
   limit,
+  deleteField,
 } from 'firebase/firestore';
 
 const PERSONS_COLLECTION = 'persons';
@@ -114,6 +115,9 @@ const snapshotToPerson = (snapshot: DocumentSnapshot<any> | QueryDocumentSnapsho
     healthInsuranceContracts: data.healthInsuranceContracts,
 
     rejectionReason: data.rejectionReason,
+
+    // Pending data changes
+    pendingData: data.pendingData,
 
     createdAt: createdAtTimestamp?.toDate().toISOString(),
     updatedAt: updatedAtTimestamp?.toDate().toISOString(),
@@ -238,7 +242,7 @@ export async function getAllPersons(): Promise<Person[]> {
 }
 
 /**
- * Processes a review for a pending person.
+ * Processes a review for a pending person registration or data change.
  * @param personId The ID of the person to review.
  * @param decision The review decision: 'approve', 'deny', or 'reject'.
  * @param justification An optional reason for denial or rejection.
@@ -250,29 +254,45 @@ export async function reviewPerson(
 ): Promise<void> {
     'use server';
     checkDb();
-    const updates: Partial<Person> = {};
+    const person = await getPersonById(personId);
+    if (!person) throw new Error("Person not found");
 
-    switch (decision) {
-        case 'approve':
-            updates.status = 'active';
-            const person = await getPersonById(personId);
-            if (person && !person.dentistId) {
-                updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-            }
-            updates.rejectionReason = ''; // Clear any previous rejection reason
-            break;
-        case 'deny':
-            updates.status = 'inactive';
-            updates.rejectionReason = justification;
-            break;
-        case 'reject':
-            // Status remains 'pending', but we update the justification for feedback.
-            updates.status = 'pending'; 
-            updates.rejectionReason = justification;
-            break;
+    // Case 1: Reviewing a data change for an active user
+    if (person.status === 'active' && person.pendingData) {
+        if (decision === 'approve') {
+            const updatesToApply = person.pendingData;
+            await updatePerson(personId, { ...updatesToApply, pendingData: deleteField() as any, rejectionReason: deleteField() as any });
+        } else { // deny or reject
+            await updatePerson(personId, { pendingData: deleteField() as any, rejectionReason: justification });
+        }
+        return;
     }
-    
-    await updatePerson(personId, updates);
+
+    // Case 2: Reviewing a new registration
+    if (person.status === 'pending') {
+        const updates: Partial<Person> = {};
+        switch (decision) {
+            case 'approve':
+                updates.status = 'active';
+                if (!person.dentistId) {
+                    updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+                }
+                updates.rejectionReason = deleteField() as any;
+                break;
+            case 'deny':
+                updates.status = 'inactive';
+                updates.rejectionReason = justification;
+                break;
+            case 'reject':
+                updates.status = 'rejected';
+                updates.rejectionReason = justification;
+                break;
+        }
+        await updatePerson(personId, updates);
+        return;
+    }
+
+    throw new Error("No pending registration or data change to review for this user.");
 }
 
 /**

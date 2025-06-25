@@ -52,7 +52,10 @@ export default function SettingsPage() {
   }
 
   const pageTitle = t.settings_page_title || "Settings";
-  const isPending = user.status === 'pending';
+  const isPendingRegistration = user.status === 'pending';
+  const hasPendingDataChange = !!user.pendingData;
+
+  const isFormDisabled = isPendingRegistration || hasPendingDataChange;
 
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
@@ -60,7 +63,7 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
         <p className="text-muted-foreground">{t.settings_page_description || "Update your personal and professional information."}</p>
 
-        {isPending && (
+        {isPendingRegistration && (
           <Alert variant="default" className="bg-amber-50 border-amber-300 text-amber-800 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-200">
             <AlertTriangle className="h-4 w-4 !text-amber-600 dark:!text-amber-400" />
             <AlertTitle>{t.settings_pending_approval_title || "Account Pending Approval"}</AlertTitle>
@@ -70,12 +73,22 @@ export default function SettingsPage() {
           </Alert>
         )}
 
+        {hasPendingDataChange && !isPendingRegistration && (
+           <Alert variant="default" className="bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200">
+            <AlertTriangle className="h-4 w-4 !text-blue-600 dark:!text-blue-400" />
+            <AlertTitle>{"Änderungen zur Überprüfung ausstehend"}</AlertTitle>
+            <AlertDescription>
+              {"Ihre letzten Datenänderungen wurden zur Überprüfung eingereicht. Sie können die Formulare erst wieder bearbeiten, nachdem die Änderungen genehmigt oder abgelehnt wurden."}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
           <AccordionItem value="item-1">
             <AccordionTrigger className="font-headline text-lg">{t.settings_personal_data_title || "Personal Data"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_personal_data_desc || "Update your personal details and contact information."}</p>
-              <PersonalDataForm user={user} t={t} isDisabled={isPending} />
+              <PersonalDataForm user={user} t={t} isDisabled={isFormDisabled} />
             </AccordionContent>
           </AccordionItem>
           
@@ -83,7 +96,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_prof_qual_title || "Professional Qualifications"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_prof_qual_desc || "Manage your professional titles, specializations, and qualifications."}</p>
-              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isPending} />
+              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isFormDisabled} />
             </AccordionContent>
           </AccordionItem>
           
@@ -91,7 +104,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_practice_info_title || "Practice Information"}</AccordionTrigger>
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
-                <PracticeInformationForm user={user} t={t} isDisabled={isPending} />
+                <PracticeInformationForm user={user} t={t} isDisabled={isFormDisabled} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
