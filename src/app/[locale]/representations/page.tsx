@@ -229,7 +229,7 @@ export default function RepresentationsPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span>{formatPeriod(rep.startDate, rep.endDate)}</span>
                                                     {isStartDateOverdue && (
-                                                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                                                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
                                                             {t.representations_label_overdue || "overdue"}
                                                         </Badge>
                                                     )}
@@ -247,7 +247,7 @@ export default function RepresentationsPage() {
                                                 <div className="flex items-center gap-2">
                                                   <span>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</span>
                                                   {isCreateDateOverdue && (
-                                                        <Badge className="bg-status-warning-background text-status-warning-foreground hover:bg-status-warning-background/90 border-transparent">
+                                                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
                                                             {t.representations_label_overdue || "overdue"}
                                                         </Badge>
                                                   )}
