@@ -6,16 +6,13 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebaseConfig';
 import { 
-  createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  deleteUser,
   sendPasswordResetEmail,
   type User as FirebaseUser // Alias to avoid naming conflict
 } from 'firebase/auth';
-import { getPersonById, deletePerson } from '@/services/personService';
-import { deleteFileByUrl } from '@/services/storageService';
+import { getPersonById } from '@/services/personService';
 
 interface AuthContextType {
   user: Person | null;
@@ -149,62 +146,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteUserAccount = async (): Promise<{ success: boolean; error?: string }> => {
-    if (!auth?.currentUser || !user) {
+    if (!auth || !user) {
         return { success: false, error: "No user is currently logged in." };
     }
 
-    const firebaseUser = auth.currentUser;
-    const userDataForCleanup = user;
+    const userId = user.id;
 
     try {
         setLoading(true);
 
-        // 1. Delete Firestore and Storage data FIRST.
-        // This is necessary because once the Auth user is deleted, the security token becomes invalid,
-        // and we would lose permission to delete their associated data if security rules are in place.
-        await deletePerson(userDataForCleanup.id);
-        console.log("User document deleted from Firestore.");
+        const response = await fetch(`https://deleteuserdata-dsey7ysrrq-uc.a.run.app/${userId}`, {
+            method: 'DELETE',
+        });
 
-        const filesToDelete = [
-            userDataForCleanup.idDocumentUrl,
-            userDataForCleanup.diplomaUrl,
-            userDataForCleanup.approbationCertificateUrl,
-            userDataForCleanup.specialistRecognitionUrl,
-        ].filter(Boolean) as string[];
-
-        if (filesToDelete.length > 0) {
-            await Promise.all(filesToDelete.map(url => deleteFileByUrl(url)));
-            console.log("Associated files in Storage deleted.");
+        if (!response.ok) {
+            // Try to parse error message from the API if available
+            const errorData = await response.json().catch(() => ({ message: `API request failed with status ${response.status}` }));
+            throw new Error(errorData.message);
         }
 
-        // 2. Delete the Auth user LAST.
-        // If this step fails (e.g., requires-recent-login), the user's data is gone but their account
-        // still exists. They can log in again and retry, which is a recoverable state.
-        // The alternative (deleting auth first) could leave their data orphaned if cleanup fails.
-        await deleteUser(firebaseUser);
-        console.log("Firebase Auth user deleted successfully.");
-
+        // If the API call is successful, it means the user is deleted on the backend.
+        // Sign the user out on the client to complete the process.
+        await signOut(auth);
         setUser(null);
         router.push('/login');
         
         return { success: true };
 
     } catch (error: any) {
-        console.error("Account deletion failed:", error);
-        let errorMessage = "Failed to delete account. Please try again.";
-
-        if (error.code === 'auth/requires-recent-login') {
-            errorMessage = "This operation is sensitive and requires a recent login. Please log out and log back in before trying to delete your account.";
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        
-        return { success: false, error: errorMessage };
-
+        console.error("Account deletion failed via API:", error);
+        return { success: false, error: error.message || "An unexpected error occurred during account deletion." };
     } finally {
         setLoading(false);
     }
-};
+  };
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user && !loading, login, logout, sendPasswordReset, deleteUserAccount, loading, setUser }}>
