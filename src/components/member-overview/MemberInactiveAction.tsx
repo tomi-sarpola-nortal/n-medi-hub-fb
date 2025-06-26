@@ -8,6 +8,7 @@ import type { Person } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
+import { auth } from '@/lib/firebaseConfig';
 
 interface MemberDangerZoneActionsProps {
   member: Person;
@@ -37,8 +38,13 @@ export default function MemberDangerZoneActions({ member, t }: MemberDangerZoneA
   };
   
   const handleDeleteConfirm = async () => {
+    if (!auth?.currentUser) {
+        toast({ title: t.toast_error_title || "Error", description: "Authentication error. Please log in again.", variant: 'destructive' });
+        return;
+    }
+    const token = await auth.currentUser.getIdToken();
     setIsDeleting(true);
-    const result = await deletePersonByAdmin(member.id);
+    const result = await deletePersonByAdmin(member.id, token);
     if (result.success) {
       toast({ title: t.toast_success_title || "Success", description: result.message });
       router.push('/member-overview');

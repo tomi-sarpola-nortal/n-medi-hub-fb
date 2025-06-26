@@ -1,3 +1,4 @@
+
 'use server';
 
 import { updatePerson, getPersonsByRole } from '@/services/personService';
@@ -62,10 +63,13 @@ export async function requestDataChange(personId: string, updates: Partial<Perso
   }
 }
 
-export async function deletePersonByAdmin(personId: string): Promise<{ success: boolean; message: string }> {
+export async function deletePersonByAdmin(personId: string, token: string): Promise<{ success: boolean; message: string }> {
   try {
     const response = await fetch(`https://deleteuserdata-dsey7ysrrq-uc.a.run.app/${personId}`, {
         method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
 
     if (!response.ok) {

@@ -146,17 +146,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteUserAccount = async (): Promise<{ success: boolean; error?: string }> => {
-    if (!auth || !user) {
+    if (!auth || !auth.currentUser) {
         return { success: false, error: "No user is currently logged in." };
     }
 
-    const userId = user.id;
+    const userId = auth.currentUser.uid;
+    const idToken = await auth.currentUser.getIdToken();
 
     try {
         setLoading(true);
 
         const response = await fetch(`https://deleteuserdata-dsey7ysrrq-uc.a.run.app/${userId}`, {
             method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${idToken}`
+            }
         });
 
         if (!response.ok) {
