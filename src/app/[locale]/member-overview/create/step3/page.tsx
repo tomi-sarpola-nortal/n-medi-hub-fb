@@ -66,7 +66,16 @@ export default function CreateMemberStep3Page() {
   const form = useForm<ProfessionalQualificationsFormInputs>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      specializations: [], languages: [],
+      currentProfessionalTitle: "",
+      specializations: [],
+      languages: [],
+      graduationDate: undefined,
+      university: "",
+      approbationNumber: "",
+      approbationDate: undefined,
+      diplomaFile: null,
+      approbationCertificateFile: null,
+      specialistRecognitionFile: null,
     },
   });
 
@@ -78,8 +87,12 @@ export default function CreateMemberStep3Page() {
       router.replace(`/${locale}/member-overview/create`);
     } else {
       form.reset({
-        ...storedData,
+        currentProfessionalTitle: storedData.currentProfessionalTitle || "",
+        specializations: storedData.specializations || [],
+        languages: storedData.languages || [],
         graduationDate: storedData.graduationDate ? new Date(storedData.graduationDate) : undefined,
+        university: storedData.university || "",
+        approbationNumber: storedData.approbationNumber || "", // Ensure empty string instead of undefined
         approbationDate: storedData.approbationDate ? new Date(storedData.approbationDate) : undefined,
       });
       setSelectedDiplomaFileName(storedData.diplomaName || null);
