@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -14,7 +13,7 @@ import type { Person, TrainingHistory, UserRole } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import MemberRepresentationsTab from '@/components/member-overview/MemberRepresentationsTab';
-import MemberInactiveAction from '@/components/member-overview/MemberInactiveAction';
+import MemberDangerZoneActions from '@/components/member-overview/MemberInactiveAction';
 import ResetPasswordButton from '@/components/member-overview/ResetPasswordButton';
 import { useAuth } from '@/context/auth-context';
 import { logGeneralAudit } from '@/app/actions/auditActions';
@@ -243,7 +242,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <MemberInactiveAction member={person} t={t} />
+                                <MemberDangerZoneActions member={person} t={t} />
                             </CardContent>
                         </Card>
                     )}

@@ -1,10 +1,9 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { setPersonStatus } from '@/app/actions/memberActions';
+import { setPersonStatus, deletePersonByAdmin } from '@/app/actions/memberActions';
 import type { Person } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -20,7 +19,9 @@ export default function MemberDangerZoneActions({ member, t }: MemberDangerZoneA
   const { toast } = useToast();
   
   const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isInactiveAlertOpen, setIsInactiveAlertOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const handleDeactivateConfirm = async () => {
     setIsDeactivating(true);
@@ -34,6 +35,21 @@ export default function MemberDangerZoneActions({ member, t }: MemberDangerZoneA
     }
     setIsDeactivating(false);
   };
+  
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    const result = await deletePersonByAdmin(member.id);
+    if (result.success) {
+      toast({ title: t.toast_success_title || "Success", description: result.message });
+      router.push('/member-overview');
+      router.refresh();
+    } else {
+      toast({ title: t.toast_error_title || "Error", description: result.message, variant: 'destructive' });
+      setIsDeleteAlertOpen(false);
+    }
+    setIsDeleting(false);
+  };
+
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -58,6 +74,33 @@ export default function MemberDangerZoneActions({ member, t }: MemberDangerZoneA
             >
               {isDeactivating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t.member_list_deactivate_dialog_confirm || "Set Inactive"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+       {/* Delete User Dialog */}
+       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <Button variant="destructive" onClick={() => setIsDeleteAlertOpen(true)}>
+          {t.member_list_delete_user_button || "Delete User"}
+        </Button>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.member_list_delete_dialog_title || "Are you absolutely sure?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(t.member_list_delete_dialog_desc || "This will permanently delete the user {memberName} and all associated data. This action cannot be undone.")
+                .replace('{memberName}', member.name || 'this user')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>{t.member_list_deactivate_dialog_cancel || "Cancel"}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t.member_list_delete_dialog_confirm || "Delete User"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

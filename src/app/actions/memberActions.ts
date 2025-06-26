@@ -1,4 +1,3 @@
-
 'use server';
 
 import { updatePerson, getPersonsByRole } from '@/services/personService';
@@ -58,6 +57,28 @@ export async function requestDataChange(personId: string, updates: Partial<Perso
     return { success: true, message: 'Your changes have been submitted for review.' };
   } catch (error) {
     console.error('Error requesting data change:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, message: `Error: ${errorMessage}` };
+  }
+}
+
+export async function deletePersonByAdmin(personId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`https://deleteuserdata-dsey7ysrrq-uc.a.run.app/${personId}`, {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `API request failed with status ${response.status}` }));
+        throw new Error(errorData.message);
+    }
+    
+    // Assuming a successful response has a body with a message
+    const result = await response.json().catch(() => ({ message: "User deleted successfully." }));
+
+    return { success: true, message: result.message };
+  } catch (error) {
+    console.error("Error deleting user via admin action:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return { success: false, message: `Error: ${errorMessage}` };
   }
