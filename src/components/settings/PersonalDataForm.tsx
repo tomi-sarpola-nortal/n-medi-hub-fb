@@ -94,13 +94,17 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
         const downloadURL = await uploadFile(fileToUpload, uploadPath);
         updateData.idDocumentUrl = downloadURL;
         updateData.idDocumentName = fileToUpload.name;
+      } else {
+        // Preserve existing file if no new one is uploaded
+        updateData.idDocumentUrl = user.idDocumentUrl;
+        updateData.idDocumentName = user.idDocumentName;
       }
 
-      const result = await requestDataChange(user.id, updateData, authUser);
+      const result = await requestDataChange(user.id, updateData, authUser, locale);
 
       if (result.success) {
         // Optimistically update the user context to reflect the pending state
-        setUser(prev => prev ? ({ ...prev, pendingData: updateData, hasPendingChanges: true }) : null);
+        setUser(prev => prev ? ({ ...prev, pendingData: { ...prev.pendingData, ...updateData }, hasPendingChanges: true }) : null);
         toast({
           title: t.settings_save_success_title || "Success",
           description: t.settings_personal_data_success_desc || "Your changes have been submitted for review.",
@@ -130,6 +134,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   };
 
   const isFormDisabled = isDisabled || !!user.pendingData;
+  const locale = t.locale || 'en';
 
   return (
     <Form {...form}>

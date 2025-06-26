@@ -112,21 +112,32 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
         const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.diplomaUrl = url;
         updateData.diplomaName = file.name;
+      } else {
+        updateData.diplomaUrl = user.diplomaUrl;
+        updateData.diplomaName = user.diplomaName;
       }
+      
       if (approbationCertificateFile?.[0]) {
         const file = approbationCertificateFile[0];
         const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.approbationCertificateUrl = url;
         updateData.approbationCertificateName = file.name;
+      } else {
+        updateData.approbationCertificateUrl = user.approbationCertificateUrl;
+        updateData.approbationCertificateName = user.approbationCertificateName;
       }
+
       if (specialistRecognitionFile?.[0]) {
         const file = specialistRecognitionFile[0];
         const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.specialistRecognitionUrl = url;
         updateData.specialistRecognitionName = file.name;
+      } else {
+        updateData.specialistRecognitionUrl = user.specialistRecognitionUrl;
+        updateData.specialistRecognitionName = user.specialistRecognitionName;
       }
 
-      const result = await requestDataChange(user.id, updateData, authUser);
+      const result = await requestDataChange(user.id, updateData, authUser, locale);
 
       if (result.success) {
         setUser(prev => prev ? ({ ...prev, pendingData: { ...prev.pendingData, ...updateData }, hasPendingChanges: true }) : null);
@@ -150,6 +161,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
   };
   
   const isFormDisabled = isDisabled || !!user.pendingData;
+  const locale = t.locale || 'en';
 
 
   return (
