@@ -72,6 +72,21 @@ This application uses the "Trigger Email" Firebase Extension to send emails.
     *   Provide your SMTP server's details (e.g., from SendGrid, Mailgun, or another provider).
     *   Leave the `Mail Collection` setting as the default (`mail`).
 
+#### Important: Authenticating Your Sending Domain (SPF & DKIM)
+
+The error message `Sender is unauthenticated` indicates that your email provider (like Gmail, Outlook) is rejecting emails because it cannot verify they are legitimately coming from your domain. To fix this, you must configure **SPF** and **DKIM** records in your domain's DNS settings.
+
+*   **What are they?** SPF (Sender Policy Framework) and DKIM (DomainKeys Identified Mail) are DNS records that prove to mail servers that your SMTP provider (e.g., SendGrid, Mailgun) is authorized to send emails on your behalf.
+*   **How to fix it:** Your SMTP provider will give you the specific DNS records (usually TXT or CNAME records) that you need to add to your domain's DNS settings (where you manage your domain, like GoDaddy, Namecheap, Cloudflare, etc.).
+
+Please consult the documentation for your specific SMTP provider for instructions:
+*   [SendGrid Instructions](https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication)
+*   [Mailgun Instructions](https://documentation.mailgun.com/en/latest/user_manual.html#verifying-your-domain)
+*   [Brevo (formerly Sendinblue) Instructions](https://help.brevo.com/hc/en-us/articles/200227202-Authenticate-your-domain-to-improve-the-deliverability-of-your-emails-SPF-DKIM-DMARC-)
+
+**This step is mandatory for reliable email delivery.** Without it, your emails will likely be marked as spam or blocked entirely.
+
+
 ### Step 5: Deploy and Seed the Database
 
 Once your environment is deployed and running:
