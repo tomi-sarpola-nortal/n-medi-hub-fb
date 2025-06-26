@@ -4,7 +4,7 @@
 import { findPersonByEmail, updatePerson, createPerson } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData } from '@/lib/types';
+import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData, UserRole } from '@/lib/types';
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
 import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
 import { createZfdGroup } from '@/services/zfdGroupService';
@@ -221,13 +221,14 @@ export async function setSabineMuellerToPending(): Promise<{ success: boolean; m
   }
 }
 
-const usersToSeed = [
-    { id: 'seed-user-markus-weber', email: 'markus.weber@example.com', name: 'Dr. Markus Weber', dentistId: '78954' },
-    { id: 'seed-user-julia-schmidt', email: 'julia.schmidt@example.com', name: 'Dr. Julia Schmidt', dentistId: '65412' },
-    { id: 'seed-user-thomas-mueller', email: 'thomas.mueller@example.com', name: 'Dr. Thomas Müller', dentistId: '34567' },
-    { id: 'seed-user-sabine-becker', email: 'sabine.becker@example.com', name: 'Dr. Sabine Becker', dentistId: '23456' },
-    { id: 'seed-user-lukas-hoffmann', email: 'lukas.hoffmann@example.com', name: 'Dr. Lukas Hoffmann', dentistId: '78954' },
-    { id: 'seed-user-anna-schneider', email: 'anna.schneider@example.com', name: 'Dr. Anna Schneider', dentistId: '65412' },
+const usersToSeed: { id: string; email: string; name: string; dentistId?: string; role: UserRole }[] = [
+    { id: 'seed-user-markus-weber', email: 'markus.weber@example.com', name: 'Dr. Markus Weber', dentistId: '78954', role: 'dentist' },
+    { id: 'seed-user-julia-schmidt', email: 'julia.schmidt@example.com', name: 'Dr. Julia Schmidt', dentistId: '65412', role: 'dentist' },
+    { id: 'seed-user-thomas-mueller', email: 'thomas.mueller@example.com', name: 'Dr. Thomas Müller', dentistId: '34567', role: 'dentist' },
+    { id: 'seed-user-sabine-becker', email: 'sabine.becker@example.com', name: 'Dr. Sabine Becker', dentistId: '23456', role: 'dentist' },
+    { id: 'seed-user-lukas-hoffmann', email: 'lukas.hoffmann@example.com', name: 'Dr. Lukas Hoffmann', dentistId: '78954', role: 'dentist' },
+    { id: 'seed-user-anna-schneider', email: 'anna.schneider@example.com', name: 'Dr. Anna Schneider', dentistId: '65412', role: 'dentist' },
+    { id: 'seed-user-max-mustermann', email: 'meme@gmail.com', name: 'Max Mustermann', role: 'lk_member' },
 ];
 
 export async function seedUsersAndRepresentations(): Promise<{ success: boolean; message: string }> {
@@ -246,12 +247,13 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
                     name: userData.name,
                     email: userData.email,
                     dentistId: userData.dentistId,
-                    role: 'dentist',
+                    role: userData.role,
                     status: 'active',
                     region: 'Wien',
                     otpEnabled: false,
+                    notificationSettings: { inApp: true, email: false },
                 };
-                await createPerson(userData.id, newUser);
+                await createPerson(userData.id, newUser, 'en');
                 usersCreated++;
                 user = await findPersonByEmail(userData.email);
             }
@@ -315,7 +317,7 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
         ];
 
         for (const repData of representationsToCreate) {
-            await createRepresentation(repData);
+            await createRepresentation(repData, 'en');
             representationsCreated++;
         }
 
@@ -326,3 +328,5 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
         return { success: false, message: `Error seeding data: ${errorMessage}` };
     }
 }
+
+    
