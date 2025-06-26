@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
-import { updatePerson } from '@/services/personService';
-import type { Person, HealthInsuranceContractId } from '@/lib/types';
+import { requestDataChange } from '@/app/actions/memberActions';
+import type { Person } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -43,7 +43,7 @@ interface PracticeInformationFormProps {
 
 export default function PracticeInformationForm({ user, t, isDisabled = false }: PracticeInformationFormProps) {
   const { toast } = useToast();
-  const { setUser } = useAuth();
+  const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormInputs>({
@@ -62,15 +62,20 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
   });
 
   const onSubmit = async (data: FormInputs) => {
+    if (!authUser) return;
     setIsLoading(true);
     try {
-      await updatePerson(user.id, data);
-      setUser(prev => prev ? ({ ...prev, ...data }) : null);
+      const result = await requestDataChange(user.id, data, authUser);
 
-      toast({
-        title: t.settings_save_success_title || "Success",
-        description: t.settings_practice_info_success_desc || "Your practice information has been updated.",
-      });
+      if (result.success) {
+        setUser(prev => prev ? ({ ...prev, pendingData: { ...prev.pendingData, ...data }, hasPendingChanges: true }) : null);
+        toast({
+          title: t.settings_save_success_title || "Success",
+          description: t.settings_practice_info_success_desc || "Your practice information changes have been submitted for review.",
+        });
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       console.error("Failed to update practice information:", error);
       toast({
@@ -83,6 +88,8 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
     }
   };
 
+  const isFormDisabled = isDisabled || !!user.pendingData;
+
   return (
     <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -92,7 +99,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceName || "Name of Practice/Clinic"}*</FormLabel>
-                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -103,7 +110,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceStreetAddress || "Street and House Number"}*</FormLabel>
-                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -115,7 +122,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>{t.register_step5_label_practicePostalCode || "Postal Code"}*</FormLabel>
-                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                        <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -126,7 +133,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>{t.register_step5_label_practiceCity || "City"}*</FormLabel>
-                        <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                        <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -138,7 +145,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practicePhoneNumber || "Practice Phone Number"}*</FormLabel>
-                    <FormControl><Input placeholder="+43" {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input placeholder="+43" {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -149,7 +156,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceFaxNumber || "Practice Fax Number"}</FormLabel>
-                    <FormControl><Input placeholder="+43" {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input placeholder="+43" {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -160,7 +167,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceEmail || "Practice Email"}</FormLabel>
-                    <FormControl><Input type="email" placeholder={t.register_step5_placeholder_practiceEmail || "practice@example.com"} {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input type="email" placeholder={t.register_step5_placeholder_practiceEmail || "practice@example.com"} {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -171,7 +178,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t.register_step5_label_practiceWebsite || "Practice Website"}</FormLabel>
-                    <FormControl><Input type="url" placeholder={t.register_step5_placeholder_practiceWebsite || "https://example.com"} {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input type="url" placeholder={t.register_step5_placeholder_practiceWebsite || "https://example.com"} {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -199,10 +206,10 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                                         )
                                     );
                                 }}
-                                disabled={isDisabled}
+                                disabled={isFormDisabled}
                             />
                             </FormControl>
-                            <FormLabel className={cn("font-normal text-sm", isDisabled && "cursor-not-allowed opacity-70")}>
+                            <FormLabel className={cn("font-normal text-sm", isFormDisabled && "cursor-not-allowed opacity-70")}>
                                 {t[item.labelKey] || item.id.toUpperCase()}
                             </FormLabel>
                         </FormItem>
@@ -213,7 +220,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
                 <FormMessage className="pt-2">{form.formState.errors.healthInsuranceContracts?.message}</FormMessage>
             </FormItem>
 
-            {!isDisabled && (
+            {!isFormDisabled && (
                 <div className="flex justify-end pt-4">
                     <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

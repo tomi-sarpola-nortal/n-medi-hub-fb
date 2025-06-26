@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
-import { updatePerson } from '@/services/personService';
+import { requestDataChange } from '@/app/actions/memberActions';
 import type { Person } from '@/lib/types';
 import { Loader2, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
@@ -57,7 +57,7 @@ interface ProfessionalQualificationsFormProps {
 
 export default function ProfessionalQualificationsForm({ user, t, isDisabled = false }: ProfessionalQualificationsFormProps) {
   const { toast } = useToast();
-  const { setUser } = useAuth();
+  const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   const [selectedDiplomaName, setSelectedDiplomaName] = useState<string | null>(user.diplomaName || null);
@@ -91,10 +91,9 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
   };
 
   const onSubmit = async (data: FormInputs) => {
+    if (!authUser) return;
     setIsLoading(true);
     try {
-      const uploadPath = `users/${user.id}/qualifications`;
-      
       const { 
         diplomaFile, 
         approbationCertificateFile, 
@@ -109,43 +108,35 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
       };
 
       if (diplomaFile?.[0]) {
-        if (user.diplomaUrl) {
-            await deleteFileByUrl(user.diplomaUrl);
-        }
         const file = diplomaFile[0];
-        const url = await uploadFile(file, uploadPath);
+        const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.diplomaUrl = url;
         updateData.diplomaName = file.name;
-        setSelectedDiplomaName(file.name);
       }
       if (approbationCertificateFile?.[0]) {
-        if (user.approbationCertificateUrl) {
-            await deleteFileByUrl(user.approbationCertificateUrl);
-        }
         const file = approbationCertificateFile[0];
-        const url = await uploadFile(file, uploadPath);
+        const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.approbationCertificateUrl = url;
         updateData.approbationCertificateName = file.name;
-        setSelectedApprobationCertificateName(file.name);
       }
       if (specialistRecognitionFile?.[0]) {
-        if (user.specialistRecognitionUrl) {
-            await deleteFileByUrl(user.specialistRecognitionUrl);
-        }
         const file = specialistRecognitionFile[0];
-        const url = await uploadFile(file, uploadPath);
+        const url = await uploadFile(file, `users/${user.id}/qualifications_pending`);
         updateData.specialistRecognitionUrl = url;
         updateData.specialistRecognitionName = file.name;
-        setSelectedSpecialistRecognitionName(file.name);
       }
 
-      await updatePerson(user.id, updateData);
-      setUser(prev => prev ? ({ ...prev, ...updateData }) : null);
+      const result = await requestDataChange(user.id, updateData, authUser);
 
-      toast({
-        title: t.settings_save_success_title || "Success",
-        description: t.settings_prof_qual_success_desc || "Your professional qualifications have been updated.",
-      });
+      if (result.success) {
+        setUser(prev => prev ? ({ ...prev, pendingData: { ...prev.pendingData, ...updateData }, hasPendingChanges: true }) : null);
+        toast({
+          title: t.settings_save_success_title || "Success",
+          description: t.settings_prof_qual_success_desc || "Your qualifications changes have been submitted for review.",
+        });
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       console.error("Failed to update professional qualifications:", error);
       toast({
@@ -157,6 +148,9 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
       setIsLoading(false);
     }
   };
+  
+  const isFormDisabled = isDisabled || !!user.pendingData;
+
 
   return (
      <Form {...form}>
@@ -167,7 +161,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_prof_title || "Current Professional Title"}*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isDisabled}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isFormDisabled}>
                         <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
@@ -209,10 +203,10 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                                         )
                                     );
                                 }}
-                                disabled={isDisabled}
+                                disabled={isFormDisabled}
                             />
                             </FormControl>
-                            <FormLabel className={cn("font-normal text-sm", isDisabled && "cursor-not-allowed opacity-70")}>
+                            <FormLabel className={cn("font-normal text-sm", isFormDisabled && "cursor-not-allowed opacity-70")}>
                             {t[item.labelKey] || item.id.replace(/_/g, ' ')}
                             </FormLabel>
                         </FormItem>
@@ -234,7 +228,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                       placeholder={t.register_step4_placeholder_languages || "Add a language..."}
                       value={field.value || []}
                       onChange={field.onChange}
-                      disabled={isDisabled}
+                      disabled={isFormDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -252,7 +246,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                         <DatePickerInput
                           value={field.value ? new Date(field.value) : undefined}
                           onChange={field.onChange}
-                          disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isDisabled}
+                          disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isFormDisabled}
                         />
                         </FormControl>
                         <FormMessage />
@@ -266,7 +260,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_university || "University/College"}*</FormLabel>
-                    <FormControl><Input placeholder={t.register_step4_placeholder_university || "Name of University/College"} {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input placeholder={t.register_step4_placeholder_university || "Name of University/College"} {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -278,7 +272,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>{t.register_step4_label_approbation_number || "Approbation Number (if available)"}</FormLabel>
-                    <FormControl><Input {...field} disabled={isDisabled} /></FormControl>
+                    <FormControl><Input {...field} disabled={isFormDisabled} /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -294,7 +288,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                         <DatePickerInput
                             value={field.value ? new Date(field.value) : undefined}
                             onChange={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isDisabled}
+                            disabled={(date) => date > new Date() || date < new Date("1950-01-01") || isFormDisabled}
                         />
                     </FormControl>
                     <FormMessage />
@@ -314,7 +308,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             htmlFor="diplomaFile-input"
                             className={cn(
                                 "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
-                                !isDisabled && "hover:bg-accent cursor-pointer"
+                                !isFormDisabled && "hover:bg-accent cursor-pointer"
                             )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
@@ -326,7 +320,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaName)}
-                            disabled={isDisabled}
+                            disabled={isFormDisabled}
                         />
                     </div>
                     </FormControl>
@@ -347,7 +341,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             htmlFor="approbationCertificateFile-input"
                             className={cn(
                                 "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
-                                !isDisabled && "hover:bg-accent cursor-pointer"
+                                !isFormDisabled && "hover:bg-accent cursor-pointer"
                             )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
@@ -359,7 +353,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateName)}
-                            disabled={isDisabled}
+                            disabled={isFormDisabled}
                         />
                     </div>
                     </FormControl>
@@ -380,7 +374,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             htmlFor="specialistRecognitionFile-input"
                             className={cn(
                                 "flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background",
-                                !isDisabled && "hover:bg-accent cursor-pointer"
+                                !isFormDisabled && "hover:bg-accent cursor-pointer"
                             )}
                         >
                             <UploadCloud className="mr-2 h-4 w-4" />
@@ -392,7 +386,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
                             className="hidden"
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionName)}
-                            disabled={isDisabled}
+                            disabled={isFormDisabled}
                         />
                     </div>
                     </FormControl>
@@ -401,7 +395,7 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
               )}
             />
 
-            {!isDisabled && (
+            {!isFormDisabled && (
                 <div className="flex justify-end pt-4">
                     <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

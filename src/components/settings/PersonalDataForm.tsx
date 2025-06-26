@@ -100,7 +100,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
 
       if (result.success) {
         // Optimistically update the user context to reflect the pending state
-        setUser(prev => prev ? ({ ...prev, pendingData: updateData }) : null);
+        setUser(prev => prev ? ({ ...prev, pendingData: updateData, hasPendingChanges: true }) : null);
         toast({
           title: t.settings_save_success_title || "Success",
           description: t.settings_personal_data_success_desc || "Your changes have been submitted for review.",
