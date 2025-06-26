@@ -190,7 +190,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                                     <DataRow label={t.register_step2_label_phoneNumber || "Telefonnummer"} value={person.phoneNumber} />
                                     <DataRow label={t.member_review_email_address || "E-Mail-Adresse"} value={person.email} />
                                     {viewer && viewer.role === 'lk_member' && (
-                                        <ResetPasswordButton person={person} t={t} />
+                                        <ResetPasswordButton person={person} t={t} locale={locale} />
                                     )}
                                 </CardContent>
                             </Card>

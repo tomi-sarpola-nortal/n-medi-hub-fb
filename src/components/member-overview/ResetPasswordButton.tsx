@@ -24,9 +24,10 @@ import { Separator } from '../ui/separator';
 interface ResetPasswordButtonProps {
   person: Person;
   t: Record<string, string>;
+  locale: string;
 }
 
-export default function ResetPasswordButton({ person, t }: ResetPasswordButtonProps) {
+export default function ResetPasswordButton({ person, t, locale }: ResetPasswordButtonProps) {
   const { user: auditor, sendPasswordReset } = useAuth();
   const { toast } = useToast();
   const [isSending, setIsSending] = useState(false);
@@ -39,7 +40,7 @@ export default function ResetPasswordButton({ person, t }: ResetPasswordButtonPr
     }
 
     setIsSending(true);
-    const result = await sendPasswordReset(person.email);
+    const result = await sendPasswordReset(person.email, locale);
 
     if (result.success) {
       await logGeneralAudit({

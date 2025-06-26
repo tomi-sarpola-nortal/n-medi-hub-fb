@@ -86,7 +86,7 @@ export default function LoginPage() {
 
   const onForgotPasswordSubmit: SubmitHandler<ForgotPasswordInputs> = async (data) => {
     setIsSendingReset(true);
-    await sendPasswordReset(data.email);
+    await sendPasswordReset(data.email, currentLocale);
     setIsSendingReset(false);
 
     toast({

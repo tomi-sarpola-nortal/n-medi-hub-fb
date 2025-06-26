@@ -23,7 +23,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   deleteUserAccount: () => Promise<{ success: boolean; error?: string }>;
-  sendPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
+  sendPasswordReset: (email: string, locale?: string) => Promise<{ success: boolean; error?: string }>;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<Person | null>>; // Exposing setUser for flexibility e.g. profile updates
 }
@@ -126,14 +126,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  const sendPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+  const sendPasswordReset = async (email: string, locale: string = 'en'): Promise<{ success: boolean; error?: string }> => {
     if (!auth) {
         return { success: false, error: "Firebase is not configured." };
     }
     try {
         const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9002'; // Fallback for server-side
         const actionCodeSettings = {
-          url: `${origin}/login`, // Redirect user back to the login page after reset
+          url: `${origin}/${locale}/login`, // Redirect user back to the login page after reset
           handleCodeInApp: true,
         };
         await sendPasswordResetEmail(auth, email, actionCodeSettings);
