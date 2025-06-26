@@ -1,3 +1,4 @@
+
 Date: 2024-05-28
 
 # Firebase Studio
@@ -8,49 +9,72 @@ To get started, take a look at src/app/page.tsx.
 
 ---
 
-## Deployment Guide
+## New Environment Setup Guide
 
 This guide provides step-by-step instructions for deploying this application to a new environment (e.g., staging or production).
 
-### Step 1: Create a New Firebase Project
+### Step 1: Prerequisites
 
-1.  Go to the [Firebase Console](https://console.firebase.google.com/).
-2.  Click "Add project" and follow the on-screen instructions to create a new project.
-3.  Once created, you will be taken to the project's dashboard.
+1.  **Install Node.js**: Ensure you have a recent version of Node.js installed.
+2.  **Install Firebase CLI**: Open your terminal and install the Firebase Command Line Interface globally.
+    ```bash
+    npm install -g firebase-tools
+    ```
+3.  **Login to Firebase**: Log in to your Google account using the CLI.
+    ```bash
+    firebase login
+    ```
+    Follow the on-screen instructions to authenticate in your browser.
 
-### Step 2: Configure Firebase Services
+### Step 2: Firebase Project Setup
 
-You need to enable and configure three core Firebase services.
+1.  **Create Firebase Project**: Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
+2.  **Enable Gemini API**: This project uses Genkit for AI features. You must enable the "Vertex AI API" (which includes Gemini) in your Google Cloud Platform console. You can usually find a link to this in your Firebase project settings or by searching for it in the GCP console associated with your Firebase project.
+3.  **Upgrade to Blaze Plan**: To use Firebase Extensions (like the email trigger) and GenAI capabilities, you must upgrade your project to the "Blaze (Pay-as-you-go)" plan. You can do this from the settings in the lower-left corner of your Firebase project dashboard.
 
-#### A. Enable Authentication
+### Step 3: Local Project Setup
 
-1.  In the left sidebar, go to **Build > Authentication**.
-2.  Click "Get started".
-3.  Under the "Sign-in method" tab, select **Email/Password** from the list of providers.
-4.  Enable it and click "Save".
+1.  **Clone the Repository**: Get the project code onto your local machine.
+2.  **Install Dependencies**: Navigate to the project directory in your terminal and run:
+    ```bash
+    npm install
+    ```
 
-#### B. Create Firestore Database
+### Step 4: Initialize Firebase in Your Project
 
-1.  In the left sidebar, go to **Build > Firestore Database**.
-2.  Click "Create database".
-3.  Choose to start in **Production mode**.
-4.  Select a location for your database (choose one close to your users).
-5.  Click "Enable".
+1.  **Initialize Firestore & Storage**: In your project's root directory, run the following command, replacing `<YOUR_PROJECT_ID>` with your actual Firebase project ID.
+    ```bash
+    firebase init firestore storage --project <YOUR_PROJECT_ID> --non-interactive
+    ```
+    This command will use the `firebase.json`, `firestore.rules`, and `storage.rules` files from this repository to configure your project.
 
-#### C. Enable Storage
+### Step 5: Configure Firebase Services (In Console)
 
-1.  In the left sidebar, go to **Build > Storage**.
-2.  Click "Get started".
-3.  Follow the on-screen prompts to set up your default storage bucket.
+1.  **Authentication**:
+    *   In the Firebase Console, go to **Build > Authentication**.
+    *   Click "Get started".
+    *   Select **Email/Password** from the list of providers, enable it, and save.
 
-### Step 3: Set Up Environment Variables
+2.  **Firestore Database**:
+    *   Go to **Build > Firestore Database**.
+    *   Click "Create database".
+    *   Choose to start in **Production mode**.
+    *   Select a location (e.g., `eur3` as specified).
+    *   Click "Enable".
+
+3.  **Storage**:
+    *   Go to **Build > Storage**.
+    *   Click "Get started" and follow the prompts to enable it.
+    *   (Optional) You can manually create the folder structure (`users`, `document_templates`, `logos`) in the Storage bucket via the console.
+
+### Step 6: Set Up Environment Variables
 
 The application connects to Firebase using environment variables.
 
 1.  **Copy the Template**: In your project's root directory, make a copy of `.env.example` and rename it to `.env`.
 2.  **Get Client-Side Keys**:
     *   In your Firebase project, go to **Project Settings** (gear icon) > **General**.
-    *   Scroll down to "Your apps" and find your Web App.
+    *   Scroll down to "Your apps" and click the `</>` icon to create or view your Web App.
     *   Under "Firebase SDK snippet", select **Config**.
     *   Copy the values from this config object into the corresponding `NEXT_PUBLIC_*` variables in your `.env` file.
 3.  **Get Server-Side (Admin) Keys**:
@@ -62,7 +86,7 @@ The application connects to Firebase using environment variables.
         *   `private_key` -> `FIREBASE_PRIVATE_KEY`
     *   **Important**: The `private_key` contains newline characters (`\n`). You must wrap the entire key in double quotes (`"`) to ensure it's parsed correctly.
 
-### Step 4: Install and Configure Email Extension
+### Step 7: Deploy Email Extension
 
 This application uses the "Trigger Email" Firebase Extension to send emails.
 
@@ -87,7 +111,7 @@ Please consult the documentation for your specific SMTP provider for instruction
 **This step is mandatory for reliable email delivery.** Without it, your emails will likely be marked as spam or blocked entirely.
 
 
-### Step 5: Deploy and Seed the Database
+### Step 8: Deploy and Seed the Database
 
 Once your environment is deployed and running:
 
