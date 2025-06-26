@@ -2,45 +2,42 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useRouter, useParams, usePathname } from 'next/navigation';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useToast } from '@/hooks/use-toast';
-import { createMemberByAdmin } from '@/app/actions/adminActions';
-import type { PersonCreationData } from '@/lib/types';
-
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
+import { findPersonByEmail } from '@/services/personService';
+import { clearRegistrationData, updateRegistrationData } from '@/lib/registrationStore'; 
+import { v4 as uuidv4 } from 'uuid';
+import RegistrationStepper from '@/components/auth/RegistrationStepper';
 import Link from 'next/link';
 
 const getClientTranslations = (locale: string) => {
   try {
     const page = locale === 'de' ? require('../../../../../locales/de/member-overview.json') : require('../../../../../locales/en/member-overview.json');
-    const common = locale === 'de' ? require('../../../../../locales/de/common.json') : require('../../../../../locales/en/common.json');
-    return { ...page, ...common };
+    const register = locale === 'de' ? require('../../../../../locales/de/register.json') : require('../../../../../locales/en/register.json');
+    return { ...page, ...register };
   } catch (e) {
-    console.warn("Translation file not found for create member page, falling back to en");
-    return require('../../../../../locales/en/member-overview.json');
+    console.warn("Translation file not found, falling back to en");
+    const page = require('../../../../../locales/en/member-overview.json');
+    const register = require('../../../../../locales/en/register.json');
+    return { ...page, ...register };
   }
 };
 
 const FormSchema = z.object({
-  title: z.string().optional(),
-  firstName: z.string().min(1, { message: "First name is required." }),
-  lastName: z.string().min(1, { message: "Last name is required." }),
-  email: z.string().email({ message: "A valid email is required." }),
+  email: z.string().email({ message: "Invalid email address." }),
 });
+type EmailFormInputs = z.infer<typeof FormSchema>;
 
-type CreateMemberFormInputs = z.infer<typeof FormSchema>;
-
-export default function CreateMemberPage() {
+export default function CreateMemberStep1Page() {
   const router = useRouter();
   const params = useParams();
   const locale = typeof params.locale === 'string' ? params.locale : 'en';
@@ -51,47 +48,44 @@ export default function CreateMemberPage() {
 
   useEffect(() => {
     setT(getClientTranslations(locale));
+    // Clear any previous registration data when starting a new flow
+    clearRegistrationData();
   }, [locale]);
   
-  const form = useForm<CreateMemberFormInputs>({
+  const form = useForm<EmailFormInputs>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      title: 'Dr.',
-      firstName: '',
-      lastName: '',
-      email: '',
-    },
+    defaultValues: { email: '' },
   });
 
-  const onSubmit = async (data: CreateMemberFormInputs) => {
+  const onSubmit: SubmitHandler<EmailFormInputs> = async (data) => {
     setIsLoading(true);
-    
-    const personData: PersonCreationData = {
-      name: `${data.title} ${data.firstName} ${data.lastName}`.trim(),
-      email: data.email,
-      role: 'dentist', // All admin-created users are dentists
-      region: 'Wien', // Default region
-      status: 'active',
-      ...data,
-    };
-
-    const result = await createMemberByAdmin({ ...personData, locale });
-
-    if (result.success) {
-      toast({
-        title: t.toast_success_title || "Success",
-        description: t.create_member_success_toast || "User created successfully. A password reset email has been sent.",
+    try {
+      const existingUser = await findPersonByEmail(data.email);
+      if (existingUser) {
+        toast({
+          title: t.register_email_exists_title || "Email Already Registered",
+          description: t.register_email_exists_description || "This email address is already in use.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      updateRegistrationData({ 
+        email: data.email,
+        sessionId: uuidv4(),
       });
-      router.push(`/${locale}/member-overview`);
-    } else {
+      router.push(`/${locale}/member-overview/create/step2`);
+
+    } catch (error: any) {
+      console.error("Email check error:", error);
       toast({
-        title: t.toast_error_title || "Error",
-        description: result.message || t.create_member_error_toast || "Failed to create user.",
-        variant: 'destructive',
+        title: t.register_email_check_error_title || "Verification Error",
+        description: t.register_email_check_error_description || "Could not verify email address.",
+        variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const pageTitle = t.create_member_page_title || "Create New Member";
@@ -127,78 +121,36 @@ export default function CreateMemberPage() {
           </div>
         </div>
 
+        <RegistrationStepper currentStep={1} totalSteps={5} />
+        
         <Card>
           <CardHeader>
-            <CardTitle>{pageTitle}</CardTitle>
-            <CardDescription>{t.create_member_page_desc || "Fill in the details for the new member. They will receive an email to set their password."}</CardDescription>
+            <CardTitle>{t.create_member_step1_title || "New Member's Email"}</CardTitle>
+            <CardDescription>{t.create_member_step1_desc || "Enter the email address for the new member. This must be unique."}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                            <FormItem className="md:col-span-1">
-                            <FormLabel>{t.register_step2_label_title || "Title"}</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="Dr.">{t.title_dr || "Dr."}</SelectItem>
-                                        <SelectItem value="Prof.">{t.title_prof || "Prof."}</SelectItem>
-                                        <SelectItem value="Mag.">{t.title_mag || "Mag."}</SelectItem>
-                                        <SelectItem value="none">{t.title_none || "None"}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                     <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                            <FormItem className="md:col-span-2">
-                                <FormLabel>{t.register_step2_label_firstName || "First Name"}*</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="font-medium">{t.register_label_email || "Email Address"}</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder={t.register_placeholder_email || "example@email.com"}
+                        {...form.register('email')}
+                        className={form.formState.errors.email ? "border-destructive" : ""}
                     />
-                </div>
-                <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t.register_step2_label_lastName || "Last Name"}*</FormLabel>
-                            <FormControl><Input {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
+                    {form.formState.errors.email && (
+                        <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
                     )}
-                />
-                 <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t.register_label_email || "Email Address"}*</FormLabel>
-                            <FormControl><Input type="email" {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <div className="flex justify-end pt-4">
-                  <Button type="submit" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t.create_member_submit_button || "Create Member and Send Invite"}
-                  </Button>
                 </div>
-              </form>
-            </Form>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base" disabled={isLoading}>
+                    {isLoading ? (
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                    t.register_button_continue || "Continue"
+                    )}
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>

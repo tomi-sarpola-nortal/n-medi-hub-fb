@@ -111,8 +111,14 @@
   "member_review_new_registration_alert_text": "Diese neue Mitgliedsregistrierung wartet auf Genehmigung. Bitte überprüfen Sie die übermittelten Daten.",
   "create_member_page_title": "Neues Mitglied anlegen",
   "create_member_page_desc": "Füllen Sie die Details für das neue Mitglied aus. Es erhält eine E-Mail, um sein Passwort festzulegen.",
-  "create_member_success_toast": "Benutzer erfolgreich erstellt. Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.",
+  "create_member_success_toast": "Benutzer erfolgreich erstellt. Eine E-Mail zum Festlegen des Passworts wurde gesendet.",
   "create_member_error_toast": "Benutzer konnte nicht erstellt werden.",
   "create_member_submit_button": "Mitglied erstellen und Einladung senden",
-  "create_member_breadcrumb_create": "Anlegen"
+  "create_member_breadcrumb_create": "Anlegen",
+  "create_member_step1_title": "E-Mail des neuen Mitglieds",
+  "create_member_step1_desc": "Geben Sie die E-Mail-Adresse für das neue Mitglied ein. Diese muss eindeutig sein.",
+  "create_member_review_info": "Bitte überprüfen Sie die Daten sorgfältig. Nach der Erstellung erhält der Benutzer eine E-Mail, um sein Passwort festzulegen.",
+  "create_member_success_page_title": "Mitglied erstellt",
+  "create_member_success_card_title": "Erfolg!",
+  "create_member_success_button": "Zurück zur Mitgliederübersicht"
 }
