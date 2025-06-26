@@ -155,9 +155,55 @@ export default function CreateMemberStep3Page() {
                 <FormField control={form.control} name="university" render={({ field }) => (<FormItem><FormLabel>{t.register_step4_label_university}*</FormLabel><FormControl><Input placeholder={t.register_step4_placeholder_university} {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="approbationNumber" render={({ field }) => (<FormItem><FormLabel>{t.register_step4_label_approbation_number}</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="approbationDate" render={({ field }) => (<FormItem><FormLabel>{t.register_step4_label_approbation_date}</FormLabel><FormControl><DatePickerInput value={field.value} onChange={field.onChange} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="diplomaFile" render={() => ( <FormItem><FormLabel>{t.register_step4_label_diploma}*</FormLabel><FormControl><label htmlFor="diploma-file" className="btn-file-upload"><UploadCloud/><span>{selectedDiplomaFileName || t.register_step2_button_selectFile}</span></label><Input id="diploma-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaFileName)}/></FormControl><FormMessage/></FormItem>)} />
-                <FormField control={form.control} name="approbationCertificateFile" render={() => ( <FormItem><FormLabel>{t.register_step4_label_approbation_cert}</FormLabel><FormControl><label htmlFor="approbation-file" className="btn-file-upload"><UploadCloud/><span>{selectedApprobationCertificateFileName || t.register_step2_button_selectFile}</span></label><Input id="approbation-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateFileName)}/></FormControl><FormMessage/></FormItem>)} />
-                <FormField control={form.control} name="specialistRecognitionFile" render={() => ( <FormItem><FormLabel>{t.register_step4_label_specialist_recognition}</FormLabel><FormControl><label htmlFor="specialist-file" className="btn-file-upload"><UploadCloud/><span>{selectedSpecialistRecognitionFileName || t.register_step2_button_selectFile}</span></label><Input id="specialist-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionFileName)}/></FormControl><FormMessage/></FormItem>)} />
+                
+                <FormField control={form.control} name="diplomaFile" render={() => ( 
+                    <FormItem>
+                        <FormLabel>{t.register_step4_label_diploma}*</FormLabel>
+                        <FormControl>
+                            <div className="flex items-center space-x-2 mt-1">
+                                <label htmlFor="diploma-file" className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer">
+                                    <UploadCloud className="mr-2 h-4 w-4" />
+                                    <span>{selectedDiplomaFileName || t.register_step2_button_selectFile}</span>
+                                </label>
+                                <Input id="diploma-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'diplomaFile', setSelectedDiplomaFileName)}/>
+                            </div>
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} />
+
+                <FormField control={form.control} name="approbationCertificateFile" render={() => ( 
+                    <FormItem>
+                        <FormLabel>{t.register_step4_label_approbation_cert}</FormLabel>
+                        <FormControl>
+                            <div className="flex items-center space-x-2 mt-1">
+                                <label htmlFor="approbation-file" className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer">
+                                    <UploadCloud className="mr-2 h-4 w-4" />
+                                    <span>{selectedApprobationCertificateFileName || t.register_step2_button_selectFile}</span>
+                                </label>
+                                <Input id="approbation-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'approbationCertificateFile', setSelectedApprobationCertificateFileName)}/>
+                            </div>
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} />
+
+                <FormField control={form.control} name="specialistRecognitionFile" render={() => ( 
+                    <FormItem>
+                        <FormLabel>{t.register_step4_label_specialist_recognition}</FormLabel>
+                        <FormControl>
+                            <div className="flex items-center space-x-2 mt-1">
+                                <label htmlFor="specialist-file" className="flex items-center justify-center w-full px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-background hover:bg-accent cursor-pointer">
+                                    <UploadCloud className="mr-2 h-4 w-4" />
+                                    <span>{selectedSpecialistRecognitionFileName || t.register_step2_button_selectFile}</span>
+                                </label>
+                                <Input id="specialist-file" type="file" className="hidden" onChange={(e) => handleFileChange(e, 'specialistRecognitionFile', setSelectedSpecialistRecognitionFileName)}/>
+                            </div>
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} />
+                
                 <div className="flex justify-between pt-4">
                   <Button type="button" variant="outline" onClick={() => router.push(`/${locale}/member-overview/create/step2`)} disabled={isLoading}>{t.register_back_button}</Button>
                   <Button type="submit" disabled={isLoading}>{isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.register_button_continue}</Button>
