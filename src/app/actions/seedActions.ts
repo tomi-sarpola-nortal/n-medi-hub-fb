@@ -10,6 +10,11 @@ import { createStateChamber, getStateChamberById } from '@/services/stateChamber
 import { createZfdGroup } from '@/services/zfdGroupService';
 import { createRepresentation } from '@/services/representationService';
 
+// ===================================================================================
+// ESSENTIAL SEEDING ACTIONS (for new environments)
+// These should be run in a new environment to ensure the application functions correctly.
+// ===================================================================================
+
 const zfdGroupsToSeed: { id: string, data: ZfdGroupCreationData }[] = [
   { id: 'berufsbezogen', data: { nameKey: 'zfd_category_berufsbezogen', totalPoints: 60 } },
   { id: 'literatur', data: { nameKey: 'zfd_category_literatur', totalPoints: 45 } },
@@ -36,29 +41,6 @@ const organizersToSeed: TrainingOrganizerCreationData[] = [
   { name: 'Dental Tribune', isActive: true },
   { name: 'Quintessenz Verlag', isActive: true },
   { name: 'Thieme', isActive: true },
-];
-
-const categoryToZfdGroupMap: { [key: string]: string } = {};
-categoriesToSeed.forEach(cat => {
-    if (cat.zfdGroupId) {
-        categoryToZfdGroupMap[cat.abbreviation] = cat.zfdGroupId;
-    }
-});
-
-const historyToSeed: TrainingHistoryCreationData[] = [
-  // This data is crafted to match the ZFD totals in the screenshot (97 points)
-  // and the order of visible items.
-  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 15, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 5, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 5, organizer: "Medizinische Universität Graz", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 10, organizer: "DentEd Online", zfdGroupId: 'literatur' },
-  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 8, organizer: "Zahnärztekammer Wien", zfdGroupId: 'frei' },
-  { date: "2025-03-05", title: "Jahresabonnement 'Dental Magazin'", category: "Literatur", points: 10, organizer: "Dental Tribune", zfdGroupId: 'literatur' },
-  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 10, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-02-01", title: "Workshop: Rechtliche Grundlagen", category: "Frei", points: 4, organizer: "ÖZÄK", zfdGroupId: 'frei' },
-  { date: "2025-01-15", title: "Jahresabonnement 'Quintessenz Zahnmedizin'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
-  { date: "2024-12-10", title: "Jahresabonnement 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
 ];
 
 const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
@@ -127,35 +109,6 @@ export async function seedTrainingOrganizers(): Promise<{ success: boolean; mess
 }
 
 
-export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
-    const userEmail = 'sabine.mueller@example.com';
-    try {
-        const user = await findPersonByEmail(userEmail);
-        if (!user) {
-            return { success: false, message: `User with email ${userEmail} not found.` };
-        }
-
-        const existingHistory = await getTrainingHistoryForUser(user.id);
-        if (existingHistory.length > 0) {
-            return { success: true, message: `Training history for ${userEmail} has already been seeded. Skipped.` };
-        }
-
-        for (const record of historyToSeed) {
-            await addTrainingHistoryForUser(user.id, record);
-        }
-
-        const totalPoints = historyToSeed.reduce((sum, record) => sum + record.points, 0);
-        await updatePerson(user.id, { educationPoints: totalPoints });
-
-        return { success: true, message: `Successfully seeded ${historyToSeed.length} training history records for ${userEmail} and updated total points to ${totalPoints}.` };
-
-    } catch (error) {
-        console.error('Error seeding training history:', error);
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        return { success: false, message: `Error seeding history: ${errorMessage}` };
-    }
-}
-
 export async function seedStateChambers(): Promise<{ success: boolean; message: string }> {
     try {
         let createdCount = 0;
@@ -201,6 +154,58 @@ export async function seedZfdGroups(): Promise<{ success: boolean; message: stri
     return { success: false, message: `Error seeding ZFD groups: ${errorMessage}` };
   }
 }
+
+// ===================================================================================
+// DEVELOPMENT & TESTING SEEDING ACTIONS
+// These are for populating a development environment with test data.
+// Do NOT run these in a production environment.
+// ===================================================================================
+
+const historyToSeed: TrainingHistoryCreationData[] = [
+  // This data is crafted to match the ZFD totals in the screenshot (97 points)
+  // and the order of visible items.
+  { date: "2025-05-22", title: "Moderne Verfahren in der Implantologie", category: "IMPL", points: 15, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-15", title: "Digitale Workflows in der Zahnarztpraxis", category: "ZMK", points: 5, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-03", title: "Fortschritte in der Parodontologie", category: "PARO", points: 5, organizer: "Medizinische Universität Graz", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-20", title: "Aktuelle Trends in der Kieferorthopädie", category: "KFO", points: 10, organizer: "Österreichische Gesellschaft für KFO", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-10", title: "Webinar: Neue Materialien in der Prothetik", category: "Literatur", points: 10, organizer: "DentEd Online", zfdGroupId: 'literatur' },
+  { date: "2025-03-28", title: "Praxismanagement und Kommunikation", category: "Frei", points: 8, organizer: "Zahnärztekammer Wien", zfdGroupId: 'frei' },
+  { date: "2025-03-05", title: "Jahresabonnement 'Dental Magazin'", category: "Literatur", points: 10, organizer: "Dental Tribune", zfdGroupId: 'literatur' },
+  { date: "2025-02-25", title: "Implantatprothetik für Fortgeschrittene", category: "IMPL", points: 10, organizer: "Universitätsklinik Wien", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-02-01", title: "Workshop: Rechtliche Grundlagen", category: "Frei", points: 4, organizer: "ÖZÄK", zfdGroupId: 'frei' },
+  { date: "2025-01-15", title: "Jahresabonnement 'Quintessenz Zahnmedizin'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
+  { date: "2024-12-10", title: "Jahresabonnement 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
+];
+
+export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
+    const userEmail = 'sabine.mueller@example.com';
+    try {
+        const user = await findPersonByEmail(userEmail);
+        if (!user) {
+            return { success: false, message: `User with email ${userEmail} not found.` };
+        }
+
+        const existingHistory = await getTrainingHistoryForUser(user.id);
+        if (existingHistory.length > 0) {
+            return { success: true, message: `Training history for ${userEmail} has already been seeded. Skipped.` };
+        }
+
+        for (const record of historyToSeed) {
+            await addTrainingHistoryForUser(user.id, record);
+        }
+
+        const totalPoints = historyToSeed.reduce((sum, record) => sum + record.points, 0);
+        await updatePerson(user.id, { educationPoints: totalPoints });
+
+        return { success: true, message: `Successfully seeded ${historyToSeed.length} training history records for ${userEmail} and updated total points to ${totalPoints}.` };
+
+    } catch (error) {
+        console.error('Error seeding training history:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return { success: false, message: `Error seeding history: ${errorMessage}` };
+    }
+}
+
 
 export async function setSabineMuellerToPending(): Promise<{ success: boolean; message: string }> {
   const userEmail = 'sabine.mueller@example.com';
