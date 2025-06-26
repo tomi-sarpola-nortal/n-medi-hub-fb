@@ -144,9 +144,37 @@ export default function CreateMemberStep3Page() {
                 <FormItem>
                   <FormLabel>{t.register_step4_label_specializations}*</FormLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                    {DENTAL_SPECIALIZATIONS.map((item) => (<FormField key={item.id} control={form.control} name="specializations" render={({ field }) => (
-                      <FormItem className="flex items-row space-x-3 space-y-0"><FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(c) => c ? field.onChange([...field.value, item.id]) : field.onChange(field.value?.filter(v => v !== item.id))} /></FormControl><FormLabel className="font-normal text-sm">{t[item.labelKey]}</FormLabel></FormItem>
-                    )} />))}
+                    {DENTAL_SPECIALIZATIONS.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="specializations"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                  const currentValue = field.value || [];
+                                  if (checked) {
+                                    field.onChange([...currentValue, item.id]);
+                                  } else {
+                                    field.onChange(
+                                      currentValue.filter(
+                                        (value) => value !== item.id
+                                      )
+                                    );
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal text-sm">
+                              {t[item.labelKey]}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
                   </div>
                   <FormMessage>{form.formState.errors.specializations?.message}</FormMessage>
                 </FormItem>
