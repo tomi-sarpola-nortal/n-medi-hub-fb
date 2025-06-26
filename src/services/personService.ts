@@ -9,7 +9,6 @@ import {
   setDoc, // Changed from addDoc to use specific UID as doc ID
   getDoc,
   updateDoc,
-  deleteDoc,
   query,
   where,
   getDocs,
@@ -221,16 +220,6 @@ export async function updatePerson(
     ...dataToUpdate,
     updatedAt: serverTimestamp(),
   });
-}
-
-/**
- * Deletes a person document from Firestore by its ID.
- * @param id - The ID of the person to delete.
- */
-export async function deletePerson(id: string): Promise<void> {
-  checkDb();
-  const docRef = doc(db, PERSONS_COLLECTION, id);
-  await deleteDoc(docRef);
 }
 
 /**

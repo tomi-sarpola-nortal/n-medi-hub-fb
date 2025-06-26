@@ -23,20 +23,6 @@ export async function setPersonStatus(
   }
 }
 
-export async function deletePersonById(personId: string): Promise<{ success: boolean; message: string }> {
-  try {
-    // Note: This action only deletes the user's record from the Firestore database.
-    // Deleting associated files in Firebase Storage and the user's Firebase Authentication
-    // account from the server requires the Firebase Admin SDK, which is not currently implemented.
-    await deletePerson(personId);
-    return { success: true, message: `Successfully deleted user's database record.` };
-  } catch (error) {
-    console.error(`Error deleting user record:`, error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return { success: false, message: `Error: ${errorMessage}` };
-  }
-}
-
 export async function requestDataChange(personId: string, updates: Partial<Person>, actor: Person, locale: string): Promise<{ success: boolean; message: string }> {
   try {
     // Store the changes in 'pendingData' and set a flag for easier querying

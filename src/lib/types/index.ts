@@ -6,40 +6,6 @@ import type { ProfessionalTitleId, SpecializationId, HealthInsuranceContractId }
 
 export type UserRole = 'dentist' | 'lk_member' | 'ozak_employee'; // Extended UserRole
 
-// This is the primary User type, used in auth context and for user data.
-// It combines properties that might have been in separate User and Person types.
-export interface User {
-  id: string; // Corresponds to Firestore document ID (which will be Firebase Auth UID)
-  name: string;
-  email: string; // Should be unique (from Firebase Auth)
-  
-  // Personal Data
-  title?: string;
-  firstName?: string;
-  lastName?: string;
-
-  role: UserRole;
-  region: string; 
-  dentistId?: string; // Unique for dentists, assigned by LK
-  avatarUrl?: string; // Standardized from profileImage
-  
-  status?: 'pending' | 'active' | 'inactive' | 'rejected';
-  
-  otpEnabled?: boolean; 
-  otpSecret?: string; // For 2FA, if implemented beyond Firebase Auth's MFA
-  
-  approved?: boolean; 
-  educationPoints?: number; 
-  stateChamberId?: string;
-
-  createdAt?: string; 
-  updatedAt?: string; 
-
-  // Field for pending data changes
-  pendingData?: Partial<Person>;
-}
-
-
 // NavItem used in navigation configuration
 export interface NavItem {
   title: string;
@@ -199,7 +165,6 @@ export interface RegistrationFormData {
   approbationCertificateUrl?: string;
   approbationCertificateName?: string;
   specialistRecognitionFile?: File | null;
-  specialistRecognitionUrl?: string;
   specialistRecognitionName?: string;
 
   // Step 5
