@@ -131,7 +131,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: false, error: "Firebase is not configured." };
     }
     try {
-        await sendPasswordResetEmail(auth, email);
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9002'; // Fallback for server-side
+        const actionCodeSettings = {
+          url: `${origin}/login`, // Redirect user back to the login page after reset
+          handleCodeInApp: true,
+        };
+        await sendPasswordResetEmail(auth, email, actionCodeSettings);
         console.log(`Password reset email initiated successfully from the app for: ${email}`);
         return { success: true };
     } catch (error: any) {

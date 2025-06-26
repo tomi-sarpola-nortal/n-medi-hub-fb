@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Info } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -28,11 +28,17 @@ const getClientTranslations = (locale: string) => {
   }
 };
 
-const FormSchema = z.object({
+const LoginFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
-type LoginFormInputs = z.infer<typeof FormSchema>;
+type LoginFormInputs = z.infer<typeof LoginFormSchema>;
+
+const ForgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Invalid email address." }),
+});
+type ForgotPasswordInputs = z.infer<typeof ForgotPasswordSchema>;
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,35 +51,51 @@ export default function LoginPage() {
       setT(getClientTranslations(currentLocale));
   }, [currentLocale]);
 
-  const { login } = useAuth();
+  const { login, sendPasswordReset } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
-  const form = useForm<LoginFormInputs>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+  const loginForm = useForm<LoginFormInputs>({
+    resolver: zodResolver(LoginFormSchema),
+    defaultValues: { email: '', password: '' },
   });
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+  const forgotPasswordForm = useForm<ForgotPasswordInputs>({
+    resolver: zodResolver(ForgotPasswordSchema),
+    defaultValues: { email: '' },
+  });
+
+  const onLoginSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsLoading(true);
     const result = await login(data.email, data.password);
-    setIsLoading(false); // Set loading false after login attempt is complete
+    setIsLoading(false); 
 
     if (result.success) {
-      router.push(`/${currentLocale}/dashboard`); // Explicit redirect on success
+      router.push(`/${currentLocale}/dashboard`);
     } else {
-      // Check if the error is a translation key or a raw message
       const errorMessage = t![result.error as string] || result.error || t!.login_error_description;
-
       toast({
         title: t!.login_error_title || "Login Failed",
         description: errorMessage,
         variant: "destructive",
       });
     }
+  };
+
+  const onForgotPasswordSubmit: SubmitHandler<ForgotPasswordInputs> = async (data) => {
+    setIsSendingReset(true);
+    await sendPasswordReset(data.email);
+    setIsSendingReset(false);
+
+    toast({
+        title: t!.toast_success_title || "Success",
+        description: t!.forgot_password_success_toast || "If an account with that email exists, a password reset link has been sent.",
+    });
+
+    setIsForgotPassOpen(false);
+    forgotPasswordForm.reset();
   };
   
   if (!t) {
@@ -94,28 +116,26 @@ export default function LoginPage() {
       <div className="w-full max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
           
-          {/* Column 1: Empty Spacer */}
           <div className="hidden lg:block"></div>
 
-          {/* Column 2: Login and Register Cards */}
           <div className="space-y-8">
             <Card className="shadow-xl w-full max-w-md mx-auto lg:mx-0">
               <CardHeader className="text-center">
                 <CardTitle className="font-headline text-2xl">{t.login_form_title || "Anmeldung ins Portal"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="font-medium">{t.login_label_email || "E-Mail oder Zahnarzt-ID"}</Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder={t.login_placeholder_email || "max.mustermann@example.com"}
-                      {...form.register('email')}
-                      className={form.formState.errors.email ? "border-destructive" : ""}
+                      {...loginForm.register('email')}
+                      className={loginForm.formState.errors.email ? "border-destructive" : ""}
                     />
-                    {form.formState.errors.email && (
-                      <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+                    {loginForm.formState.errors.email && (
+                      <p className="text-xs text-destructive">{loginForm.formState.errors.email.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -124,11 +144,11 @@ export default function LoginPage() {
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      {...form.register('password')}
-                      className={form.formState.errors.password ? "border-destructive" : ""}
+                      {...loginForm.register('password')}
+                      className={loginForm.formState.errors.password ? "border-destructive" : ""}
                     />
-                    {form.formState.errors.password && (
-                      <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+                    {loginForm.formState.errors.password && (
+                      <p className="text-xs text-destructive">{loginForm.formState.errors.password.message}</p>
                     )}
                   </div>
                   <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base" disabled={isLoading}>
@@ -141,14 +161,14 @@ export default function LoginPage() {
                 </form>
               </CardContent>
               <CardFooter className="flex-col items-center space-y-2 pt-4 pb-6">
-                <Link href="#" className="text-sm text-primary hover:underline">
-                  {t.login_forgot_password_link || "Passwort vergessen?"}
-                </Link>
+                <Button variant="link" type="button" onClick={() => setIsForgotPassOpen(true)} className="text-sm text-primary hover:underline p-0 h-auto">
+                    {t.login_forgot_password_link || "Forgot password?"}
+                </Button>
                 <p className="text-xs text-muted-foreground">
-                  {t.login_support_text_prefix || "Probleme bei der Anmeldung?"}{" "}
-                  <Link href="#" className="hover:underline">
-                    {t.login_support_link || "Kontaktieren Sie unseren Support"}
-                  </Link>
+                  {t.login_support_text_prefix || "Problems with login?"}{" "}
+                  <a href="#" className="hover:underline">
+                    {t.login_support_link || "Contact our support"}
+                  </a>
                 </p>
               </CardFooter>
             </Card>
@@ -165,9 +185,9 @@ export default function LoginPage() {
                       {t.login_register_description || "Wenn Sie neu in Österreich tätig sind und noch keinen Eintrag bei der Österreichischen Zahnärztekammer haben, können Sie sich hier für einen Eintrag anmelden."}
                     </p>
                     <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
-                      <Link href={`/${currentLocale}/register/step1`}> 
+                      <a href={`/${currentLocale}/register/step1`}> 
                         {t.login_register_button_text || "EINTRAG IN DIE KAMMER BEANTRAGEN"}
-                      </Link>
+                      </a>
                     </Button>
                   </div>
                 </div>
@@ -175,7 +195,6 @@ export default function LoginPage() {
             </Card>
           </div>
           
-          {/* Column 3: Demo Mode */}
           <div className="w-full max-w-md mx-auto lg:mx-0">
             <Alert>
                 <Info className="h-4 w-4" />
@@ -205,9 +224,38 @@ export default function LoginPage() {
                 </AlertDescription>
             </Alert>
           </div>
-
         </div>
       </div>
+      
+      <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
+        <DialogContent>
+            <DialogHeader>
+            <DialogTitle>{t.forgot_password_dialog_title || "Reset your password"}</DialogTitle>
+            <DialogDescription>{t.forgot_password_dialog_desc || "Enter your email address and we will send you a link to reset your password."}</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="reset-email">{t.login_label_email || "Email or Dentist ID"}</Label>
+                    <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder={t.login_placeholder_email || "john.doe@example.com"}
+                        {...forgotPasswordForm.register('email')}
+                        className={forgotPasswordForm.formState.errors.email ? "border-destructive" : ""}
+                    />
+                    {forgotPasswordForm.formState.errors.email && (
+                        <p className="text-xs text-destructive">{forgotPasswordForm.formState.errors.email.message}</p>
+                    )}
+                </div>
+                <DialogFooter>
+                    <Button type="submit" disabled={isSendingReset}>
+                        {isSendingReset && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t.forgot_password_button_send || "Send Reset Link"}
+                    </Button>
+                </DialogFooter>
+            </form>
+        </DialogContent>
+      </Dialog>
     </AuthLayout>
   );
 }
