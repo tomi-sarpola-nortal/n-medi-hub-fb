@@ -1,4 +1,3 @@
-
 {
   "page_title": "Dashboard",
   "training_status_title": "Your Training Status",
@@ -7,8 +6,8 @@
   "representation_status_title": "Your Representations",
   "representation_status_hours": "Confirmed Representation Hours",
   "representation_status_button": "VIEW MY REPRESENTATIONS",
-  "chamber_info_title": "Your State Chamber",
-  "chamber_name": "Vienna Dental Chamber",
+  "chamber_info_title": "Your Bureau",
+  "chamber_name": "Vienna Medical Bureau",
   "chamber_office_hours": "Mon-Thu: 8:00 AM - 4:30 PM\nFri: 8:00 AM - 2:00 PM",
   "confirm_reps_title": "Confirm Representations",
   "confirm_reps_description": "Here you can confirm representations where you were represented.",

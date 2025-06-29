@@ -1,4 +1,3 @@
-
 import type { Timestamp } from 'firebase/firestore';
 import type { LucideIcon } from 'lucide-react'; // For NavItem icon
 import type { ProfessionalTitleId, SpecializationId, HealthInsuranceContractId } from '@/lib/registrationStore';

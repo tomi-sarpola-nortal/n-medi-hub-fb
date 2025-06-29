@@ -2,7 +2,7 @@
 
 ## Core Features:
 
-- Dentist Login: Secure OTP-based login.
+- Doctor Login: Secure OTP-based login.
 - Dashboard: Personalized dashboard displaying requests and recent actions.
 - Document Access: Browse and download region-based documents.
 - Representation Management: Request peer representation, with approval/rejection workflow.
@@ -10,21 +10,21 @@
 - Logs: Logs (basic/essential only).
 - Integration: Integration: Events Provider API (fetch education points).
 - Database: Database to store objects (Persons, Trainings, Training points, Representations, Representation requests, documents).
-- Database: authentication for person Dentist ID: ZA-2025-0842, Email: sabine.mueller@example.com, Password: TestTest24.
-- Separate portals: Separate portal views per role (dentist, landeskammer member).
-- Dentist Register: Register (via LK approval, OTP).
-- Dentist Edit Profile: Edit profile (free/critical fields, approval flow for critical).
-- Dentist Education Points: View education points (via Events Provider API).
-- Dentist Document Access: Browse/download documents (region-based access).
-- Dentist Representation Management: Manage representation days (assign peer cover, approve/refuse).
-- Dentist Notifications: Notifications (email for approvals/rejections).
-- Dentist Dashboard: Dashboard (requests, recent actions).
-- LK Dentist Register: Register dentists, issue IDs & OTPs.
-- LK Profile Changes: Confirm/reject critical profile changes.
-- LK Document Management: Upload/tag documents (no versioning).
-- LK Representation Requests: Confirm representation requests (fallback if dentist unresponsive).
-- LK Dashboard: Dashboard for pending actions.
-- LK Employee Access: Cannot view other employees.
+- Database: authentication for person Doctor ID: ZA-2025-0842, Email: sabine.mueller@example.com, Password: TestTest24.
+- Separate portals: Separate portal views per role (doctor, bureau member).
+- Doctor Register: Register (via Bureau approval, OTP).
+- Doctor Edit Profile: Edit profile (free/critical fields, approval flow for critical).
+- Doctor Education Points: View education points (via Events Provider API).
+- Doctor Document Access: Browse/download documents (region-based access).
+- Doctor Representation Management: Manage representation days (assign peer cover, approve/refuse).
+- Doctor Notifications: Notifications (email for approvals/rejections).
+- Doctor Dashboard: Dashboard (requests, recent actions).
+- Bureau Doctor Register: Register doctors, issue IDs & OTPs.
+- Bureau Profile Changes: Confirm/reject critical profile changes.
+- Bureau Document Management: Upload/tag documents (no versioning).
+- Bureau Representation Requests: Confirm representation requests (fallback if doctor unresponsive).
+- Bureau Dashboard: Dashboard for pending actions.
+- Bureau Employee Access: Cannot view other employees.
 - Language selections: English, German.
 
 ## Style Guidelines:

@@ -1,4 +1,3 @@
-
 {
   "page_title": "Dashboard",
   "training_status_title": "Ihr Fortbildungsstand",
@@ -7,8 +6,8 @@
   "representation_status_title": "Ihre Vertretungen",
   "representation_status_hours": "Bestätigte Vertretungsstunden",
   "representation_status_button": "MEINE VERTRETUNGEN ANSEHEN",
-  "chamber_info_title": "Ihre Landeskammer",
-  "chamber_name": "Zahnärztekammer Wien",
+  "chamber_info_title": "Ihr Büro",
+  "chamber_name": "Ärztebüro Wien",
   "chamber_office_hours": "Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr",
   "confirm_reps_title": "Vertretungen bestätigen",
   "confirm_reps_description": "Hier können Sie Vertretungen bestätigen, bei denen Sie vertreten wurden.",

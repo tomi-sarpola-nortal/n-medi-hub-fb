@@ -1,7 +1,6 @@
-
 {
-  "dentist": "Zahnarzt",
-  "lk_member": "Landeskammer-Mitglied",
+  "dentist": "Arzt",
+  "lk_member": "Büro-Mitglied",
   "ozak_employee": "ÖZÄK-Mitarbeiter",
   "title_dr": "Dr.",
   "title_prof": "Prof.",
@@ -42,7 +41,7 @@
   "email_subject_new_registration": "Neue Mitgliedsregistrierung zur Prüfung",
   "email_body_new_registration": "Sehr geehrte/r {targetName},<br><br>eine neue Mitgliedsregistrierung für {actorName} steht zur Prüfung bereit. Bitte melden Sie sich im Portal an.<br><br>Vielen Dank.",
   "email_subject_registration_approved": "Ihre Registrierung wurde genehmigt",
-  "email_body_registration_approved": "Sehr geehrte/r {targetName},<br><br>Herzlichen Glückwunsch! Ihre Registrierung bei der Zahnärztekammer wurde genehmigt. Sie können nun alle Funktionen des Portals nutzen.<br><br>Vielen Dank.",
+  "email_body_registration_approved": "Sehr geehrte/r {targetName},<br><br>Herzlichen Glückwunsch! Ihre Registrierung bei der Ärztekammer wurde genehmigt. Sie können nun alle Funktionen des Portals nutzen.<br><br>Vielen Dank.",
   "email_subject_registration_rejected": "Aktualisierung zu Ihrer Registrierung",
   "email_body_registration_rejected": "Sehr geehrte/r {targetName},<br><br>es gibt eine Aktualisierung bezüglich Ihres Registrierungsantrags. Bitte melden Sie sich im Portal an, um weitere Details zu erfahren.<br><br>Vielen Dank.",
 
