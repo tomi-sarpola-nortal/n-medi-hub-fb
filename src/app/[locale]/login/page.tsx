@@ -97,6 +97,11 @@ export default function LoginPage() {
     forgotPasswordForm.reset();
   };
   
+  const fillLoginForm = (email: string, password: string) => {
+    loginForm.setValue('email', email);
+    loginForm.setValue('password', password);
+  };
+  
   if (!t) {
     return (
         <AuthLayout pageTitle="Loading..." locale={currentLocale}>
@@ -207,10 +212,26 @@ export default function LoginPage() {
                                 <div>
                                     <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
                                     <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        className="mt-1 text-xs h-7" 
+                                        onClick={() => fillLoginForm('adasd@asdas.com', '-dkwfFv8WDGL=tR')}
+                                    >
+                                        Use these credentials
+                                    </Button>
                                 </div>
                                 <div className="pt-1">
                                     <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sarah.miller@example.com</code></p>
                                     <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">TestTest24</code></p>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        className="mt-1 text-xs h-7" 
+                                        onClick={() => fillLoginForm('sarah.miller@example.com', 'TestTest24')}
+                                    >
+                                        Use these credentials
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -218,6 +239,14 @@ export default function LoginPage() {
                             <p className="font-semibold">Bureau Member Role:</p>
                             <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">max.sample@example.com</code></p>
                             <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="mt-1 ml-2 text-xs h-7" 
+                                onClick={() => fillLoginForm('max.sample@example.com', '-dkwfFv8WDGL=tR')}
+                            >
+                                Use these credentials
+                            </Button>
                         </div>
                     </div>
                 </AlertDescription>
