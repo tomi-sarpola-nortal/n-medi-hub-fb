@@ -29,8 +29,7 @@ This guide provides step-by-step instructions for deploying this application to 
 ### Step 2: Firebase Project Setup
 
 1.  **Create Firebase Project**: Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
-2.  **Enable Gemini API**: This project uses Genkit for AI features. You must enable the "Vertex AI API" (which includes Gemini) in your Google Cloud Platform console. You can usually find a link to this in your Firebase project settings or by searching for it in the GCP console associated with your Firebase project.
-3.  **Upgrade to Blaze Plan**: To use Firebase Extensions (like the email trigger) and GenAI capabilities, you must upgrade your project to the "Blaze (Pay-as-you-go)" plan. You can do this from the settings in the lower-left corner of your Firebase project dashboard.
+2.  **Upgrade to Blaze Plan**: To use Firebase Extensions (like the email trigger), you must upgrade your project to the "Blaze (Pay-as-you-go)" plan. You can do this from the settings in the lower-left corner of your Firebase project dashboard.
 
 ### Step 3: Local Project Setup
 

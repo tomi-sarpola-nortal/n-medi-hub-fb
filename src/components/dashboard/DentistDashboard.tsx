@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import ConfirmRepresentationCard from '../representations/ConfirmRepresentationCard';
 import { useToast } from '@/hooks/use-toast';
-import SmartSuggestions from './SmartSuggestions';
 
 interface DentistDashboardProps {
     user: Person;
@@ -221,8 +220,6 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 onStatusChange={handleStatusChange}
                             />
                         )}
-
-                        <SmartSuggestions userRole={user.role} userRegion={user.region} />
                     </div>
 
                     <div className="lg:col-span-1">

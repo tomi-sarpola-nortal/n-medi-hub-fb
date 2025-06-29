@@ -1,3 +1,4 @@
+
 "use client";
 
 import AppLayout from '@/components/layout/AppLayout';
@@ -128,11 +129,6 @@ export default function DeveloperPage() {
                         <Button asChild variant="outline">
                             <Link href="/docs/project-history.md" target="_blank">
                                 {t.developer_module_show_project_history_button || "Show Project History"}
-                            </Link>
-                        </Button>
-                         <Button asChild variant="outline">
-                            <Link href="/docs/prompt_history.md" target="_blank">
-                                {t.developer_module_show_prompt_history_button || "Show Prompt History"}
                             </Link>
                         </Button>
                     </div>
