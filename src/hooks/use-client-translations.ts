@@ -14,6 +14,9 @@ export function useClientTranslations(namespaces: string[] = []) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Create a stable key from the namespaces array to use as a dependency.
+  const namespacesKey = namespaces.join(',');
+
   useEffect(() => {
     async function loadTranslations() {
       setIsLoading(true);
@@ -57,7 +60,8 @@ export function useClientTranslations(namespaces: string[] = []) {
     }
     
     loadTranslations();
-  }, [locale, namespaces]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, namespacesKey]);
 
   /**
    * Translation function that returns the translation for a key or the key itself if not found
