@@ -49,8 +49,8 @@ export default function DashboardPage() {
     }
   }, [user, loading, router, locale]);
 
-  // Show loading while translations are being loaded
-  if (loading || !t) {
+  // Show loading while translations are being loaded or during authentication
+  if (loading || !t || !user || user.status === 'pending') {
     return (
       <AppLayout pageTitle="Dashboard" locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
@@ -63,15 +63,15 @@ export default function DashboardPage() {
   const pageTitle = t.page_title || "Dashboard";
 
   const renderDashboardByRole = () => {
-    switch(user?.role) {
+    switch(user.role) {
       case 'dentist':
-        return <DentistDashboard user={user} t={t!} />;
+        return <DentistDashboard user={user} t={t} />;
       case 'lk_member':
-        return <LkMemberDashboard user={user} t={t!} locale={locale} />;
+        return <LkMemberDashboard user={user} t={t} locale={locale} />;
       // Add other roles here in the future
       default:
         // Fallback to a default view or dentist view if preferred
-        return <DentistDashboard user={user} t={t!} />;
+        return <DentistDashboard user={user} t={t} />;
     }
   };
 
