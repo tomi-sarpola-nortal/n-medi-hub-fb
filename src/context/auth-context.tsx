@@ -49,12 +49,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (personProfile) {
           setUser(personProfile);
         } else {
-          // This case might happen if Firestore document creation failed after auth user creation
-          // Or if it's a new user whose profile isn't created yet (should be handled during registration)
+          // This case might happen if a user was created in Firebase Auth but not in Firestore.
           console.warn(`No Firestore profile found for UID: ${firebaseUser.uid}. Logging out.`);
           toast({
-            title: "Profile Error",
-            description: "Your profile could not be loaded. Please try logging in again.",
+            title: "Profile Not Found",
+            description: "Your user profile was not found. Please complete the registration or contact an administrator if you believe this is an error.",
             variant: "destructive",
           });
           await signOut(auth); // Log out to prevent inconsistent state
