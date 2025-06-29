@@ -1,4 +1,3 @@
-
 "use client";
 
 import { AuthProvider } from "@/context/auth-context";
@@ -8,7 +7,7 @@ import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
         <AuthProvider>
         {children}
         <Toaster />
