@@ -1,3 +1,4 @@
+
 'use server';
 
 import { findPersonByEmail, updatePerson, createPerson } from '@/services/personService';
@@ -8,6 +9,7 @@ import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services
 import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
 import { createZfdGroup } from '@/services/zfdGroupService';
 import { createRepresentation } from '@/services/representationService';
+import { adminAuth } from '@/lib/firebaseAdminConfig';
 
 // ===================================================================================
 // ESSENTIAL SEEDING ACTIONS (for new environments)
@@ -177,11 +179,11 @@ const historyToSeed: TrainingHistoryCreationData[] = [
 ];
 
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
-    const userEmail = 'sarah.miller@example.com';
+    const userEmail = process.env.DENTIST2_EMAIL || 'sarah.miller@example.com';
     try {
         const user = await findPersonByEmail(userEmail);
         if (!user) {
-            return { success: false, message: `User with email ${userEmail} not found.` };
+            return { success: false, message: `User with email ${userEmail} not found. Please run "Seed Demo Users" first.` };
         }
 
         const existingHistory = await getTrainingHistoryForUser(user.id);
@@ -207,11 +209,11 @@ export async function seedTrainingHistory(): Promise<{ success: boolean; message
 
 
 export async function setSabineMuellerToPending(): Promise<{ success: boolean; message: string }> {
-  const userEmail = 'sarah.miller@example.com';
+  const userEmail = process.env.DENTIST_EMAIL || 'adasd@asdas.com';
   try {
     const user = await findPersonByEmail(userEmail);
     if (!user) {
-      return { success: false, message: `User with email ${userEmail} not found.` };
+      return { success: false, message: `User with email ${userEmail} not found. Please run "Seed Demo Users" first.` };
     }
 
     await updatePerson(user.id, { status: 'pending' });
@@ -225,58 +227,62 @@ export async function setSabineMuellerToPending(): Promise<{ success: boolean; m
   }
 }
 
-const usersToSeed: { id: string; email: string; name: string; dentistId?: string; role: UserRole }[] = [
-    { id: 'seed-user-mark-weaver', email: 'mark.weaver@example.com', name: 'Dr. Mark Weaver', dentistId: '78954', role: 'dentist' },
-    { id: 'seed-user-julia-smith', email: 'julia.smith@example.com', name: 'Dr. Julia Smith', dentistId: '65412', role: 'dentist' },
-    { id: 'seed-user-thomas-miller', email: 'thomas.miller@example.com', name: 'Dr. Thomas Miller', dentistId: '34567', role: 'dentist' },
-    { id: 'seed-user-sarah-baker', email: 'sarah.baker@example.com', name: 'Dr. Sarah Baker', dentistId: '23456', role: 'dentist' },
-    { id: 'seed-user-lucas-hoffman', email: 'lucas.hoffman@example.com', name: 'Dr. Lucas Hoffman', dentistId: '78954', role: 'dentist' },
-    { id: 'seed-user-anna-taylor', email: 'anna.taylor@example.com', name: 'Dr. Anna Taylor', dentistId: '65412', role: 'dentist' },
-    { id: 'seed-user-max-sample', email: 'max.sample@example.com', name: 'Max Sample', role: 'lk_member' },
+const usersToSeedForReps: { email: string; name: string; dentistId?: string; role: UserRole }[] = [
+    { email: 'mark.weaver@example.com', name: 'Dr. Mark Weaver', dentistId: '78954', role: 'dentist' },
+    { email: 'julia.smith@example.com', name: 'Dr. Julia Smith', dentistId: '65412', role: 'dentist' },
+    { email: 'thomas.miller@example.com', name: 'Dr. Thomas Miller', dentistId: '34567', role: 'dentist' },
+    { email: 'sarah.baker@example.com', name: 'Dr. Sarah Baker', dentistId: '23456', role: 'dentist' },
+    { email: 'lucas.hoffman@example.com', name: 'Dr. Lucas Hoffman', dentistId: '78954', role: 'dentist' },
+    { email: 'anna.taylor@example.com', name: 'Dr. Anna Taylor', dentistId: '65412', role: 'dentist' },
 ];
 
 export async function seedUsersAndRepresentations(): Promise<{ success: boolean; message: string }> {
     try {
-        let usersCreated = 0;
+        let usersCreatedCount = 0;
         let representationsCreated = 0;
 
-        // 1. Ensure all users exist
         const userMap = new Map<string, string>(); // email -> id
         const userNamesMap = new Map<string, string>(); // id -> name
 
-        for (const userData of usersToSeed) {
-            let user = await findPersonByEmail(userData.email);
-            if (!user) {
-                const newUser: PersonCreationData = {
-                    name: userData.name,
-                    email: userData.email,
-                    dentistId: userData.dentistId,
-                    role: userData.role,
-                    status: 'active',
-                    region: 'Wien',
-                    otpEnabled: false,
-                    notificationSettings: { inApp: true, email: false },
-                };
-                await createPerson(userData.id, newUser, 'en');
-                usersCreated++;
-                user = await findPersonByEmail(userData.email);
+        for (const userData of usersToSeedForReps) {
+             let authUser;
+            try {
+                authUser = await adminAuth.getUserByEmail(userData.email);
+            } catch (error: any) {
+                if (error.code === 'auth/user-not-found') {
+                    authUser = await adminAuth.createUser({ email: userData.email, password: 'password123', displayName: userData.name });
+                } else {
+                    throw error;
+                }
             }
-             if (user) {
-                userMap.set(user.email, user.id);
-                userNamesMap.set(user.id, user.name);
+            
+            let person = await getPersonById(authUser.uid);
+            if (!person) {
+                const newPersonData: PersonCreationData = {
+                    name: userData.name, email: userData.email, dentistId: userData.dentistId,
+                    role: userData.role, status: 'active', region: 'Wien', stateChamberId: 'wien',
+                    otpEnabled: false, notificationSettings: { inApp: true, email: false },
+                    avatarUrl: `https://avatar.vercel.sh/${userData.email}.png?size=100`,
+                };
+                await createPerson(authUser.uid, newPersonData, 'en');
+                usersCreatedCount++;
+                person = await getPersonById(authUser.uid);
+            }
+
+            if (person) {
+                userMap.set(person.email, person.id);
+                userNamesMap.set(person.id, person.name);
             }
         }
-
-        // 2. Get Sarah Miller's ID
-        const sarahMiller = await findPersonByEmail('sarah.miller@example.com');
+        
+        const sarahMillerEmail = process.env.DENTIST2_EMAIL || 'sarah.miller@example.com';
+        const sarahMiller = await findPersonByEmail(sarahMillerEmail);
         if (!sarahMiller) {
-            return { success: false, message: "Could not find sarah.miller@example.com. Please ensure she exists." };
+            return { success: false, message: `Could not find Sarah Miller (${sarahMillerEmail}). Please seed demo users first.` };
         }
         userNamesMap.set(sarahMiller.id, sarahMiller.name);
 
-        // 3. Create representation data
         const representationsToCreate: RepresentationCreationData[] = [
-            // Sarah represented others
             {
                 representingPersonId: sarahMiller.id, representedPersonId: userMap.get('mark.weaver@example.com')!,
                 representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Mark Weaver (ID: 78954)',
@@ -297,7 +303,6 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
                 representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Sarah Baker (ID: 23456)',
                 startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:30:00', durationHours: 6.5, status: 'confirmed', confirmedAt: '2025-04-12T09:00:00'
             },
-            // Others represented Sarah
             {
                 representingPersonId: userMap.get('lucas.hoffman@example.com')!, representedPersonId: sarahMiller.id,
                 representingPersonName: userNamesMap.get(userMap.get('lucas.hoffman@example.com')!)!, representedPersonName: sarahMiller.name,
@@ -325,10 +330,81 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
             representationsCreated++;
         }
 
-        return { success: true, message: `Seeding complete. Created ${usersCreated} new users and ${representationsCreated} representation records.` };
+        return { success: true, message: `Seeding complete. Created ${usersCreatedCount} new users and ${representationsCreated} representation records.` };
     } catch (error) {
         console.error('Error seeding users and representations:', error);
         const errorMessage = error instanceof Error ? error.message : String(error);
         return { success: false, message: `Error seeding data: ${errorMessage}` };
     }
 }
+
+
+export async function seedDemoUsers(): Promise<{ success: boolean; message: string }> {
+  try {
+    const demoUsers = [
+      { email: process.env.DENTIST_EMAIL, name: 'Dr. Sabine Mueller', role: 'dentist' as UserRole, dentistId: '12345' },
+      { email: process.env.DENTIST2_EMAIL, name: 'Dr. Sarah Miller', role: 'dentist' as UserRole, dentistId: '54321' },
+      { email: process.env.LK_MEMBER_EMAIL, name: 'Max Sample', role: 'lk_member' as UserRole, dentistId: undefined },
+    ];
+
+    let createdCount = 0;
+    let skippedCount = 0;
+    let notFoundInAuthCount = 0;
+
+    for (const demoUser of demoUsers) {
+      if (!demoUser.email) {
+        console.warn(`Email not found in .env for a demo user, skipping.`);
+        continue;
+      }
+      
+      const existingPerson = await findPersonByEmail(demoUser.email);
+      if (existingPerson) {
+        skippedCount++;
+        continue;
+      }
+
+      try {
+        const authUser = await adminAuth.getUserByEmail(demoUser.email);
+        const personData: PersonCreationData = {
+          name: demoUser.name,
+          email: demoUser.email,
+          role: demoUser.role,
+          status: 'active',
+          region: 'Wien',
+          stateChamberId: 'wien',
+          dentistId: demoUser.dentistId,
+          otpEnabled: false,
+          notificationSettings: { inApp: true, email: false },
+          firstName: demoUser.name.split(' ').slice(1).join(' '),
+          lastName: demoUser.name.split(' ').pop() || '',
+          title: demoUser.role === 'dentist' ? 'Dr.' : undefined,
+          avatarUrl: `https://avatar.vercel.sh/${demoUser.email}.png?size=100`,
+        };
+
+        await createPerson(authUser.uid, personData, 'en');
+        createdCount++;
+      } catch (authError: any) {
+        if (authError.code === 'auth/user-not-found') {
+          console.warn(`Auth user for ${demoUser.email} not found. Please run 'node firebase.auth.createDemoUsers.js' first. Skipping this user.`);
+          notFoundInAuthCount++;
+        } else {
+          throw authError;
+        }
+      }
+    }
+    
+    let message = `Seeding demo users complete. Created: ${createdCount}. Skipped: ${skippedCount}.`;
+    if (notFoundInAuthCount > 0) {
+        message += ` Could not find ${notFoundInAuthCount} user(s) in Firebase Auth. Please run 'node firebase.auth.createDemoUsers.js' to create them.`;
+    }
+
+    return { success: true, message };
+
+  } catch (error) {
+    console.error('Error seeding demo users:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, message: `Error seeding demo users: ${errorMessage}` };
+  }
+}
+
+    

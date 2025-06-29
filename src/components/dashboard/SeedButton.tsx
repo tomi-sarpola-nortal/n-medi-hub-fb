@@ -1,7 +1,8 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups, seedUsersAndRepresentations } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups, seedUsersAndRepresentations, seedDemoUsers } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -13,6 +14,7 @@ export default function SeedButton() {
   const [isChambersLoading, setIsChambersLoading] = useState(false);
   const [isZfdGroupsLoading, setIsZfdGroupsLoading] = useState(false);
   const [isRepresentationsLoading, setIsRepresentationsLoading] = useState(false);
+  const [isDemoUsersLoading, setIsDemoUsersLoading] = useState(false);
 
 
   const handleSeedCategories = async () => {
@@ -128,9 +130,31 @@ export default function SeedButton() {
     }
     setIsRepresentationsLoading(false);
   };
+  
+  const handleSeedDemoUsers = async () => {
+    setIsDemoUsersLoading(true);
+    try {
+      const result = await seedDemoUsers();
+      toast({
+        title: "Seeding Report (Demo Users)",
+        description: result.message,
+      });
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+       toast({
+        title: "Client-side Error",
+        description: `Failed to execute seed action: ${errorMessage}`,
+        variant: "destructive",
+      });
+    }
+    setIsDemoUsersLoading(false);
+  };
 
   return (
     <div className="flex flex-wrap gap-4">
+        <Button onClick={handleSeedDemoUsers} disabled={isDemoUsersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isDemoUsersLoading ? "Seeding..." : "Seed Demo Users"}
+        </Button>
         <Button onClick={handleSeedZfdGroups} disabled={isZfdGroupsLoading} variant="destructive" className="w-full sm:w-auto">
           {isZfdGroupsLoading ? "Seeding..." : "Seed ZFD Groups"}
         </Button>
@@ -152,3 +176,5 @@ export default function SeedButton() {
     </div>
   );
 }
+
+    
