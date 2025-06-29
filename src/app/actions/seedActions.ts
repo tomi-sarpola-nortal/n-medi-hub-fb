@@ -1,7 +1,7 @@
 
 'use server';
 
-import { findPersonByEmail, updatePerson, createPerson } from '@/services/personService';
+import { findPersonByEmail, updatePerson, createPerson, getPersonById } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
 import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData, UserRole } from '@/lib/types';
