@@ -37,3 +37,5 @@
 /playwright-report/
 /playwright/.cache/
 /playwright/.auth/
+firebase-debug.log
+firestore-debug.log
