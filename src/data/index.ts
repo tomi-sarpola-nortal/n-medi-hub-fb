@@ -1,7 +1,21 @@
 import { FirebaseRepresentationRepository } from './firebase/FirebaseRepresentationRepository';
+import { FirebaseDocumentTemplateRepository } from './firebase/FirebaseDocumentTemplateRepository';
+import { FirebaseTrainingCategoryRepository } from './firebase/FirebaseTrainingCategoryRepository';
+import { FirebaseTrainingOrganizerRepository } from './firebase/FirebaseTrainingOrganizerRepository';
+import { FirebaseTrainingHistoryRepository } from './firebase/FirebaseTrainingHistoryRepository';
+import { FirebasePersonRepository } from './firebase/FirebasePersonRepository';
+
 import { IRepresentationRepository } from './interfaces/IRepresentationRepository';
+import { IDocumentTemplateRepository } from './interfaces/IDocumentTemplateRepository';
+import { ITrainingCategoryRepository } from './interfaces/ITrainingCategoryRepository';
+import { ITrainingOrganizerRepository } from './interfaces/ITrainingOrganizerRepository';
+import { ITrainingHistoryRepository } from './interfaces/ITrainingHistoryRepository';
+import { IPersonRepository } from './interfaces/IPersonRepository';
 
 // Create and export repository instances
 export const representationRepository: IRepresentationRepository = new FirebaseRepresentationRepository();
-
-// Add other repositories as they are implemented
+export const documentTemplateRepository: IDocumentTemplateRepository = new FirebaseDocumentTemplateRepository();
+export const trainingCategoryRepository: ITrainingCategoryRepository = new FirebaseTrainingCategoryRepository();
+export const trainingOrganizerRepository: ITrainingOrganizerRepository = new FirebaseTrainingOrganizerRepository();
+export const trainingHistoryRepository: ITrainingHistoryRepository = new FirebaseTrainingHistoryRepository();
+export const personRepository: IPersonRepository = new FirebasePersonRepository();
