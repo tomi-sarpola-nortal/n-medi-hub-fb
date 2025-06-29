@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -13,6 +12,7 @@ import {
 import type { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '../ui/skeleton';
+import { useClientTranslations } from '@/hooks/use-client-translations';
 
 // Using inline SVGs for flags to avoid adding new image files.
 const AustriaFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -32,16 +32,6 @@ const UKFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-
-const getClientTranslations = (locale: string) => {
-  try {
-    const layout = locale === 'de' ? require('../../../locales/de/layout.json') : require('../../../locales/en/layout.json');
-    return layout;
-  } catch (e) {
-    return require('../../../locales/en/layout.json'); 
-  }
-};
-
 type LanguageSwitcherProps = ComponentProps<'div'> & {
   initialLocale?: string;
 };
@@ -60,12 +50,7 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
   const calculatedLocale = ['en', 'de'].includes(potentialLocale) ? potentialLocale : 'en';
   const currentLocale = initialLocale || calculatedLocale;
   
-  const [t, setT] = useState<Record<string, string> | null>(null);
-
-  useEffect(() => {
-    setT(getClientTranslations(currentLocale));
-  }, [currentLocale]);
-
+  const { t, isLoading } = useClientTranslations(['layout']);
 
   const handleChange = (newLocale: string) => {
     // pathname will now be /en/dashboard or /de/settings etc.
@@ -87,7 +72,7 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
     router.push(newPath);
   };
   
-  if (!t) {
+  if (isLoading) {
     return <Skeleton className="w-[120px] h-8" />;
   }
   
@@ -99,7 +84,7 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
       <Select value={currentLocale} onValueChange={handleChange}>
         <SelectTrigger 
           className="h-8 px-3 text-sm"
-          aria-label={t.language_switcher_label || "Language"}
+          aria-label={t('language_switcher_label')}
         >
             <div className="flex items-center gap-2">
                 {CurrentFlag && <CurrentFlag className="h-4 w-6 rounded-sm" />}

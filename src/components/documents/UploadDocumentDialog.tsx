@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -72,8 +71,8 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
       const { file, ...metadata } = data;
       await addDocumentTemplate(metadata, file[0]);
       toast({
-        title: t.documents_upload_success_title || 'Upload Successful',
-        description: t.documents_upload_success_desc || `Document "${data.title}" has been uploaded.`,
+        title: t.documents_upload_success_title,
+        description: t.documents_upload_success_desc.replace('{title}', data.title),
       });
       onUploadSuccess();
       form.reset();
@@ -82,8 +81,8 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
     } catch (error) {
       console.error("Upload failed:", error);
       toast({
-        title: t.documents_upload_error_title || 'Upload Failed',
-        description: t.documents_upload_error_desc || 'Could not upload the document. Please try again.',
+        title: t.documents_upload_error_title,
+        description: t.documents_upload_error_desc,
         variant: 'destructive',
       });
     } finally {
@@ -104,8 +103,8 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t.documents_upload_dialog_title || 'Upload New Document'}</DialogTitle>
-          <DialogDescription>{t.documents_upload_dialog_desc || "Add a new document to the templates library. Click save when you're done."}</DialogDescription>
+          <DialogTitle>{t.documents_upload_dialog_title}</DialogTitle>
+          <DialogDescription>{t.documents_upload_dialog_desc}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
@@ -114,7 +113,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.documents_upload_form_title || 'Document Title'}</FormLabel>
+                  <FormLabel>{t.documents_upload_form_title}</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,13 +124,13 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.documents_upload_form_type || 'Document Type'}</FormLabel>
+                  <FormLabel>{t.documents_upload_form_type}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder={t.register_select_placeholder || 'Please select'} /></SelectTrigger></FormControl>
+                    <FormControl><SelectTrigger><SelectValue placeholder={t.register_select_placeholder} /></SelectTrigger></FormControl>
                     <SelectContent>
-                      <SelectItem value="vorlage">{t.documents_type_vorlage || 'Template'}</SelectItem>
-                      <SelectItem value="leitlinie">{t.documents_type_leitlinie || 'Guideline'}</SelectItem>
-                      <SelectItem value="empfehlung">{t.documents_type_empfehlung || 'Recommendation'}</SelectItem>
+                      <SelectItem value="vorlage">{t.documents_type_vorlage}</SelectItem>
+                      <SelectItem value="leitlinie">{t.documents_type_leitlinie}</SelectItem>
+                      <SelectItem value="empfehlung">{t.documents_type_empfehlung}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -143,7 +142,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
               name="publisher"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.documents_upload_form_publisher || 'Publisher'}</FormLabel>
+                  <FormLabel>{t.documents_upload_form_publisher}</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +153,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
               name="file"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.documents_upload_form_file || 'File'}</FormLabel>
+                  <FormLabel>{t.documents_upload_form_file}</FormLabel>
                    <FormControl>
                         <div className="flex items-center space-x-2 mt-1">
                             <label
@@ -163,7 +162,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
                             >
                                 <UploadCloud className="mr-2 h-4 w-4" />
                                 <span className="truncate max-w-[200px]">
-                                   {selectedFileName || (t.register_step2_button_selectFile || "Select File")}
+                                   {selectedFileName || t.register_step2_button_selectFile}
                                 </span>
                             </label>
                             <Input
@@ -182,7 +181,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
             <div className="flex justify-end pt-2">
                 <Button type="submit" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {t.documents_upload_form_submit || 'Save and Upload'}
+                    {t.documents_upload_form_submit}
                 </Button>
             </div>
           </form>

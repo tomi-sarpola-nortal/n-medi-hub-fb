@@ -15,17 +15,7 @@ import { Loader2, PlusCircle, Info, Code } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-// Helper for client-side translations
-const getClientTranslations = (locale: string) => {
-  try {
-    const page = locale === 'de' ? require('../../../../locales/de/login.json') : require('../../../../locales/en/login.json');
-    return page;
-  } catch (e) {
-    console.warn("Translation file not found for login page, falling back to en");
-    return require('../../../../locales/en/login.json'); // Fallback
-  }
-};
+import { useClientTranslations } from '@/hooks/use-client-translations';
 
 const LoginFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -44,11 +34,7 @@ export default function LoginPage() {
   const params = useParams();
   const currentLocale = typeof params.locale === 'string' ? params.locale : 'en';
   
-  const [t, setT] = useState<Record<string, string> | null>(null);
-
-  useEffect(() => {
-      setT(getClientTranslations(currentLocale));
-  }, [currentLocale]);
+  const { t, isLoading: translationsLoading } = useClientTranslations(['login']);
 
   const { login, sendPasswordReset } = useAuth();
   const { toast } = useToast();
@@ -79,9 +65,9 @@ export default function LoginPage() {
     if (result.success) {
       router.push(`/${currentLocale}/dashboard`);
     } else {
-      const errorMessage = t![result.error as string] || result.error || t!.login_error_description;
+      const errorMessage = t(result.error as string) || result.error || t('login_error_description');
       toast({
-        title: t!.login_error_title || "Login Failed",
+        title: t('login_error_title'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -94,17 +80,30 @@ export default function LoginPage() {
     setIsSendingReset(false);
 
     toast({
-        title: t!.toast_success_title || "Success",
-        description: t!.forgot_password_success_toast || "If an account with that email exists, a password reset link has been sent.",
+        title: t('toast_success_title'),
+        description: t('forgot_password_success_toast'),
     });
 
     setIsForgotPassOpen(false);
     forgotPasswordForm.reset();
   };
   
+  if (translationsLoading) {
+    return (
+      <AuthLayout
+        pageTitle="Loading..."
+        locale={currentLocale}
+      >
+        <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+      </AuthLayout>
+    );
+  }
+  
   return (
     <AuthLayout
-      pageTitle={t?.login_page_main_title || "Portal Login"}
+      pageTitle={t('login_page_main_title')}
       locale={currentLocale}
     >
       <div className="w-full max-w-screen-xl mx-auto px-4">
@@ -115,16 +114,16 @@ export default function LoginPage() {
           <div className="space-y-8">
             <Card className="shadow-xl w-full max-w-md mx-auto lg:mx-0">
               <CardHeader className="text-center">
-                <CardTitle className="font-headline text-2xl">{t?.login_form_title || "Anmeldung ins Portal"}</CardTitle>
+                <CardTitle className="font-headline text-2xl">{t('login_form_title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="font-medium">{t?.login_label_email || "E-Mail oder Arzt-ID"}</Label>
+                    <Label htmlFor="email" className="font-medium">{t('login_label_email')}</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder={t?.login_placeholder_email || "max.mustermann@example.com"}
+                      placeholder={t('login_placeholder_email')}
                       {...loginForm.register('email')}
                       className={loginForm.formState.errors.email ? "border-destructive" : ""}
                     />
@@ -133,7 +132,7 @@ export default function LoginPage() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">{t?.login_label_password || "Passwort"}</Label>
+                    <Label htmlFor="password">{t('login_label_password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -149,19 +148,19 @@ export default function LoginPage() {
                     {isLoading ? (
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : (
-                      t?.login_button_text || "ANMELDEN"
+                      t('login_button_text')
                     )}
                   </Button>
                 </form>
               </CardContent>
               <CardFooter className="flex-col items-center space-y-2 pt-4 pb-6">
                 <Button variant="link" type="button" onClick={() => setIsForgotPassOpen(true)} className="text-sm text-primary hover:underline p-0 h-auto">
-                    {t?.login_forgot_password_link || "Forgot password?"}
+                    {t('login_forgot_password_link')}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  {t?.login_support_text_prefix || "Problems with login?"}{" "}
+                  {t('login_support_text_prefix')}{" "}
                   <a href="#" className="hover:underline">
-                    {t?.login_support_link || "Contact our support"}
+                    {t('login_support_link')}
                   </a>
                 </p>
               </CardFooter>
@@ -173,14 +172,14 @@ export default function LoginPage() {
                   <PlusCircle className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-headline text-lg font-semibold">
-                      {t?.login_register_title || "Noch nicht beim Medizinischen Büro gemeldet?"}
+                      {t('login_register_title')}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {t?.login_register_description || "Wenn Sie neu in der Region tätig sind und noch keinen Eintrag beim Medizinischen Büro haben, können Sie sich hier für einen Eintrag anmelden."}
+                      {t('login_register_description')}
                     </p>
                     <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
                       <a href={`/${currentLocale}/register/step1`}> 
-                        {t?.login_register_button_text || "EINTRAG IN DIE KAMMER BEANTRAGEN"}
+                        {t('login_register_button_text')}
                       </a>
                     </Button>
                   </div>
@@ -259,16 +258,16 @@ export default function LoginPage() {
       <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
         <DialogContent>
             <DialogHeader>
-            <DialogTitle>{t?.forgot_password_dialog_title || "Reset your password"}</DialogTitle>
-            <DialogDescription>{t?.forgot_password_dialog_desc || "Enter your email address and we will send you a link to reset your password."}</DialogDescription>
+            <DialogTitle>{t('forgot_password_dialog_title')}</DialogTitle>
+            <DialogDescription>{t('forgot_password_dialog_desc')}</DialogDescription>
             </DialogHeader>
             <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="reset-email">{t?.login_label_email || "Email or Doctor ID"}</Label>
+                    <Label htmlFor="reset-email">{t('login_label_email')}</Label>
                     <Input
                         id="reset-email"
                         type="email"
-                        placeholder={t?.login_placeholder_email || "john.doe@example.com"}
+                        placeholder={t('login_placeholder_email')}
                         {...forgotPasswordForm.register('email')}
                         className={forgotPasswordForm.formState.errors.email ? "border-destructive" : ""}
                     />
@@ -279,7 +278,7 @@ export default function LoginPage() {
                 <DialogFooter>
                     <Button type="submit" disabled={isSendingReset}>
                         {isSendingReset && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {t?.forgot_password_button_send || "Send Reset Link"}
+                        {t('forgot_password_button_send')}
                     </Button>
                 </DialogFooter>
             </form>

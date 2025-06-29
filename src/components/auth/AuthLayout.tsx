@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -8,20 +8,7 @@ import { Button } from '@/components/ui/button';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
 import Logo from '../layout/Logo';
 import { ThemeToggle } from '../layout/ThemeToggle';
-
-// Helper for client-side translations (consistent with login page)
-const getClientTranslations = (locale: string) => {
-  try {
-    const layout = locale === 'de' ? require('../../../locales/de/layout.json') : require('../../../locales/en/layout.json');
-    const register = locale === 'de' ? require('../../../locales/de/register.json') : require('../../../locales/en/register.json');
-    return { ...layout, ...register };
-  } catch (e) {
-    console.warn("Translation file not found for AuthLayout, falling back to en");
-    const layout = require('../../../locales/en/layout.json');
-    const register = require('../../../locales/en/register.json');
-    return { ...layout, ...register };
-  }
-};
+import { useClientTranslations } from '@/hooks/use-client-translations';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -43,13 +30,9 @@ export default function AuthLayout({
   locale,
 }: AuthLayoutProps) {
   const router = useRouter();
-  const [t, setT] = useState<Record<string, string> | null>(null);
+  const { t, isLoading } = useClientTranslations(['layout', 'register']);
 
-  useEffect(() => {
-    setT(getClientTranslations(locale));
-  }, [locale]);
-
-  if (!t) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col bg-background text-foreground font-body items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -57,7 +40,7 @@ export default function AuthLayout({
     );
   }
 
-  const translatedBackButtonText = t[backButtonTextKey] || "Back";
+  const translatedBackButtonText = t(backButtonTextKey) || "Back";
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground font-body">
@@ -92,11 +75,11 @@ export default function AuthLayout({
       </main>
 
       <footer className="py-8 text-center text-xs text-muted-foreground border-t border-border">
-        <p className="mb-2">{t.login_footer_copyright || "© 2025 Österreichische Zahnärztekammer. Alle Rechte vorbehalten."}</p>
+        <p className="mb-2">{t('login_footer_copyright')}</p>
         <div className="space-x-4">
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_privacy || "Datenschutz"}</Link>
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_imprint || "Impressum"}</Link>
-          <Link href="#" className="hover:text-primary hover:underline">{t.login_footer_contact || "Kontakt"}</Link>
+          <Link href="#" className="hover:text-primary hover:underline">{t('login_footer_privacy')}</Link>
+          <Link href="#" className="hover:text-primary hover:underline">{t('login_footer_imprint')}</Link>
+          <Link href="#" className="hover:text-primary hover:underline">{t('login_footer_contact')}</Link>
         </div>
       </footer>
     </div>

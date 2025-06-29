@@ -1,6 +1,6 @@
-
 "use client";
 
+import { useEffect, useState, useMemo } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,34 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { FileUp, Download, Trash2, ArrowLeft, ArrowUp, ArrowDown, Loader2, File, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TypeBadge } from '@/components/documents/TypeBadge';
 import { useAuth } from '@/context/auth-context';
-import { useEffect, useState, useMemo } from 'react';
 import { getDocumentTemplates, deleteDocumentTemplate } from '@/services/documentTemplateService';
 import { useToast } from '@/hooks/use-toast';
 import UploadDocumentDialog from '@/components/documents/UploadDocumentDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { DocumentTemplate } from '@/lib/types';
 import { format } from 'date-fns';
-
-
-// Helper for client-side translations
-const getClientTranslations = (locale: string) => {
-  try {
-    const page = locale === 'de' ? require('../../../../locales/de/documents.json') : require('../../../../locales/en/documents.json');
-    return page;
-  } catch (e) {
-    console.warn("Translation file not found for documents page, falling back to en");
-    return require('../../../../locales/en/documents.json');
-  }
-};
-
-const documentTypeMap = {
-    'vorlage': 'documents_type_vorlage',
-    'leitlinie': 'documents_type_leitlinie',
-    'empfehlung': 'documents_type_empfehlung',
-};
+import { useClientTranslations } from '@/hooks/use-client-translations';
 
 type FilterType = 'all' | 'vorlage' | 'leitlinie' | 'empfehlung';
 type SortDescriptor = {
@@ -64,10 +46,8 @@ const WordFileIcon = () => (
 
 export default function DocumentsPage() {
   const router = useRouter();
-  const params = useParams();
-  const locale = typeof params.locale === 'string' ? params.locale : 'en';
   const { user, loading: authLoading } = useAuth();
-  const [t, setT] = useState<Record<string, string>>({});
+  const { t, isLoading: translationsLoading, locale } = useClientTranslations(['documents']);
   const { toast } = useToast();
 
   const [documents, setDocuments] = useState<DocumentTemplate[]>([]);
@@ -95,9 +75,8 @@ export default function DocumentsPage() {
   };
 
   useEffect(() => {
-    setT(getClientTranslations(locale));
     fetchDocuments();
-  }, [locale]);
+  }, []);
 
   const handleSort = (columnId: keyof DocumentTemplate) => {
     setSorting(current => ({
@@ -169,11 +148,11 @@ export default function DocumentsPage() {
     </TableHead>
   );
 
-  const pageLoading = authLoading || Object.keys(t).length === 0;
+  const pageLoading = authLoading || translationsLoading || isLoading;
 
-  if (pageLoading || !user) {
+  if (pageLoading) {
     return (
-      <AppLayout pageTitle={t?.documents_page_title || "Document Templates"} locale={locale}>
+      <AppLayout pageTitle={t('documents_page_title')} locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -181,8 +160,14 @@ export default function DocumentsPage() {
     );
   }
 
-  const pageTitle = t.documents_page_title || "Document Templates";
-  const isLkMember = user.role === 'lk_member';
+  const pageTitle = t('documents_page_title');
+  const isLkMember = user?.role === 'lk_member';
+
+  const documentTypeMap = {
+    'vorlage': 'documents_type_vorlage',
+    'leitlinie': 'documents_type_leitlinie',
+    'empfehlung': 'documents_type_empfehlung',
+  };
 
   return (
     <AppLayout pageTitle={pageTitle} locale={locale}>
@@ -195,35 +180,35 @@ export default function DocumentsPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight font-headline">{pageTitle}</h1>
               <div className="text-sm text-muted-foreground mt-2">
-                <Link href="/dashboard" className="hover:underline">{t.documents_breadcrumb_dashboard || "Dashboard"}</Link>
+                <Link href="/dashboard" className="hover:underline">{t('documents_breadcrumb_dashboard')}</Link>
                 <span className="mx-1">/</span>
-                <span className="font-medium text-foreground">{t.documents_breadcrumb_current || "Document Templates"}</span>
+                <span className="font-medium text-foreground">{t('documents_breadcrumb_current')}</span>
               </div>
             </div>
           </div>
           {isLkMember && (
             <Button className="flex items-center gap-2" onClick={() => setIsUploadOpen(true)}>
               <FileUp className="h-5 w-5" />
-              <span className="hidden sm:inline">{t.documents_upload_button || "UPLOAD NEW DOCUMENT"}</span>
+              <span className="hidden sm:inline">{t('documents_upload_button')}</span>
             </Button>
           )}
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-headline">{t.documents_card_title || "Overview of all provided documents"}</CardTitle>
-            <CardDescription>{t.documents_card_description || "Here you can find all templates, guidelines, and recommendations..."}</CardDescription>
+            <CardTitle className="text-xl font-headline">{t('documents_card_title')}</CardTitle>
+            <CardDescription>{t('documents_card_description')}</CardDescription>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{t.documents_filter_all || "All"}</Button>
-                    <Button variant={filter === 'vorlage' ? 'default' : 'outline'} onClick={() => setFilter('vorlage')}>{t.documents_filter_templates || "Templates"}</Button>
-                    <Button variant={filter === 'empfehlung' ? 'default' : 'outline'} onClick={() => setFilter('empfehlung')}>{t.documents_filter_recommendations || "Recommendations"}</Button>
-                    <Button variant={filter === 'leitlinie' ? 'default' : 'outline'} onClick={() => setFilter('leitlinie')}>{t.documents_filter_guidelines || "Guidelines"}</Button>
+                    <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{t('documents_filter_all')}</Button>
+                    <Button variant={filter === 'vorlage' ? 'default' : 'outline'} onClick={() => setFilter('vorlage')}>{t('documents_filter_templates')}</Button>
+                    <Button variant={filter === 'empfehlung' ? 'default' : 'outline'} onClick={() => setFilter('empfehlung')}>{t('documents_filter_recommendations')}</Button>
+                    <Button variant={filter === 'leitlinie' ? 'default' : 'outline'} onClick={() => setFilter('leitlinie')}>{t('documents_filter_guidelines')}</Button>
                 </div>
                 <div className="relative w-full sm:w-auto sm:max-w-xs">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder={t.documents_search_placeholder || "Search by title or publisher..."}
+                        placeholder={t('documents_search_placeholder')}
                         className="pl-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -241,13 +226,13 @@ export default function DocumentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <SortableHeader columnId="title" label={t.documents_table_header_title || "Title"} />
-                    <SortableHeader columnId="type" label={t.documents_table_header_type || "Type"} />
-                    <SortableHeader columnId="publisher" label={t.documents_table_header_publisher || "Publisher"} />
-                    <SortableHeader columnId="lastChange" label={t.documents_table_header_last_change || "Last Change"} />
-                    <SortableHeader columnId="fileFormat" label={t.documents_table_header_format || "Format"} />
+                    <SortableHeader columnId="title" label={t('documents_table_header_title')} />
+                    <SortableHeader columnId="type" label={t('documents_table_header_type')} />
+                    <SortableHeader columnId="publisher" label={t('documents_table_header_publisher')} />
+                    <SortableHeader columnId="lastChange" label={t('documents_table_header_last_change')} />
+                    <SortableHeader columnId="fileFormat" label={t('documents_table_header_format')} />
                     <TableHead className="text-right">
-                      {isLkMember ? (t.documents_table_header_action || "Action") : (t.documents_table_header_download || "Download")}
+                      {isLkMember ? t('documents_table_header_action') : t('documents_table_header_download')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -257,7 +242,7 @@ export default function DocumentsPage() {
                       <TableCell className="font-medium">{doc.title}</TableCell>
                       <TableCell>
                         <TypeBadge type={doc.type}>
-                          {t[documentTypeMap[doc.type]] || doc.type}
+                          {t(documentTypeMap[doc.type])}
                         </TypeBadge>
                       </TableCell>
                       <TableCell>{doc.publisher}</TableCell>
@@ -289,7 +274,7 @@ export default function DocumentsPage() {
                   )) : (
                     <TableRow>
                         <TableCell colSpan={6} className="h-24 text-center">
-                            {t.documents_table_no_results || "No results found."}
+                            {t('documents_table_no_results')}
                         </TableCell>
                     </TableRow>
                   )}
@@ -297,7 +282,7 @@ export default function DocumentsPage() {
               </Table>
               <div className="flex items-center justify-between space-x-2 p-4 border-t">
                     <div className="flex items-center space-x-2">
-                        <p className="text-sm font-medium">{t.documents_pagination_rows_per_page || "Rows per page"}</p>
+                        <p className="text-sm font-medium">{t('documents_pagination_rows_per_page')}</p>
                         <Select
                             value={`${pagination.pageSize}`}
                             onValueChange={(value) => {
@@ -318,10 +303,10 @@ export default function DocumentsPage() {
                     </div>
                     <div className="flex items-center space-x-2 text-sm font-medium">
                        <span>
-                         {(t.documents_pagination_page_info || "Page {currentPage} of {totalPages}")
-                            .replace('{currentPage}', (pagination.pageIndex + 1).toString())
-                            .replace('{totalPages}', totalPages.toString())
-                         }
+                         {t('documents_pagination_page_info', {
+                           currentPage: pagination.pageIndex + 1,
+                           totalPages: totalPages
+                         })}
                        </span>
                         <Button
                             variant="outline"
@@ -329,7 +314,7 @@ export default function DocumentsPage() {
                             onClick={() => setPagination(p => ({...p, pageIndex: p.pageIndex - 1}))}
                             disabled={pagination.pageIndex === 0}
                         >
-                            {t.documents_pagination_previous || "Previous"}
+                            {t('documents_pagination_previous')}
                         </Button>
                         <Button
                             variant="outline"
@@ -337,7 +322,7 @@ export default function DocumentsPage() {
                             onClick={() => setPagination(p => ({...p, pageIndex: p.pageIndex + 1}))}
                             disabled={pagination.pageIndex >= totalPages - 1}
                         >
-                            {t.documents_pagination_next || "Next"}
+                            {t('documents_pagination_next')}
                         </Button>
                     </div>
                 </div>
@@ -347,7 +332,7 @@ export default function DocumentsPage() {
         </Card>
 
         <p className="text-xs text-muted-foreground">
-          {t.documents_footer_note || "The documents shown are provided centrally..."}
+          {t('documents_footer_note')}
         </p>
       </div>
 
@@ -363,15 +348,15 @@ export default function DocumentsPage() {
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t.documents_delete_dialog_title || "Are you sure?"}</AlertDialogTitle>
+            <AlertDialogTitle>{t('documents_delete_dialog_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t.documents_delete_dialog_desc || "This action cannot be undone. This will permanently delete the document."}
+              {t('documents_delete_dialog_desc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t.documents_delete_dialog_cancel || "Cancel"}</AlertDialogCancel>
+            <AlertDialogCancel>{t('documents_delete_dialog_cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">
-                {t.documents_delete_dialog_confirm || "Delete"}
+                {t('documents_delete_dialog_confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
