@@ -66,6 +66,11 @@ export default function LoginPage() {
     defaultValues: { email: '' },
   });
 
+  const fillLoginForm = (email: string, password: string) => {
+    loginForm.setValue('email', email);
+    loginForm.setValue('password', password);
+  };
+
   const onLoginSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsLoading(true);
     const result = await login(data.email, data.password);
@@ -95,11 +100,6 @@ export default function LoginPage() {
 
     setIsForgotPassOpen(false);
     forgotPasswordForm.reset();
-  };
-  
-  const fillLoginForm = (email: string, password: string) => {
-    loginForm.setValue('email', email);
-    loginForm.setValue('password', password);
   };
   
   if (!t) {
@@ -215,7 +215,7 @@ export default function LoginPage() {
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
+                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200 text-green-800 font-medium" 
                                         onClick={() => fillLoginForm('adasd@asdas.com', '-dkwfFv8WDGL=tR')}
                                     >
                                         Use these credentials
@@ -227,7 +227,7 @@ export default function LoginPage() {
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
+                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200 text-green-800 font-medium" 
                                         onClick={() => fillLoginForm('sarah.miller@example.com', 'TestTest24')}
                                     >
                                         Use these credentials
@@ -242,7 +242,7 @@ export default function LoginPage() {
                             <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="mt-1 ml-2 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
+                                className="mt-1 ml-2 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200 text-green-800 font-medium" 
                                 onClick={() => fillLoginForm('max.sample@example.com', '-dkwfFv8WDGL=tR')}
                             >
                                 Use these credentials
