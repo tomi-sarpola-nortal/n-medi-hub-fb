@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -126,7 +125,7 @@ export default function LoginPage() {
               <CardContent>
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="font-medium">{t.login_label_email || "E-Mail oder Zahnarzt-ID"}</Label>
+                    <Label htmlFor="email" className="font-medium">{t.login_label_email || "E-Mail oder Arzt-ID"}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -179,10 +178,10 @@ export default function LoginPage() {
                   <PlusCircle className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-headline text-lg font-semibold">
-                      {t.login_register_title || "Noch nicht bei der Österreichischen Zahnärztekammer gemeldet?"}
+                      {t.login_register_title || "Noch nicht beim Medizinischen Büro gemeldet?"}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {t.login_register_description || "Wenn Sie neu in Österreich tätig sind und noch keinen Eintrag bei der Österreichischen Zahnärztekammer haben, können Sie sich hier für einen Eintrag anmelden."}
+                      {t.login_register_description || "Wenn Sie neu in der Region tätig sind und noch keinen Eintrag beim Medizinischen Büro haben, können Sie sich hier für einen Eintrag anmelden."}
                     </p>
                     <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
                       <a href={`/${currentLocale}/register/step1`}> 
@@ -203,21 +202,21 @@ export default function LoginPage() {
                     <p className="mb-2">You can use the following credentials to explore the application:</p>
                     <div className="space-y-2">
                         <div>
-                            <p className="font-semibold">Dentist Role:</p>
+                            <p className="font-semibold">Doctor Role:</p>
                             <div className="pl-2 mt-1 space-y-1">
                                 <div>
                                     <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
                                     <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
                                 </div>
                                 <div className="pt-1">
-                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sabine.mueller@example.com</code></p>
+                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sarah.miller@example.com</code></p>
                                     <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">TestTest24</code></p>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <p className="font-semibold">Chamber Member Role:</p>
-                            <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">meme@gmail.com</code></p>
+                            <p className="font-semibold">Bureau Member Role:</p>
+                            <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">max.sample@example.com</code></p>
                             <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
                         </div>
                     </div>
@@ -235,7 +234,7 @@ export default function LoginPage() {
             </DialogHeader>
             <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="reset-email">{t.login_label_email || "Email or Dentist ID"}</Label>
+                    <Label htmlFor="reset-email">{t.login_label_email || "Email or Doctor ID"}</Label>
                     <Input
                         id="reset-email"
                         type="email"
