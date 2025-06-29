@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,7 @@ interface MemberProfileViewProps {
   trainingHistory: TrainingHistory[];
   t: Record<string, string>;
   locale: string;
+  defaultTab?: string;
 }
 
 const DataRow = ({ label, value }: { label: string; value?: string | null }) => (
@@ -48,11 +49,10 @@ const DocumentRow = ({ label, docName, docUrl }: { label: string; docName?: stri
     </div>
 );
 
-export default function MemberProfileView({ person, trainingHistory, t, locale }: MemberProfileViewProps) {
+export default function MemberProfileView({ person, trainingHistory, t, locale, defaultTab }: MemberProfileViewProps) {
   const { user: viewer } = useAuth();
-  const searchParams = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'stammdaten';
-
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState(defaultTab || 'stammdaten');
   const [repsViewLogged, setRepsViewLogged] = useState(false);
 
   useEffect(() => {
@@ -73,6 +73,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
   }, [viewer, person]);
 
   const handleTabChange = (tabValue: string) => {
+    setActiveTab(tabValue);
     if (tabValue === 'vertretungen' && !repsViewLogged && viewer && person && viewer.id !== person.id) {
         const auditor = { id: viewer.id, name: viewer.name, role: viewer.role as UserRole, chamber: viewer.stateChamberId || 'wien' };
         const impacted = { id: person.id, name: person.name };
@@ -108,22 +109,22 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-                        <Link href="/member-overview" className="hidden lg:block">
+                        <Link href={`/${locale}/member-overview`} className="hidden lg:block">
                             <ArrowLeft className="h-6 w-6 text-muted-foreground"/>
                         </Link>
                         {pageTitle}
                     </h1>
                      <div className="text-sm text-muted-foreground mt-2">
-                        <Link href="/dashboard" className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
+                        <Link href={`/${locale}/dashboard`} className="hover:underline">{t.member_overview_breadcrumb_dashboard || "Dashboard"}</Link>
                         <span className="mx-1">/</span>
-                        <Link href="/member-overview" className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
+                        <Link href={`/${locale}/member-overview`} className="hover:underline">{t.member_overview_breadcrumb_current || "Member Overview"}</Link>
                         <span className="mx-1">/</span>
                         <span className="font-medium text-foreground">{person.name}</span>
                     </div>
                 </div>
             </div>
 
-             <Tabs defaultValue={defaultTab} className="w-full" onValueChange={handleTabChange}>
+             <Tabs defaultValue={activeTab} className="w-full" onValueChange={handleTabChange}>
                 <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
                     <TabsTrigger value="stammdaten">{t.member_review_stammdaten_tab || "Stammdaten"}</TabsTrigger>
                     <TabsTrigger value="fortbildungen">{t.member_review_fortbildungen_tab || "Fortbildungen"}</TabsTrigger>
@@ -133,15 +134,15 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                     <Card>
                         <CardContent className="p-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                             <div>
-                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_id || "Zahnarzt-ID"}</p>
+                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_id || "Doctor-ID"}</p>
                                 <p className="text-lg font-bold">{person.dentistId || '-'}</p>
                             </div>
                              <div>
-                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_points || "Fortbildungspunkte"}</p>
+                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_points || "Training Points"}</p>
                                 <p className="text-lg font-bold">{person.educationPoints || '0'}/150</p>
                             </div>
                             <div>
-                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_hours || "Vertretungsstunden"}</p>
+                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_hours || "Rep. Hours"}</p>
                                 <p className="text-lg font-bold">{'-'}</p>
                             </div>
                             <div>
@@ -149,7 +150,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                                 <StatusBadge status={person.status}>{t[statusKeyMap[person.status]] || person.status}</StatusBadge>
                             </div>
                             <div>
-                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_last_update || "Letzte Datenbestätigung"}</p>
+                                <p className="text-xs font-semibold uppercase text-muted-foreground">{t.member_review_stats_last_update || "Last Data Confirmation"}</p>
                                 <p className="text-lg font-bold">{person.updatedAt || '-'}</p>
                             </div>
                         </CardContent>
@@ -176,18 +177,18 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                     <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-1 space-y-6">
                             <Card>
-                                <CardHeader><CardTitle>{t.member_review_personal_data_title || "Persönliche Daten"}</CardTitle></CardHeader>
+                                <CardHeader><CardTitle>{t.member_review_personal_data_title || "Personal Data"}</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
-                                    <DataRow label={t.member_list_table_header_id || "Zahnarzt-ID"} value={person.dentistId} />
-                                    <DataRow label={t.register_step2_label_title || "Titel"} value={person.title} />
-                                    <DataRow label={t.register_step2_label_firstName || "Vorname"} value={person.firstName} />
-                                    <DataRow label={t.register_step2_label_lastName || "Nachname"} value={person.lastName} />
-                                    <DataRow label={t.register_step2_label_dateOfBirth || "Geburtsdatum"} value={person.dateOfBirth} />
-                                    <DataRow label={t.register_step2_label_placeOfBirth || "Geburtsort"} value={person.placeOfBirth} />
-                                    <DataRow label={t.register_step2_label_nationality || "Staatsbürgerschaft"} value={person.nationality} />
-                                    <DataRow label={t.member_review_residential_address || "Wohnadresse"} value={`${person.streetAddress}, ${person.postalCode} ${person.city}`} />
-                                    <DataRow label={t.register_step2_label_phoneNumber || "Telefonnummer"} value={person.phoneNumber} />
-                                    <DataRow label={t.member_review_email_address || "E-Mail-Adresse"} value={person.email} />
+                                    <DataRow label={t.member_list_table_header_id || "Doctor-ID"} value={person.dentistId} />
+                                    <DataRow label={t.register_step2_label_title || "Title"} value={person.title} />
+                                    <DataRow label={t.register_step2_label_firstName || "First Name"} value={person.firstName} />
+                                    <DataRow label={t.register_step2_label_lastName || "Last Name"} value={person.lastName} />
+                                    <DataRow label={t.register_step2_label_dateOfBirth || "Date of Birth"} value={person.dateOfBirth} />
+                                    <DataRow label={t.register_step2_label_placeOfBirth || "Place of Birth"} value={person.placeOfBirth} />
+                                    <DataRow label={t.register_step2_label_nationality || "Region of Origin"} value={person.nationality} />
+                                    <DataRow label={t.member_review_residential_address || "Residential Address"} value={`${person.streetAddress}, ${person.postalCode} ${person.city}`} />
+                                    <DataRow label={t.register_step2_label_phoneNumber || "Phone Number"} value={person.phoneNumber} />
+                                    <DataRow label={t.member_review_email_address || "Email Address"} value={person.email} />
                                     {viewer && viewer.role === 'lk_member' && (
                                         <ResetPasswordButton person={person} t={t} locale={locale} />
                                     )}
@@ -195,39 +196,39 @@ export default function MemberProfileView({ person, trainingHistory, t, locale }
                             </Card>
 
                              <Card>
-                                <CardHeader><CardTitle>{t.member_review_documents_title || "Dokumente"}</CardTitle></CardHeader>
+                                <CardHeader><CardTitle>{t.member_review_documents_title || "Documents"}</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
-                                     <DocumentRow label={t.register_step2_label_idDocument || "Personalausweis oder Reisepass"} docName={person.idDocumentName} docUrl={person.idDocumentUrl} />
-                                     <DocumentRow label={t.register_step4_label_diploma || "Diplom / Zeugnis des Zahnmedizinstudiums"} docName={person.diplomaName} docUrl={person.diplomaUrl} />
-                                     <DocumentRow label={t.register_step4_label_approbation_cert || "Approbationsurkunde"} docName={person.approbationCertificateName} docUrl={person.approbationCertificateUrl} />
-                                     <DocumentRow label={t.register_step4_label_specialist_recognition || "Fachzahnarztanerkennung"} docName={person.specialistRecognitionName} docUrl={person.specialistRecognitionUrl} />
+                                     <DocumentRow label={t.register_step2_label_idDocument || "ID Card or Passport"} docName={person.idDocumentName} docUrl={person.idDocumentUrl} />
+                                     <DocumentRow label={t.register_step4_label_diploma || "Diploma / Certificate of Medical Studies"} docName={person.diplomaName} docUrl={person.diplomaUrl} />
+                                     <DocumentRow label={t.register_step4_label_approbation_cert || "Approbation Certificate"} docName={person.approbationCertificateName} docUrl={person.approbationCertificateUrl} />
+                                     <DocumentRow label={t.register_step4_label_specialist_recognition || "Medical Specialist Recognition"} docName={person.specialistRecognitionName} docUrl={person.specialistRecognitionUrl} />
                                 </CardContent>
                             </Card>
                         </div>
                         <div className="lg:col-span-2 space-y-6">
                             <Card>
-                                <CardHeader><CardTitle>{t.member_review_prof_qual_title || "Berufliche Qualifikationen"}</CardTitle></CardHeader>
+                                <CardHeader><CardTitle>{t.member_review_prof_qual_title || "Professional Qualifications"}</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
-                                    <DataRow label={t.register_step4_label_prof_title || "Aktuelle Berufsbezeichnung"} value={person.currentProfessionalTitle} />
-                                    <DataRow label={t.register_step4_label_specializations || "Fachrichtungen/Schwerpunkte"} value={person.specializations?.join(', ')} />
-                                    <DataRow label={t.register_step4_label_languages || "Sprachen"} value={person.languages?.join(', ')} />
-                                    <DataRow label={t.register_step4_label_graduation_date || "Datum des Studienabschlusses"} value={person.graduationDate} />
-                                    <DataRow label={t.register_step4_label_university || "Universität/Hochschule"} value={person.university} />
-                                    <DataRow label={t.register_step4_label_approbation_number || "Approbationsnummer"} value={person.approbationNumber} />
-                                    <DataRow label={t.register_step4_label_approbation_date || "Datum des Approbation"} value={person.approbationDate} />
+                                    <DataRow label={t.register_step4_label_prof_title || "Current Professional Title"} value={person.currentProfessionalTitle} />
+                                    <DataRow label={t.register_step4_label_specializations || "Specializations/Focus Areas"} value={person.specializations?.join(', ')} />
+                                    <DataRow label={t.register_step4_label_languages || "Languages"} value={person.languages?.join(', ')} />
+                                    <DataRow label={t.register_step4_label_graduation_date || "Date of Graduation"} value={person.graduationDate} />
+                                    <DataRow label={t.register_step4_label_university || "University/College"} value={person.university} />
+                                    <DataRow label={t.register_step4_label_approbation_number || "Approbation Number"} value={person.approbationNumber} />
+                                    <DataRow label={t.register_step4_label_approbation_date || "Date of Approbation"} value={person.approbationDate} />
                                 </CardContent>
                             </Card>
 
                             <Card>
-                                <CardHeader><CardTitle>{t.member_review_practice_info_title || "Informationen zur Ordination"}</CardTitle></CardHeader>
+                                <CardHeader><CardTitle>{t.member_review_practice_info_title || "Practice Information"}</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
-                                    <DataRow label={t.register_step5_label_practiceName || "Name der Ordination/Klinik"} value={person.practiceName} />
-                                    <DataRow label={t.member_review_practice_address || "Adresse der Ordination"} value={`${person.practiceStreetAddress}, ${person.practicePostalCode} ${person.practiceCity}`} />
-                                    <DataRow label={t.register_step5_label_practicePhoneNumber || "Telefonnummer der Ordination"} value={person.practicePhoneNumber} />
-                                    <DataRow label={t.register_step5_label_practiceFaxNumber || "Faxnummer der Ordination"} value={person.practiceFaxNumber} />
-                                    <DataRow label={t.register_step5_label_practiceEmail || "E-Mail der Ordination"} value={person.practiceEmail} />
-                                    <DataRow label={t.register_step5_label_practiceWebsite || "Website der Ordination"} value={person.practiceWebsite} />
-                                    <DataRow label={t.register_step5_label_healthInsuranceContracts || "Kassenverträge"} value={person.healthInsuranceContracts?.join(', ')} />
+                                    <DataRow label={t.register_step5_label_practiceName || "Name of Practice/Clinic"} value={person.practiceName} />
+                                    <DataRow label={t.member_review_practice_address || "Practice Address"} value={`${person.practiceStreetAddress}, ${person.practicePostalCode} ${person.practiceCity}`} />
+                                    <DataRow label={t.register_step5_label_practicePhoneNumber || "Practice Phone Number"} value={person.practicePhoneNumber} />
+                                    <DataRow label={t.register_step5_label_practiceFaxNumber || "Practice Fax Number"} value={person.practiceFaxNumber} />
+                                    <DataRow label={t.register_step5_label_practiceEmail || "Practice Email"} value={person.practiceEmail} />
+                                    <DataRow label={t.register_step5_label_practiceWebsite || "Practice Website"} value={person.practiceWebsite} />
+                                    <DataRow label={t.register_step5_label_healthInsuranceContracts || "Health Insurance Contracts"} value={person.healthInsuranceContracts?.join(', ')} />
                                 </CardContent>
                             </Card>
                         </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -16,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 // Helper for client-side translations
 const getClientTranslations = (locale: string) => {
@@ -135,7 +134,7 @@ export default function EducationPage() {
             'IMPL': t.register_step4_spec_implantologie || 'Implantology',
             'KFO': t.register_step4_spec_kieferorthopaedie || 'Orthodontics',
             'PARO': t.register_step4_spec_parodontologie || 'Periodontology',
-            'ZMK': t.register_step4_spec_allgemeine_zahnheilkunde || 'General Dentistry',
+            'ZMK': t.register_step4_spec_allgemeine_zahnheilkunde || 'General Medicine',
         };
         const diplomaCategoryAbbrs = Object.keys(diplomaCategoryMap);
 
@@ -211,7 +210,7 @@ export default function EducationPage() {
                             <p className="text-3xl font-bold font-headline">
                                 {`${zfdProgressData.total.current}/${zfdProgressData.total.total}`}
                             </p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 {t.zfd_total_progress?.split(' ')[1] || "Points"}
                             </p>
                         </div>
