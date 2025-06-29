@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -20,6 +21,7 @@ import { LogOut, UserCircle, Database } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
+import { Button } from "../ui/button";
 
 // Helper for client-side translations (similar to Header)
 const getClientTranslations = (locale: string) => {
@@ -80,138 +82,95 @@ export function AppSidebar() {
     );
   }
 
-  // Always show the Developer Module link, regardless of user authentication
-  const developerMenuItem = (
-    <SidebarMenuItem key="/developer">
-      <Link 
-        href={`/${locale}/developer`}
-        legacyBehavior={false}
-        passHref={false}
-      >
-        <SidebarMenuButton
-          isActive={pathname === `/${locale}/developer` || pathname.startsWith(`/${locale}/developer`)}
-          tooltip={{ children: t.sidebar_developer_module || "Developer Module", side: "right", align: "center" }}
-          aria-label={t.sidebar_developer_module || "Developer Module"}
-          className="font-medium"
-        >
-          <Database className="h-5 w-5"/>
-          <span>{t.sidebar_developer_module || "Developer Module"}</span>
-        </SidebarMenuButton>
-      </Link>
-    </SidebarMenuItem>
-  );
-
-  // If no user is logged in, show a minimal sidebar with just the developer module
-  if (!user) {
-    return (
-      <Sidebar collapsible="none">
-        <SidebarHeader className="flex items-center justify-between p-4">
-          <Link href={`/${locale}/login`} className="flex items-center gap-3 overflow-hidden">
-            <Logo iconSize={190} />
-          </Link>
-        </SidebarHeader>
-
-        <SidebarContent className="flex-grow p-4">
-          <SidebarMenu>
-            {/* Main content is empty for logged out users */}
-          </SidebarMenu>
-        </SidebarContent>
-        
-        <SidebarFooter className="p-4 border-t border-sidebar-border mt-auto">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <div className="px-2">
-                <LanguageSwitcher />
-              </div>
-            </SidebarMenuItem>
-            {developerMenuItem}
-          </SidebarMenu>
-        </SidebarFooter>
-      </Sidebar>
-    );
-  }
-
-  const userNavItems = navConfig[user.role] || [];
-  const isPending = user.status === 'pending';
+  const isPending = user?.status === 'pending';
+  const userNavItems = user ? (navConfig[user.role] || []) : [];
 
   return (
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-4">
-        <Link href={`/${locale}/dashboard`} className="flex items-center gap-3 overflow-hidden">
+        <Link href={`/${user ? locale + '/dashboard' : locale + '/login'}`} className="flex items-center gap-3 overflow-hidden">
           <Logo iconSize={190} />
         </Link>
       </SidebarHeader>
 
       {/* User Profile Section */}
-      <div className="p-4">
-        <Link href={`/${locale}/settings`} className="block">
-            <div className="w-full h-auto p-4 justify-start items-center gap-3 flex bg-muted rounded-lg hover:bg-accent transition-colors cursor-pointer">
-                <UserCircle className="h-10 w-10 text-muted-foreground flex-shrink-0" />
-                <div className="text-sm overflow-hidden text-left">
-                    <p className="font-semibold truncate">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">ID: {user.dentistId || 'N/A'}</p>
-                    <p className="text-xs text-muted-foreground capitalize truncate">{t[user.role] || user.role}</p>
+      {user && (
+        <div className="p-4">
+            <Link href={`/${locale}/settings`} className="block">
+                <div className="w-full h-auto p-4 justify-start items-center gap-3 flex bg-muted rounded-lg hover:bg-accent transition-colors cursor-pointer">
+                    <UserCircle className="h-10 w-10 text-muted-foreground flex-shrink-0" />
+                    <div className="text-sm overflow-hidden text-left">
+                        <p className="font-semibold truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">ID: {user.dentistId || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground capitalize truncate">{t[user.role] || user.role}</p>
+                    </div>
                 </div>
-            </div>
-        </Link>
-      </div>
-
+            </Link>
+        </div>
+      )}
 
       <SidebarContent className="flex-grow p-4">
-        <SidebarMenu>
-          {userNavItems.map((item) => {
-            const isNavItemDisabled = isPending && item.href !== '/settings';
-            const itemHref = `/${locale}${item.href}`;
-            return (
-              <SidebarMenuItem key={item.href}>
-                <Link 
-                  href={itemHref}
-                  legacyBehavior={false}
-                  passHref={false}
-                  className={isNavItemDisabled ? "pointer-events-none" : ""}
-                  onClick={(e) => {
-                      if (isNavItemDisabled) e.preventDefault();
-                  }}
-                >
-                  <SidebarMenuButton
-                    disabled={isNavItemDisabled}
-                    isActive={
-                      (isPending && item.href === '/settings') ||
-                      (!isPending && (pathname === itemHref || (item.href !== "/dashboard" && pathname.startsWith(itemHref))))
-                    }
-                    tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
-                    aria-label={t[item.title] || item.title}
-                    className="font-medium"
+        {user && (
+          <SidebarMenu>
+            {userNavItems.map((item) => {
+              const isNavItemDisabled = isPending && item.href !== '/settings';
+              const itemHref = `/${locale}${item.href}`;
+              return (
+                <SidebarMenuItem key={item.href}>
+                  <Link 
+                    href={itemHref}
+                    legacyBehavior={false}
+                    passHref={false}
+                    className={isNavItemDisabled ? "pointer-events-none" : ""}
+                    onClick={(e) => {
+                        if (isNavItemDisabled) e.preventDefault();
+                    }}
                   >
-                    {item.icon && <item.icon className="h-5 w-5"/>}
-                    <span>{t[item.title] || item.title}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
+                    <SidebarMenuButton
+                      disabled={isNavItemDisabled}
+                      isActive={
+                        (isPending && item.href === '/settings') ||
+                        (!isPending && (pathname === itemHref || (item.href !== "/dashboard" && pathname.startsWith(itemHref))))
+                      }
+                      tooltip={{ children: t[item.title] || item.title, side: "right", align: "center" }}
+                      aria-label={t[item.title] || item.title}
+                      className="font-medium"
+                    >
+                      {item.icon && <item.icon className="h-5 w-5"/>}
+                      <span>{t[item.title] || item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border mt-auto">
-         <SidebarMenu>
+         <SidebarMenu className="flex flex-col gap-2">
             <SidebarMenuItem>
-               <div className="px-2">
-                 <LanguageSwitcher />
-               </div>
+               <LanguageSwitcher />
             </SidebarMenuItem>
-            {developerMenuItem}
-            {user && (
-              <SidebarMenuItem>
-                  <SidebarMenuButton
-                      onClick={logout}
-                      className="text-sidebar-foreground font-medium"
-                  >
-                      <LogOut className="h-5 w-5"/>
-                      <span>{t.sidebar_logout || "Abmelden"}</span>
-                  </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+            <SidebarMenuItem>
+              <Button asChild variant="default" className="w-full justify-start">
+                  <Link href={`/${locale}/developer`}>
+                      <Database className="h-5 w-5"/>
+                      <span>{t.sidebar_developer_module || "Developer Module"}</span>
+                  </Link>
+              </Button>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <Button
+                    onClick={user ? logout : undefined}
+                    disabled={!user}
+                    variant="outline"
+                    className="w-full justify-start"
+                >
+                    <LogOut className="h-5 w-5"/>
+                    <span>{t.sidebar_logout || "Logout"}</span>
+                </Button>
+            </SidebarMenuItem>
          </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
