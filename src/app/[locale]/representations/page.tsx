@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,20 +13,10 @@ import { useAuth } from '@/context/auth-context';
 import { getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import type { Representation } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import ConfirmRepresentationCard from '@/components/representations/ConfirmRepresentationCard';
 import { Badge } from '@/components/ui/badge';
-
-const getClientTranslations = (locale: string) => {
-    try {
-        const page = locale === 'de' ? require('../../../../locales/de/representations.json') : require('../../../../locales/en/representations.json');
-        return page;
-    } catch (e) {
-        console.warn("Translation file not found, falling back to en");
-        return require('../../../../locales/en/representations.json');
-    }
-};
+import { useClientTranslations } from '@/hooks/use-client-translations';
 
 const formatPeriod = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
@@ -45,10 +35,8 @@ const formatPeriod = (startDate: string, endDate: string) => {
 export default function RepresentationsPage() {
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
-    const params = useParams();
-    const locale = typeof params.locale === 'string' ? params.locale : 'en';
+    const { t, isLoading: translationsLoading, locale } = useClientTranslations(['representations']);
 
-    const [t, setT] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [representations, setRepresentations] = useState<{
         performed: Representation[],
@@ -62,11 +50,7 @@ export default function RepresentationsPage() {
         return d;
     }, []);
 
-    useEffect(() => {
-        setT(getClientTranslations(locale));
-    }, [locale]);
-    
-    const fetchRepresentations = async () => {
+    const fetchRepresentations = useCallback(async () => {
         if (!user) return;
         setIsLoading(true);
         try {
@@ -78,7 +62,7 @@ export default function RepresentationsPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [user, toast]);
     
     useEffect(() => {
         if (user) {
@@ -86,11 +70,11 @@ export default function RepresentationsPage() {
         } else if (!authLoading) {
             setIsLoading(false);
         }
-    }, [user, authLoading, toast]);
+    }, [user, authLoading, fetchRepresentations]);
 
     const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
         try {
-            await updateRepresentationStatus(representationId, status);
+            await updateRepresentationStatus(representationId, status, locale);
             toast({
                 title: "Success",
                 description: `Representation has been ${status}.`,
@@ -117,8 +101,8 @@ export default function RepresentationsPage() {
          return [...representations.performed].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
     }, [representations.performed]);
 
-    const pageTitle = t.representations_page_title || "My Representations";
-    const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
+    const pageTitle = t('representations_page_title');
+    const pageIsLoading = authLoading || isLoading || translationsLoading;
 
     if (pageIsLoading) {
         return (
@@ -139,9 +123,9 @@ export default function RepresentationsPage() {
                             {pageTitle}
                         </h1>
                          <div className="text-sm text-muted-foreground mt-2">
-                            <Link href={`/${locale}/dashboard`} className="hover:underline">{t.representations_breadcrumb_dashboard || "Dashboard"}</Link>
+                            <Link href={`/${locale}/dashboard`} className="hover:underline">{t('representations_breadcrumb_dashboard')}</Link>
                             <span className="mx-1">/</span>
-                            <span className="font-medium text-foreground">{t.representations_breadcrumb_current || "My Representations"}</span>
+                            <span className="font-medium text-foreground">{t('representations_breadcrumb_current')}</span>
                         </div>
                     </div>
                 </div>
@@ -154,19 +138,19 @@ export default function RepresentationsPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-xl font-headline">{t.representations_my_title || "Overview of my representations"}</CardTitle>
-                        <CardDescription>{t.representations_my_desc || "Here you can view representations where you were represented by others."}</CardDescription>
+                        <CardTitle className="text-xl font-headline">{t('representations_my_title')}</CardTitle>
+                        <CardDescription>{t('representations_my_desc')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                        <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-1/4">{t.representations_table_header_period || "Period"}</TableHead>
-                                    <TableHead>{t.representations_table_header_representing_person || "Representing Person"}</TableHead>
-                                    <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
-                                    <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
-                                    <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
-                                    <TableHead>{t.representations_table_header_created_date || "Created Date"}</TableHead>
+                                    <TableHead className="w-1/4">{t('representations_table_header_period')}</TableHead>
+                                    <TableHead>{t('representations_table_header_representing_person')}</TableHead>
+                                    <TableHead>{t('representations_table_header_duration')}</TableHead>
+                                    <TableHead>{t('representations_table_header_status')}</TableHead>
+                                    <TableHead>{t('representations_table_header_confirmation_date')}</TableHead>
+                                    <TableHead>{t('representations_table_header_created_date')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -177,7 +161,7 @@ export default function RepresentationsPage() {
                                         <TableCell>{rep.durationHours} Stunden</TableCell>
                                         <TableCell>
                                             <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending' | 'declined'}>
-                                                {t[`representations_status_${rep.status}`] || rep.status}
+                                                {t(`representations_status_${rep.status}`)}
                                             </RepresentationStatusBadge>
                                         </TableCell>
                                         <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
@@ -196,13 +180,13 @@ export default function RepresentationsPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                          <div>
-                            <CardTitle className="text-xl font-headline">{t.representations_performed_title || "Overview of my performed representations"}</CardTitle>
-                            <CardDescription>{t.representations_performed_desc || "Here you can see representations where you have covered for others."}</CardDescription>
+                            <CardTitle className="text-xl font-headline">{t('representations_performed_title')}</CardTitle>
+                            <CardDescription>{t('representations_performed_desc')}</CardDescription>
                         </div>
                         <Button className="flex items-center gap-2 flex-shrink-0" asChild>
                             <Link href={`/${locale}/representations/new`}>
                                 <PlusCircle className="h-5 w-5"/>
-                                <span className="hidden sm:inline">{t.representations_new_button || "ENTER NEW REPRESENTATION"}</span>
+                                <span className="hidden sm:inline">{t('representations_new_button')}</span>
                             </Link>
                         </Button>
                     </CardHeader>
@@ -210,12 +194,12 @@ export default function RepresentationsPage() {
                        <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-1/4">{t.representations_table_header_period || "Period"}</TableHead>
-                                    <TableHead>{t.representations_table_header_person || "Represented Person"}</TableHead>
-                                    <TableHead>{t.representations_table_header_duration || "Duration"}</TableHead>
-                                    <TableHead>{t.representations_table_header_status || "Status"}</TableHead>
-                                    <TableHead>{t.representations_table_header_confirmation_date || "Confirmation Date"}</TableHead>
-                                    <TableHead>{t.representations_table_header_created_date || "Created Date"}</TableHead>
+                                    <TableHead className="w-1/4">{t('representations_table_header_period')}</TableHead>
+                                    <TableHead>{t('representations_table_header_person')}</TableHead>
+                                    <TableHead>{t('representations_table_header_duration')}</TableHead>
+                                    <TableHead>{t('representations_table_header_status')}</TableHead>
+                                    <TableHead>{t('representations_table_header_confirmation_date')}</TableHead>
+                                    <TableHead>{t('representations_table_header_created_date')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -229,8 +213,8 @@ export default function RepresentationsPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span>{formatPeriod(rep.startDate, rep.endDate)}</span>
                                                     {isStartDateOverdue && (
-                                                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
-                                                            {t.representations_label_overdue || "overdue"}
+                                                        <Badge variant="destructive" className="border border-destructive bg-destructive text-destructive-foreground">
+                                                            {t('representations_label_overdue')}
                                                         </Badge>
                                                     )}
                                                 </div>
@@ -239,7 +223,7 @@ export default function RepresentationsPage() {
                                             <TableCell>{rep.durationHours} Stunden</TableCell>
                                             <TableCell>
                                                 <RepresentationStatusBadge status={rep.status as 'confirmed' | 'pending' | 'declined'}>
-                                                    {t[`representations_status_${rep.status}`] || rep.status}
+                                                    {t(`representations_status_${rep.status}`)}
                                                 </RepresentationStatusBadge>
                                             </TableCell>
                                             <TableCell>{rep.confirmedAt ? format(new Date(rep.confirmedAt), 'dd.MM.yyyy') : '-'}</TableCell>
@@ -247,8 +231,8 @@ export default function RepresentationsPage() {
                                                 <div className="flex items-center gap-2">
                                                   <span>{rep.createdAt ? format(new Date(rep.createdAt), 'dd.MM.yyyy') : '-'}</span>
                                                   {isCreateDateOverdue && (
-                                                        <Badge className="border border-destructive bg-destructive text-destructive-foreground">
-                                                            {t.representations_label_overdue || "overdue"}
+                                                        <Badge variant="destructive" className="border border-destructive bg-destructive text-destructive-foreground">
+                                                            {t('representations_label_overdue')}
                                                         </Badge>
                                                   )}
                                                 </div>
@@ -266,10 +250,11 @@ export default function RepresentationsPage() {
                 </Card>
 
                  <p className="text-xs text-muted-foreground text-center pt-4">
-                    {t.representations_footer_note || "Representations can only be confirmed by the represented person. Your state chamber also has access to this data."}
+                    {t('representations_footer_note')}
                 </p>
 
             </div>
         </AppLayout>
     );
 }
+
