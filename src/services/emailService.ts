@@ -1,8 +1,7 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 
 const MAIL_COLLECTION = 'mail';
 
@@ -23,8 +22,8 @@ export async function sendEmail(mail: Mail): Promise<string> {
   if (!db) {
     throw new Error("Firestore is not initialized.");
   }
-  const mailCollectionRef = collection(db, MAIL_COLLECTION);
-  const docRef = await addDoc(mailCollectionRef, mail);
+  const mailCollectionRef = db.collection(MAIL_COLLECTION);
+  const docRef = await mailCollectionRef.add(mail);
   console.log(`Email document created with ID: ${docRef.id} for recipient: ${mail.to[0]}`);
   return docRef.id;
 }

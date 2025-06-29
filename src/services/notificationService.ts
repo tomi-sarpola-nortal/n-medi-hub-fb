@@ -1,22 +1,13 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  addDoc,
-  updateDoc,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  serverTimestamp,
+  FieldValue,
   type Timestamp,
   type DocumentSnapshot,
   type QueryDocumentSnapshot
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { Notification, NotificationCreationData } from '@/lib/types';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
@@ -46,49 +37,45 @@ const snapshotToNotification = (snapshot: DocumentSnapshot<any> | QueryDocumentS
 
 export async function createNotification(notificationData: NotificationCreationData): Promise<string> {
   checkDb();
-  const notificationsRef = collection(db, NOTIFICATIONS_COLLECTION);
-  const docRef = await addDoc(notificationsRef, {
+  const notificationsRef = db.collection(NOTIFICATIONS_COLLECTION);
+  const docRef = await notificationsRef.add({
     ...notificationData,
-    createdAt: serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
   return docRef.id;
 }
 
 export async function getNotificationsForUser(userId: string): Promise<Notification[]> {
   checkDb();
-  const notificationsRef = collection(db, NOTIFICATIONS_COLLECTION);
-  const q = query(
-    notificationsRef,
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(50) // Limit to the last 50 notifications to avoid performance issues
-  );
-  const snapshot = await getDocs(q);
+  const notificationsRef = db.collection(NOTIFICATIONS_COLLECTION);
+  const q = notificationsRef
+    .where('userId', '==', userId)
+    .orderBy('createdAt', 'desc')
+    .limit(50); // Limit to the last 50 notifications to avoid performance issues
+  
+  const snapshot = await q.get();
   return snapshot.docs.map(snapshotToNotification);
 }
 
 export async function markNotificationAsRead(notificationId: string): Promise<void> {
   checkDb();
-  const notificationRef = doc(db, NOTIFICATIONS_COLLECTION, notificationId);
-  await updateDoc(notificationRef, { isRead: true });
+  const notificationRef = db.collection(NOTIFICATIONS_COLLECTION).doc(notificationId);
+  await notificationRef.update({ isRead: true });
 }
 
 export async function markAllNotificationsAsRead(userId: string): Promise<void> {
   checkDb();
-  const notificationsRef = collection(db, NOTIFICATIONS_COLLECTION);
-  const q = query(
-    notificationsRef,
-    where('userId', '==', userId),
-    where('isRead', '==', false)
-  );
+  const notificationsRef = db.collection(NOTIFICATIONS_COLLECTION);
+  const q = notificationsRef
+    .where('userId', '==', userId)
+    .where('isRead', '==', false);
   
-  const snapshot = await getDocs(q);
+  const snapshot = await q.get();
   
-  const batch = [];
-  for (const document of snapshot.docs) {
-    const docRef = doc(db, NOTIFICATIONS_COLLECTION, document.id);
-    batch.push(updateDoc(docRef, { isRead: true }));
-  }
+  const batch = db.batch();
+  snapshot.docs.forEach(doc => {
+    batch.update(doc.ref, { isRead: true });
+  });
 
-  await Promise.all(batch);
+  await batch.commit();
 }

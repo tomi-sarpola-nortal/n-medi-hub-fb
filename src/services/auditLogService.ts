@@ -1,18 +1,13 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  addDoc,
-  getDocs,
-  serverTimestamp,
-  orderBy,
-  query,
+  FieldValue,
   type Timestamp,
   type DocumentSnapshot,
   type QueryDocumentSnapshot
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { AuditLog, AuditLogCreationData } from '@/lib/types';
 
 const AUDIT_LOGS_COLLECTION = 'audit_logs';
@@ -49,18 +44,18 @@ const snapshotToAuditLog = (snapshot: DocumentSnapshot<any> | QueryDocumentSnaps
 
 export async function createAuditLog(logData: AuditLogCreationData): Promise<string> {
   checkDb();
-  const logCollectionRef = collection(db, AUDIT_LOGS_COLLECTION);
-  const docRef = await addDoc(logCollectionRef, {
+  const logCollectionRef = db.collection(AUDIT_LOGS_COLLECTION);
+  const docRef = await logCollectionRef.add({
     ...logData,
-    timestamp: serverTimestamp(),
+    timestamp: FieldValue.serverTimestamp(),
   });
   return docRef.id;
 }
 
 export async function getAuditLogs(): Promise<AuditLog[]> {
   checkDb();
-  const logCollectionRef = collection(db, AUDIT_LOGS_COLLECTION);
-  const q = query(logCollectionRef, orderBy('timestamp', 'desc'));
-  const snapshot = await getDocs(q);
+  const logCollectionRef = db.collection(AUDIT_LOGS_COLLECTION);
+  const q = logCollectionRef.orderBy('timestamp', 'desc');
+  const snapshot = await q.get();
   return snapshot.docs.map(snapshotToAuditLog);
 }

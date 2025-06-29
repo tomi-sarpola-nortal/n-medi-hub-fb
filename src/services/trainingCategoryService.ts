@@ -1,17 +1,11 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  where,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { TrainingCategory, TrainingCategoryCreationData } from '@/lib/types';
 
 const TRAINING_CATEGORIES_COLLECTION = 'training_categories';
@@ -44,8 +38,8 @@ const snapshotToCategory = (snapshot: DocumentSnapshot<any> | QueryDocumentSnaps
  */
 export async function findTrainingCategoryByAbbreviation(abbreviation: string): Promise<TrainingCategory | null> {
   checkDb();
-  const q = query(collection(db, TRAINING_CATEGORIES_COLLECTION), where('abbreviation', '==', abbreviation));
-  const querySnapshot = await getDocs(q);
+  const q = db.collection(TRAINING_CATEGORIES_COLLECTION).where('abbreviation', '==', abbreviation);
+  const querySnapshot = await q.get();
   if (querySnapshot.empty) {
     return null;
   }
@@ -58,8 +52,8 @@ export async function findTrainingCategoryByAbbreviation(abbreviation: string): 
  */
 export async function createTrainingCategory(categoryData: TrainingCategoryCreationData): Promise<void> {
   checkDb();
-  const categoryDocRef = doc(db, TRAINING_CATEGORIES_COLLECTION, categoryData.abbreviation);
-  await setDoc(categoryDocRef, categoryData);
+  const categoryDocRef = db.collection(TRAINING_CATEGORIES_COLLECTION).doc(categoryData.abbreviation);
+  await categoryDocRef.set(categoryData);
 }
 
 /**
@@ -68,6 +62,6 @@ export async function createTrainingCategory(categoryData: TrainingCategoryCreat
  */
 export async function getAllTrainingCategories(): Promise<TrainingCategory[]> {
     checkDb();
-    const querySnapshot = await getDocs(collection(db, TRAINING_CATEGORIES_COLLECTION));
+    const querySnapshot = await db.collection(TRAINING_CATEGORIES_COLLECTION).get();
     return querySnapshot.docs.map(snapshotToCategory);
 }

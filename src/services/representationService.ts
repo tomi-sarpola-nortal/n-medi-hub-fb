@@ -1,20 +1,11 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp,
+  FieldValue,
   type Timestamp,
-  or,
-  orderBy,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { Representation, RepresentationCreationData } from '@/lib/types';
 import { getPersonById, getPersonsByRole } from './personService';
 import { createNotification } from './notificationService';
@@ -64,10 +55,10 @@ const snapshotToRepresentation = (snapshot: any): Representation => {
  */
 export async function createRepresentation(data: RepresentationCreationData, locale: string): Promise<string> {
   checkDb();
-  const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
-  const docRef = await addDoc(representationsRef, {
+  const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
+  const docRef = await representationsRef.add({
     ...data,
-    createdAt: serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
   
   const t = getTranslations(locale);
@@ -141,13 +132,12 @@ export async function createRepresentation(data: RepresentationCreationData, loc
  */
 export async function getConfirmedRepresentationHours(userId: string): Promise<number> {
   checkDb();
-  const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
-  const q = query(representationsRef, 
-    where('representedPersonId', '==', userId),
-    where('status', '==', 'confirmed')
-  );
+  const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
+  const q = representationsRef 
+    .where('representedPersonId', '==', userId)
+    .where('status', '==', 'confirmed');
   
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await q.get();
   if (querySnapshot.empty) {
     return 0;
   }
@@ -172,17 +162,23 @@ export async function getRepresentationsForUser(userId: string): Promise<{
     wasRepresented: Representation[],
 }> {
     checkDb();
-    const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
-    const q = query(representationsRef, 
-        or(
-            where('representingPersonId', '==', userId),
-            where('representedPersonId', '==', userId)
-        )
-    );
+    const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
+    const q = representationsRef 
+        .where('representingPersonId', '==', userId)
+        .where('representedPersonId', '==', userId);
 
-    const querySnapshot = await getDocs(q);
-    
-    const allRepresentations: Representation[] = querySnapshot.docs.map(snapshotToRepresentation);
+    const querySnapshot = await representationsRef
+        .where('representingPersonId', '==', userId)
+        .get();
+
+    const querySnapshot2 = await representationsRef
+        .where('representedPersonId', '==', userId)
+        .get();
+
+    const allRepresentations: Representation[] = [...querySnapshot.docs, ...querySnapshot2.docs]
+        .map(snapshotToRepresentation)
+        // Deduplicate
+        .filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
 
     const performed = allRepresentations.filter(r => r.representingPersonId === userId);
     const wasRepresented = allRepresentations.filter(r => r.representedPersonId === userId);
@@ -202,26 +198,26 @@ export async function getRepresentationsForUser(userId: string): Promise<{
  * @param status The new status: 'confirmed' or 'declined'.
  * @param locale The locale for email translations.
  */
-export async function updateRepresentationStatus(representationId: string, status: 'confirmed' | 'declined', locale: string): Promise<void> {
+export async function updateRepresentationStatus(representationId: string, status: 'confirmed' | 'declined'): Promise<void> {
     checkDb();
-    const representationRef = doc(db, REPRESENTATIONS_COLLECTION, representationId);
+    const representationRef = db.collection(REPRESENTATIONS_COLLECTION).doc(representationId);
     
     const updateData: { status: 'confirmed' | 'declined', confirmedAt?: any } = { status };
 
     if (status === 'confirmed') {
-        updateData.confirmedAt = serverTimestamp();
+        updateData.confirmedAt = FieldValue.serverTimestamp();
     }
     
-    await updateDoc(representationRef, updateData);
+    await representationRef.update(updateData);
 
     // Get the representation data to find the other user
-    const repDoc = await getDocs(query(collection(db, REPRESENTATIONS_COLLECTION), where('__name__', '==', representationId)));
-    if (!repDoc.empty) {
-        const repData = snapshotToRepresentation(repDoc.docs[0]);
+    const repDoc = await representationRef.get();
+    if (repDoc.exists) {
+        const repData = snapshotToRepresentation(repDoc);
         const representingPerson = await getPersonById(repData.representingPersonId);
         
         if (representingPerson) {
-            const t = getTranslations(locale);
+            const t = getTranslations('en'); // Default to 'en' for now on server
             const notificationKey = status === 'confirmed' ? 'notification_representation_approved' : 'notification_representation_declined';
             const subjectKey = status === 'confirmed' ? 'email_subject_representation_approved' : 'email_subject_representation_declined';
             const bodyKey = status === 'confirmed' ? 'email_body_representation_approved' : 'email_body_representation_declined';
@@ -255,8 +251,8 @@ export async function updateRepresentationStatus(representationId: string, statu
  */
 export async function getAllRepresentations(): Promise<Representation[]> {
     checkDb();
-    const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
-    const snapshot = await getDocs(representationsRef);
+    const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
+    const snapshot = await representationsRef.get();
     return snapshot.docs.map(snapshotToRepresentation);
 }
 
@@ -268,17 +264,16 @@ export async function getAllRepresentations(): Promise<Representation[]> {
  */
 export async function getOldPendingRepresentations(daysOld: number = 5): Promise<Representation[]> {
   checkDb();
-  const representationsRef = collection(db, REPRESENTATIONS_COLLECTION);
+  const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
   
   const thresholdDate = new Date();
   thresholdDate.setDate(thresholdDate.getDate() - daysOld);
 
-  const q = query(representationsRef, 
-    where('status', '==', 'pending'),
-    where('startDate', '<=', thresholdDate.toISOString()),
-    orderBy('startDate', 'asc') // Oldest first
-  );
+  const q = representationsRef 
+    .where('status', '==', 'pending')
+    .where('startDate', '<=', thresholdDate.toISOString())
+    .orderBy('startDate', 'asc');
   
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await q.get();
   return querySnapshot.docs.map(snapshotToRepresentation);
 }

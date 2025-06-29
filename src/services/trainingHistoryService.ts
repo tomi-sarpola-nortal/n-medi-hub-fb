@@ -1,20 +1,12 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  getDoc,
-  query,
-  orderBy,
-  serverTimestamp,
-  type Timestamp,
+  FieldValue,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { TrainingHistory, TrainingHistoryCreationData } from '@/lib/types';
 
 const PERSONS_COLLECTION = 'persons';
@@ -55,10 +47,10 @@ export async function addTrainingHistoryForUser(
   historyData: TrainingHistoryCreationData
 ): Promise<string> {
   checkDb();
-  const historyCollectionRef = collection(db, PERSONS_COLLECTION, userId, TRAINING_HISTORY_SUBCOLLECTION);
-  const docRef = await addDoc(historyCollectionRef, {
+  const historyCollectionRef = db.collection(PERSONS_COLLECTION).doc(userId).collection(TRAINING_HISTORY_SUBCOLLECTION);
+  const docRef = await historyCollectionRef.add({
     ...historyData,
-    createdAt: serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
   return docRef.id;
 }
@@ -71,10 +63,10 @@ export async function addTrainingHistoryForUser(
  */
 export async function getTrainingHistoryForUser(userId: string): Promise<TrainingHistory[]> {
   checkDb();
-  const historyCollectionRef = collection(db, PERSONS_COLLECTION, userId, TRAINING_HISTORY_SUBCOLLECTION);
-  const q = query(historyCollectionRef, orderBy('date', 'desc'));
+  const historyCollectionRef = db.collection(PERSONS_COLLECTION).doc(userId).collection(TRAINING_HISTORY_SUBCOLLECTION);
+  const q = historyCollectionRef.orderBy('date', 'desc');
   
-  const snapshot = await getDocs(q);
+  const snapshot = await q.get();
 
   return snapshot.docs.map(snapshotToTrainingHistory);
 }
@@ -87,10 +79,10 @@ export async function getTrainingHistoryForUser(userId: string): Promise<Trainin
  */
 export async function getTrainingHistoryItem(userId: string, itemId: string): Promise<TrainingHistory | null> {
     checkDb();
-    const docRef = doc(db, PERSONS_COLLECTION, userId, TRAINING_HISTORY_SUBCOLLECTION, itemId);
-    const docSnap = await getDoc(docRef);
+    const docRef = db.collection(PERSONS_COLLECTION).doc(userId).collection(TRAINING_HISTORY_SUBCOLLECTION).doc(itemId);
+    const docSnap = await docRef.get();
 
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
         return null;
     }
     

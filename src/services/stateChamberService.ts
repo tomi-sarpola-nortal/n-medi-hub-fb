@@ -1,18 +1,11 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  query,
-  where,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { StateChamber, StateChamberCreationData } from '@/lib/types';
 
 const STATE_CHAMBERS_COLLECTION = 'state_chambers';
@@ -45,8 +38,8 @@ const snapshotToStateChamber = (snapshot: DocumentSnapshot<any> | QueryDocumentS
  */
 export async function createStateChamber(id: string, chamberData: StateChamberCreationData): Promise<void> {
   checkDb();
-  const chamberDocRef = doc(db, STATE_CHAMBERS_COLLECTION, id);
-  await setDoc(chamberDocRef, chamberData);
+  const chamberDocRef = db.collection(STATE_CHAMBERS_COLLECTION).doc(id);
+  await chamberDocRef.set(chamberData);
 }
 
 /**
@@ -56,9 +49,9 @@ export async function createStateChamber(id: string, chamberData: StateChamberCr
  */
 export async function getStateChamberById(id: string): Promise<StateChamber | null> {
   checkDb();
-  const docRef = doc(db, STATE_CHAMBERS_COLLECTION, id);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) {
+  const docRef = db.collection(STATE_CHAMBERS_COLLECTION).doc(id);
+  const docSnap = await docRef.get();
+  if (!docSnap.exists) {
     return null;
   }
   return snapshotToStateChamber(docSnap);
@@ -71,6 +64,6 @@ export async function getStateChamberById(id: string): Promise<StateChamber | nu
  */
 export async function getAllStateChambers(): Promise<StateChamber[]> {
   checkDb();
-  const querySnapshot = await getDocs(collection(db, STATE_CHAMBERS_COLLECTION));
+  const querySnapshot = await db.collection(STATE_CHAMBERS_COLLECTION).get();
   return querySnapshot.docs.map(snapshotToStateChamber);
 }

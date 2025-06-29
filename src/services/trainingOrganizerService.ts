@@ -1,17 +1,11 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  where,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { TrainingOrganizer, TrainingOrganizerCreationData } from '@/lib/types';
 
 const TRAINING_ORGANIZERS_COLLECTION = 'training_organizers';
@@ -43,8 +37,8 @@ const snapshotToOrganizer = (snapshot: DocumentSnapshot<any> | QueryDocumentSnap
 export async function findTrainingOrganizerByName(name: string): Promise<TrainingOrganizer | null> {
   checkDb();
   // We search by the 'name' field, not the ID which might be formatted.
-  const q = query(collection(db, TRAINING_ORGANIZERS_COLLECTION), where('name', '==', name));
-  const querySnapshot = await getDocs(q);
+  const q = db.collection(TRAINING_ORGANIZERS_COLLECTION).where('name', '==', name);
+  const querySnapshot = await q.get();
   if (querySnapshot.empty) {
     return null;
   }
@@ -58,6 +52,6 @@ export async function findTrainingOrganizerByName(name: string): Promise<Trainin
 export async function createTrainingOrganizer(organizerData: TrainingOrganizerCreationData): Promise<void> {
   checkDb();
   const docId = organizerData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  const organizerDocRef = doc(db, TRAINING_ORGANIZERS_COLLECTION, docId);
-  await setDoc(organizerDocRef, organizerData);
+  const organizerDocRef = db.collection(TRAINING_ORGANIZERS_COLLECTION).doc(docId);
+  await organizerDocRef.set(organizerData);
 }

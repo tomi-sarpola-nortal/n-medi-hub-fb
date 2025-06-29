@@ -1,17 +1,11 @@
 
 'use server';
 
-import { db } from '@/lib/firebaseConfig';
+import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
-  collection,
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  orderBy,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase-admin/firestore';
 import type { ZfdGroup, ZfdGroupCreationData } from '@/lib/types';
 
 const ZFD_GROUPS_COLLECTION = 'zfd_groups';
@@ -41,8 +35,8 @@ const snapshotToZfdGroup = (snapshot: DocumentSnapshot<any> | QueryDocumentSnaps
  */
 export async function createZfdGroup(id: string, groupData: ZfdGroupCreationData): Promise<void> {
   checkDb();
-  const groupDocRef = doc(db, ZFD_GROUPS_COLLECTION, id);
-  await setDoc(groupDocRef, groupData);
+  const groupDocRef = db.collection(ZFD_GROUPS_COLLECTION).doc(id);
+  await groupDocRef.set(groupData);
 }
 
 /**
@@ -51,8 +45,8 @@ export async function createZfdGroup(id: string, groupData: ZfdGroupCreationData
  */
 export async function getAllZfdGroups(): Promise<ZfdGroup[]> {
   checkDb();
-  const groupsCollection = collection(db, ZFD_GROUPS_COLLECTION);
-  const q = query(groupsCollection, orderBy('totalPoints', 'desc'));
-  const snapshot = await getDocs(q);
+  const groupsCollection = db.collection(ZFD_GROUPS_COLLECTION);
+  const q = groupsCollection.orderBy('totalPoints', 'desc');
+  const snapshot = await q.get();
   return snapshot.docs.map(snapshotToZfdGroup);
 }
