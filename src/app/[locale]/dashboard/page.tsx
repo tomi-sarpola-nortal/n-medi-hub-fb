@@ -39,8 +39,6 @@ export default function DashboardPage() {
     setT(getClientTranslations(locale));
   }, [locale]);
 
-//Authentication commented out for demo mode
-/*
   useEffect(() => {
     if (!loading) {
       if (!user) {
@@ -50,7 +48,6 @@ export default function DashboardPage() {
       }
     }
   }, [user, loading, router, locale]);
-*/
 
   // Show loading while translations are being loaded
   if (loading || !t) {
