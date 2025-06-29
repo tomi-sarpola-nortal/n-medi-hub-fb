@@ -1,4 +1,3 @@
-
 // A very simple in-memory store for multi-step registration data.
 
 import type { UserRole } from "./types";
@@ -58,66 +57,13 @@ export const STATES_MAP: Record<string, string> = {
   // Add other states as needed
 };
 
+// Import the RegistrationFormData type from the consolidated types file
+import type { RegistrationFormData } from './types';
 
-export interface RegistrationData {
-  // Session ID for anonymous file uploads
-  sessionId?: string;
+// Alias for backward compatibility
+export type RegistrationData = RegistrationFormData;
 
-  // Step 1
-  email?: string;
-  // Step 2
-  password?: string;
-
-  // Step 3: Personal Data
-  title?: string;
-  firstName?: string;
-  lastName?: string;
-  dateOfBirth?: Date;
-  placeOfBirth?: string;
-  nationality?: string;
-  streetAddress?: string;
-  postalCode?: string;
-  city?: string;
-  stateOrProvince?: string;
-  phoneNumber?: string;
-  idDocumentUrl?: string;
-  idDocumentName?: string;
-
-  // Step 4: Professional Qualifications
-  currentProfessionalTitle?: ProfessionalTitleId;
-  specializations?: SpecializationId[];
-  languages?: string[]; 
-  graduationDate?: Date; 
-  university?: string;
-  approbationNumber?: string;
-  approbationDate?: Date; 
-  diplomaUrl?: string;
-  diplomaName?: string;
-  approbationCertificateUrl?: string;
-  approbationCertificateName?: string;
-  specialistRecognitionUrl?: string;
-  specialistRecognitionName?: string;
-
-  // Step 5: Practice Information
-  practiceName?: string;
-  practiceStreetAddress?: string;
-  practicePostalCode?: string;
-  practiceCity?: string;
-  practicePhoneNumber?: string;
-  practiceFaxNumber?: string;
-  practiceEmail?: string;
-  practiceWebsite?: string;
-  healthInsuranceContracts?: HealthInsuranceContractId[];
-
-  // Step 6: Review & Confirm
-  agreedToTerms?: boolean;
-
-
-  // Overall registration details - role is selected/assigned as part of the process or post-reg
-  role?: UserRole; // This might be set to 'dentist' by default for this flow
-}
-
-let registrationDataStore: RegistrationData = {};
+let registrationDataStore: RegistrationData = {} as RegistrationData;
 
 export function updateRegistrationData(data: Partial<RegistrationData>) {
   Object.assign(registrationDataStore, data);
@@ -129,7 +75,7 @@ export function getRegistrationData(): RegistrationData {
 }
 
 export function clearRegistrationData() {
-  registrationDataStore = {};
+  registrationDataStore = {} as RegistrationData;
   console.log("Registration data cleared.");
 }
 

@@ -1,11 +1,13 @@
-import type { Timestamp } from 'firebase/firestore';
-import type { LucideIcon } from 'lucide-react'; // For NavItem icon
-import type { ProfessionalTitleId, SpecializationId, HealthInsuranceContractId } from '@/lib/registrationStore';
+import type { LucideIcon } from 'lucide-react';
 
+// ==========================================
+// User Role and Authentication Types
+// ==========================================
+export type UserRole = 'dentist' | 'lk_member' | 'ozak_employee';
 
-export type UserRole = 'dentist' | 'lk_member' | 'ozak_employee'; // Extended UserRole
-
-// NavItem used in navigation configuration
+// ==========================================
+// Navigation Types
+// ==========================================
 export interface NavItem {
   title: string;
   href: string;
@@ -17,7 +19,9 @@ export interface NavItem {
   items?: NavItem[]; 
 }
 
-
+// ==========================================
+// Document Types
+// ==========================================
 export interface SuggestedDocument {
   title: string;
   description: string;
@@ -37,50 +41,56 @@ export interface DocumentTemplate {
 
 export type DocumentTemplateCreationData = Omit<DocumentTemplate, 'id' | 'lastChange'>;
 
+// ==========================================
+// Person Types - Broken into smaller interfaces
+// ==========================================
 
-// Firestore document structure for a person.
-// The document ID for 'persons' collection should be the Firebase Auth UID.
-export interface Person {
-  id: string; // This will be the Firebase Auth UID
+// Base information about a person
+export interface IPersonBase {
+  id: string;
   name: string;
-  email: string; 
-  role: UserRole; 
-  region: string; // e.g. "Bayern", "Wien"
-  dentistId?: string; 
-  avatarUrl?: string; 
+  email: string;
+  role: UserRole;
+  region: string;
+  dentistId?: string;
+  avatarUrl?: string;
   status: 'pending' | 'active' | 'inactive' | 'rejected';
-  otpEnabled: boolean; 
-  otpSecret?: string; 
   stateChamberId?: string;
-  
-  // Add missing fields to make it a complete user representation
-  approved?: boolean;
-  educationPoints?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-  // Notification preferences
+// Security and authentication related fields
+export interface IPersonSecurity {
+  otpEnabled: boolean;
+  otpSecret?: string;
   notificationSettings: {
     inApp: boolean;
     email: boolean;
   };
+}
 
-  // Personal Data from Step 3
+// Personal details
+export interface IPersonalDetails {
   title?: string;
   firstName?: string;
   lastName?: string;
-  dateOfBirth?: string; // Storing as YYYY-MM-DD string
+  dateOfBirth?: string; // YYYY-MM-DD
   placeOfBirth?: string;
   nationality?: string;
   streetAddress?: string;
   postalCode?: string;
   city?: string;
-  stateOrProvince?: string; // This could be the same as 'region' or more specific
+  stateOrProvince?: string;
   phoneNumber?: string;
   idDocumentUrl?: string;
   idDocumentName?: string;
+}
 
-  // Professional Qualifications from Step 4
-  currentProfessionalTitle?: ProfessionalTitleId;
-  specializations?: SpecializationId[];
+// Professional qualifications
+export interface IProfessionalQualifications {
+  currentProfessionalTitle?: string;
+  specializations?: string[];
   languages?: string[];
   graduationDate?: string;
   university?: string;
@@ -92,8 +102,10 @@ export interface Person {
   approbationCertificateName?: string;
   specialistRecognitionUrl?: string;
   specialistRecognitionName?: string;
-  
-  // Practice Information from Step 5
+}
+
+// Practice information
+export interface IPracticeInformation {
   practiceName?: string;
   practiceStreetAddress?: string;
   practicePostalCode?: string;
@@ -102,85 +114,32 @@ export interface Person {
   practiceFaxNumber?: string;
   practiceEmail?: string;
   practiceWebsite?: string;
-  healthInsuranceContracts?: HealthInsuranceContractId[];
+  healthInsuranceContracts?: string[];
+}
 
-  // Review information
+// Additional metadata
+export interface IPersonMetadata {
+  approved?: boolean;
+  educationPoints?: number;
   rejectionReason?: string;
-
-  // Pending data changes
   pendingData?: Partial<Person>;
   hasPendingChanges?: boolean;
-
-  createdAt?: string; 
-  updatedAt?: string; 
 }
 
-// Data needed to create a new person document in Firestore, after Firebase Auth user is created.
+// Complete Person type composed of all the smaller interfaces
+export type Person = IPersonBase & 
+  IPersonSecurity & 
+  IPersonalDetails & 
+  IProfessionalQualifications & 
+  IPracticeInformation & 
+  IPersonMetadata;
+
+// Type for creating a new person
 export type PersonCreationData = Omit<Person, 'id' | 'createdAt' | 'updatedAt' | 'pendingData'>;
 
-// Data structure for the registration form state (in registrationStore.ts)
-// This interface is more for the internal store, PersonCreationData is for Firestore.
-export interface RegistrationFormData {
-  email: string;
-  password?: string; // Password will be handled by Auth
-  
-  // From Person interface (for data structure consistency during creation)
-  name: string; // Will be constructed from title, firstName, lastName
-  role: UserRole;
-  region: string;
-  dentistId?: string;
-  avatarUrl?: string; 
-  status?: 'pending' | 'active' | 'inactive' | 'rejected'; 
-  otpEnabled?: boolean; // Default to false
-  
-  // Step 3
-  title?: string;
-  firstName?: string;
-  lastName?: string;
-  dateOfBirth?: Date; 
-  placeOfBirth?: string;
-  nationality?: string;
-  streetAddress?: string;
-  postalCode?: string;
-  city?: string;
-  stateOrProvince?: string;
-  phoneNumber?: string;
-  idDocument?: File | null;
-  idDocumentUrl?: string;
-  idDocumentName?: string;
-
-  // Step 4
-  currentProfessionalTitle?: ProfessionalTitleId;
-  specializations?: SpecializationId[];
-  languages?: string[];
-  graduationDate?: Date;
-  university?: string;
-  approbationNumber?: string;
-  approbationDate?: Date;
-  diplomaFile?: File | null;
-  diplomaUrl?: string;
-  diplomaName?: string;
-  approbationCertificateFile?: File | null;
-  approbationCertificateUrl?: string;
-  approbationCertificateName?: string;
-  specialistRecognitionFile?: File | null;
-  specialistRecognitionName?: string;
-
-  // Step 5
-  practiceName?: string;
-  practiceStreetAddress?: string;
-  practicePostalCode?: string;
-  practiceCity?: string;
-  practicePhoneNumber?: string;
-  practiceFaxNumber?: string;
-  practiceEmail?: string;
-  practiceWebsite?: string;
-  healthInsuranceContracts?: HealthInsuranceContractId[];
-
-  // Step 6
-  agreedToTerms?: boolean;
-}
-
+// ==========================================
+// Training and Education Types
+// ==========================================
 export interface TrainingCategory {
   id: string;
   name: string;
@@ -199,7 +158,6 @@ export interface TrainingOrganizer {
 
 export type TrainingOrganizerCreationData = Omit<TrainingOrganizer, 'id'>;
 
-
 export interface TrainingHistory {
   id: string;
   date: string; // YYYY-MM-DD
@@ -212,17 +170,6 @@ export interface TrainingHistory {
 
 export type TrainingHistoryCreationData = Omit<TrainingHistory, 'id'>;
 
-export interface StateChamber {
-    id: string;
-    name: string;
-    address: string;
-    phone: string;
-    email: string;
-    officeHours: string;
-}
-
-export type StateChamberCreationData = Omit<StateChamber, 'id'>;
-
 export interface ZfdGroup {
   id: string; // e.g., 'berufsbezogen'
   nameKey: string; // Translation key, e.g., 'zfd_category_berufsbezogen'
@@ -231,6 +178,23 @@ export interface ZfdGroup {
 
 export type ZfdGroupCreationData = Omit<ZfdGroup, 'id'>;
 
+// ==========================================
+// Chamber and Organization Types
+// ==========================================
+export interface StateChamber {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  officeHours: string;
+}
+
+export type StateChamberCreationData = Omit<StateChamber, 'id'>;
+
+// ==========================================
+// Representation Types
+// ==========================================
 export interface Representation {
   id: string;
   representingPersonId: string;
@@ -247,6 +211,9 @@ export interface Representation {
 
 export type RepresentationCreationData = Omit<Representation, 'id' | 'createdAt' | 'confirmedAt'>;
 
+// ==========================================
+// Audit and Notification Types
+// ==========================================
 export interface AuditLog {
   id: string;
   timestamp: string; // ISO string
@@ -275,3 +242,68 @@ export interface Notification {
 }
 
 export type NotificationCreationData = Omit<Notification, 'id' | 'createdAt'>;
+
+// ==========================================
+// Registration Form Types
+// ==========================================
+export interface RegistrationFormData {
+  email: string;
+  password?: string;
+  
+  // From Person interface
+  name: string;
+  role: UserRole;
+  region: string;
+  dentistId?: string;
+  avatarUrl?: string;
+  status?: 'pending' | 'active' | 'inactive' | 'rejected';
+  otpEnabled?: boolean;
+  
+  // Personal Data
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: Date;
+  placeOfBirth?: string;
+  nationality?: string;
+  streetAddress?: string;
+  postalCode?: string;
+  city?: string;
+  stateOrProvince?: string;
+  phoneNumber?: string;
+  idDocument?: File | null;
+  idDocumentUrl?: string;
+  idDocumentName?: string;
+
+  // Professional Qualifications
+  currentProfessionalTitle?: string;
+  specializations?: string[];
+  languages?: string[];
+  graduationDate?: Date | string;
+  university?: string;
+  approbationNumber?: string;
+  approbationDate?: Date | string;
+  diplomaFile?: File | null;
+  diplomaUrl?: string;
+  diplomaName?: string;
+  approbationCertificateFile?: File | null;
+  approbationCertificateUrl?: string;
+  approbationCertificateName?: string;
+  specialistRecognitionFile?: File | null;
+  specialistRecognitionUrl?: string;
+  specialistRecognitionName?: string;
+
+  // Practice Information
+  practiceName?: string;
+  practiceStreetAddress?: string;
+  practicePostalCode?: string;
+  practiceCity?: string;
+  practicePhoneNumber?: string;
+  practiceFaxNumber?: string;
+  practiceEmail?: string;
+  practiceWebsite?: string;
+  healthInsuranceContracts?: string[];
+
+  // Terms agreement
+  agreedToTerms?: boolean;
+}
