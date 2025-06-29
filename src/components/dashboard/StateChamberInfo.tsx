@@ -49,7 +49,7 @@ const LoadingSkeleton = () => (
 export default function StateChamberInfo({ chamberId }: StateChamberInfoProps) {
   const [chamber, setChamber] = useState<StateChamber | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { t } = useClientTranslations(['dashboard', 'common']);
+  const { t } = useClientTranslations(['dashboard']);
   const { toast } = useToast();
 
   useEffect(() => {

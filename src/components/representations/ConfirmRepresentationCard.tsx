@@ -25,7 +25,7 @@ const formatPeriod = (startDate: string, endDate: string) => {
     return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
 };
 
-const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Representation, t: Record<string, string>, onStatusChange: (id: string, status: 'confirmed' | 'declined') => void }) => {
+const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Representation, t: (key: string, replacements?: Record<string, string | number>) => string, onStatusChange: (id: string, status: 'confirmed' | 'declined') => void }) => {
     const [isSubmitting, setIsSubmitting] = React.useState<'confirm' | 'decline' | null>(null);
 
     const handleConfirm = async () => {
@@ -54,11 +54,11 @@ const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Represen
             <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                 <Button onClick={handleConfirm} disabled={!!isSubmitting} className="flex-1 sm:flex-none">
                     {isSubmitting === 'confirm' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t.representations_confirm_button || "CONFIRM"}
+                    {t('representations_confirm_button')}
                 </Button>
                 <Button onClick={handleDecline} disabled={!!isSubmitting} variant="outline" className="flex-1 sm:flex-none">
                     {isSubmitting === 'decline' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t.representations_decline_button || "DECLINE"}
+                    {t('representations_decline_button')}
                 </Button>
             </div>
         </div>
@@ -68,27 +68,29 @@ const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Represen
 
 interface ConfirmRepresentationCardProps {
     requests: Representation[];
-    t: Record<string, string>;
+    t: (key: string, replacements?: Record<string, string | number>) => string;
     onStatusChange: (representationId: string, status: 'confirmed' | 'declined') => void;
     className?: string;
 }
 
 export default function ConfirmRepresentationCard({ requests, t, onStatusChange, className }: ConfirmRepresentationCardProps) {
+    if (requests.length === 0) {
+        return null;
+    }
+
     return (
         <Card className={`shadow-lg ${className}`}>
             <CardHeader>
-                <CardTitle className="text-xl font-medium font-headline">{t.confirm_reps_title || "Confirm Representations"}</CardTitle>
-                <CardDescription>{t.confirm_reps_description || "Here you can confirm representations where you were represented."}</CardDescription>
+                <CardTitle className="text-xl font-medium font-headline">{t('confirm_reps_title')}</CardTitle>
+                <CardDescription>{t('confirm_reps_description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {requests.length > 0 ? requests.map((req, index) => (
+                {requests.map((req, index) => (
                     <div key={req.id}>
                         <ConfirmationRequest request={req} t={t} onStatusChange={onStatusChange} />
                         {index < requests.length - 1 && <Separator className="my-4"/>}
                     </div>
-                )) : (
-                     <p className="text-sm text-muted-foreground text-center py-4">No pending member reviews at the moment.</p>
-                )}
+                ))}
             </CardContent>
         </Card>
     );

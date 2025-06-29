@@ -16,7 +16,7 @@ import StateChamberInfo from './StateChamberInfo';
 
 interface LkMemberDashboardProps {
     user: Person;
-    t: Record<string, string>;
+    t: (key: string, replacements?: Record<string, string | number>) => string;
     locale: string;
 }
 
@@ -86,7 +86,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
     }, []);
 
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
-    const welcomeMessage = t.welcome_back?.replace('{userName}', fullName) || `Welcome, ${fullName}!`;
+    const welcomeMessage = t('welcome_back', { userName: fullName });
 
     return (
         <div className="flex-1 space-y-8 p-4 md:p-8">
@@ -108,9 +108,9 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                     <CardHeader>
                                         <div className="flex items-center gap-2">
                                             <FilePen className="h-5 w-5 text-primary" />
-                                            <CardTitle className="font-headline text-xl">{t.review_registrations_title || 'Review New Registrations'}</CardTitle>
+                                            <CardTitle className="font-headline text-xl">{t('review_registrations_title')}</CardTitle>
                                         </div>
-                                        <CardDescription>{t.review_registrations_desc || 'Review and approve new member registrations.'}</CardDescription>
+                                        <CardDescription>{t('review_registrations_desc')}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-0">
                                         <div className="space-y-0">
@@ -124,14 +124,14 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                     {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                                                 </p>
                                                                 <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/60 dark:text-orange-200 dark:border-orange-800">
-                                                                    {t.member_review_type_new_registration || "New Registration"}
+                                                                    {t('member_review_type_new_registration')}
                                                                 </Badge>
                                                             </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
                                                                 <FilePen className="mr-2 h-4 w-4" />
-                                                                {t.member_overview_review_registration_button || 'Review Registration'}
+                                                                {t('member_overview_review_registration_button')}
                                                             </Link>
                                                         </Button>
                                                     </div>
@@ -149,9 +149,9 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                     <CardHeader>
                                         <div className="flex items-center gap-2">
                                             <FilePen className="h-5 w-5 text-primary" />
-                                            <CardTitle className="font-headline text-xl">{t.review_changes_title || 'Review Data Changes'}</CardTitle>
+                                            <CardTitle className="font-headline text-xl">{t('review_changes_title')}</CardTitle>
                                         </div>
-                                        <CardDescription>{t.review_changes_desc || 'Review and approve data changes from existing members.'}</CardDescription>
+                                        <CardDescription>{t('review_changes_desc')}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-0">
                                         <div className="space-y-0">
@@ -165,14 +165,14 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                     {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                                                 </p>
                                                                 <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/60 dark:text-yellow-200 dark:border-yellow-800">
-                                                                    {t.data_change_label || "Data Change"}
+                                                                    {t('data_change_label')}
                                                                 </Badge>
                                                             </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
                                                                 <FilePen className="mr-2 h-4 w-4" />
-                                                                {t.member_overview_review_changes_button || 'Review Changes'}
+                                                                {t('member_overview_review_changes_button')}
                                                             </Link>
                                                         </Button>
                                                     </div>
@@ -190,10 +190,10 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                     <CardHeader>
                                         <div className="flex items-center gap-2">
                                             <ShieldAlert className="h-5 w-5 text-destructive" />
-                                            <CardTitle>{t.dashboard_old_reps_title || 'Overdue Representation Requests'}</CardTitle>
+                                            <CardTitle>{t('dashboard_old_reps_title')}</CardTitle>
                                         </div>
                                         <CardDescription>
-                                            {(t.dashboard_old_reps_desc || '{count} representation requests are older than 5 days and require review.').replace('{count}', totalOverdueCount.toString())}
+                                            {t('dashboard_old_reps_desc', { count: totalOverdueCount })}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-0">
@@ -205,17 +205,17 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                             <p className="font-semibold">{item.personName}</p>
                                                              <div className="flex items-center gap-2 mt-1">
                                                                 <p className="text-sm text-muted-foreground">
-                                                                    {(t.dashboard_overdue_reps_for_person || "{count} overdue request(s)").replace('{count}', item.count.toString())}
+                                                                    {t("dashboard_overdue_reps_for_person", { count: item.count })}
                                                                 </p>
                                                                 <Badge className="border border-destructive bg-destructive text-destructive-foreground">
-                                                                    {t.representations_label_overdue || "overdue"}
+                                                                    {t('representations_label_overdue')}
                                                                 </Badge>
                                                             </div>
                                                         </div>
                                                         <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
                                                             <Link href={`/${locale}/member-overview/${item.personId}?tab=vertretungen`}>
                                                                 <Users2 className="mr-2 h-4 w-4" />
-                                                                {t.dashboard_old_reps_button || "REVIEW REPRESENTATIONS"}
+                                                                {t('dashboard_old_reps_button')}
                                                             </Link>
                                                         </Button>
                                                     </div>
@@ -231,7 +231,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                 </div>
                 
                 <div className="lg:col-span-1">
-                    <StateChamberInfo chamberId={user.stateChamberId} t={t} />
+                    <StateChamberInfo chamberId={user.stateChamberId} />
                 </div>
             </div>
         </div>

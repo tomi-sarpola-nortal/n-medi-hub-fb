@@ -17,7 +17,7 @@ import SmartSuggestions from './SmartSuggestions';
 
 interface DentistDashboardProps {
     user: Person;
-    t: Record<string, string>;
+    t: (key: string, replacements?: Record<string, string | number>) => string;
 }
 
 const LoadingSkeleton = () => (
@@ -151,7 +151,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
     };
 
     const fullName = [user.title, user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.name;
-    const welcomeMessage = t.welcome_back.replace('{userName}', fullName);
+    const welcomeMessage = t('welcome_back', { userName: fullName });
     const TRAINING_TARGET_POINTS = 120;
     const trainingPoints = user.educationPoints || 0;
 
@@ -168,7 +168,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                             {/* Training Status Card */}
                             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <CardHeader>
-                                    <CardTitle className="text-lg font-medium font-headline">{t.training_status_title || "Your Training Status"}</CardTitle>
+                                    <CardTitle className="text-lg font-medium font-headline">{t('training_status_title')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-center pt-6 pb-2">
                                      <CircularProgress
@@ -178,7 +178,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                         label={
                                             <div className="text-center">
                                                 <p className="text-2xl font-bold font-headline">{`${trainingPoints}/${TRAINING_TARGET_POINTS}`}</p>
-                                                <p className="text-xs text-muted-foreground">{t.training_status_points || "Training Points"}</p>
+                                                <p className="text-xs text-muted-foreground">{t('training_status_points')}</p>
                                             </div>
                                         }
                                         showValue={false}
@@ -186,7 +186,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardContent>
                                 <CardFooter>
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href="/education">{t.training_status_button || "VIEW MY TRAININGS"}</Link>
+                                        <Link href="/education">{t('training_status_button')}</Link>
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -194,12 +194,12 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                             {/* Representation Status Card */}
                             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <CardHeader>
-                                    <CardTitle className="text-lg font-medium font-headline">{t.representation_status_title || "Your Representations"}</CardTitle>
+                                    <CardTitle className="text-lg font-medium font-headline">{t('representation_status_title')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex items-center justify-between">
                                     <div>
                                         <p className="text-4xl font-bold">{representationHours}</p>
-                                        <p className="text-sm text-muted-foreground">{t.representation_status_hours || "Confirmed Representation Hours"}</p>
+                                        <p className="text-sm text-muted-foreground">{t('representation_status_hours')}</p>
                                     </div>
                                     <div className="p-3 bg-accent rounded-full">
                                         <CalendarCheck className="h-8 w-8 text-primary"/>
@@ -207,7 +207,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                                 </CardContent>
                                 <CardFooter>
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href="/representations">{t.representation_status_button || "VIEW MY REPRESENTATIONS"}</Link>
+                                        <Link href="/representations">{t('representation_status_button')}</Link>
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -227,7 +227,7 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
 
                     <div className="lg:col-span-1">
                         {/* Chamber Info Card */}
-                        <StateChamberInfo chamberId={user.stateChamberId} t={t} />
+                        <StateChamberInfo chamberId={user.stateChamberId} />
                     </div>
                 </div>
             )}
