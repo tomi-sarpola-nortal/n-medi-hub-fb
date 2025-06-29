@@ -250,7 +250,7 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
                 authUser = await adminAuth.getUserByEmail(userData.email);
             } catch (error: any) {
                 if (error.code === 'auth/user-not-found') {
-                    authUser = await adminAuth.createUser({ email: userData.email, password: 'password123', displayName: userData.name });
+                    authUser = await adminAuth.createUser({ email: userData.email, password: 'Password123', displayName: userData.name });
                 } else {
                     throw error;
                 }
@@ -406,5 +406,3 @@ export async function seedDemoUsers(): Promise<{ success: boolean; message: stri
     return { success: false, message: `Error seeding demo users: ${errorMessage}` };
   }
 }
-
-    
