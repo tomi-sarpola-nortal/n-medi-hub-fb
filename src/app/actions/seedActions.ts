@@ -169,7 +169,7 @@ export async function seedZfdGroups(): Promise<{ success: boolean; message: stri
 // Do NOT run these in a production environment.
 // ===================================================================================
 
-const historyToSeed: TrainingHistoryCreationData[] = [
+const historyToSeedForAsif: TrainingHistoryCreationData[] = [
   // This data is crafted to match the ZFD totals in the screenshot (97 points)
   // and the order of visible items.
   { date: "2025-05-22", title: "Modern Procedures in Implantology", category: "IMPL", points: 15, organizer: "University Clinic Vienna", zfdGroupId: 'berufsbezogen' },
@@ -185,28 +185,46 @@ const historyToSeed: TrainingHistoryCreationData[] = [
   { date: "2024-12-10", title: "Annual Subscription 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
 ];
 
+const historyToSeedForSarah: TrainingHistoryCreationData[] = [
+    { date: "2025-06-10", title: "Emergency Management in the Dental Office", category: "ZMK", points: 10, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-05-20", title: "Pediatric Dentistry Update", category: "ZMK", points: 8, organizer: "Medical University Graz", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-04-18", title: "Advanced Endodontics Workshop", category: "ZMK", points: 12, organizer: "University Clinic Vienna", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-03-15", title: "Journal Club: Periodontology Research", category: "Literatur", points: 5, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
+    { date: "2025-02-20", title: "Ethical Considerations in Dentistry", category: "Frei", points: 5, organizer: "Medical Bureau Vienna", zfdGroupId: 'frei' },
+];
+
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
-    const userEmail = process.env.DENTIST2_EMAIL || 'adasd@asdas.com';
+    const usersToSeed = [
+        { email: process.env.DENTIST2_EMAIL || 'adasd@asdas.com', history: historyToSeedForAsif, name: 'Asif Adidas' },
+        { email: process.env.DENTIST_EMAIL || 'sarah.miller@example.com', history: historyToSeedForSarah, name: 'Sarah Miller' },
+    ];
+
+    const results = [];
+
     try {
-        const user = await findPersonByEmail(userEmail);
-        if (!user) {
-            return { success: false, message: `User with email ${userEmail} not found. Please run "Seed Demo Users" first.` };
+        for (const { email, history, name } of usersToSeed) {
+            const user = await findPersonByEmail(email);
+            if (!user) {
+                results.push(`User ${name} (${email}) not found. Skipped.`);
+                continue;
+            }
+
+            const existingHistory = await getTrainingHistoryForUser(user.id);
+            if (existingHistory.length > 0) {
+                results.push(`Training history for ${name} already exists. Skipped.`);
+                continue;
+            }
+
+            for (const record of history) {
+                await addTrainingHistoryForUser(user.id, record);
+            }
+
+            const totalPoints = history.reduce((sum, record) => sum + record.points, 0);
+            await updatePerson(user.id, { educationPoints: totalPoints });
+
+            results.push(`Seeded ${history.length} records for ${name} (${totalPoints} points).`);
         }
-
-        const existingHistory = await getTrainingHistoryForUser(user.id);
-        if (existingHistory.length > 0) {
-            return { success: true, message: `Training history for ${userEmail} has already been seeded. Skipped.` };
-        }
-
-        for (const record of historyToSeed) {
-            await addTrainingHistoryForUser(user.id, record);
-        }
-
-        const totalPoints = historyToSeed.reduce((sum, record) => sum + record.points, 0);
-        await updatePerson(user.id, { educationPoints: totalPoints });
-
-        return { success: true, message: `Successfully seeded ${historyToSeed.length} training history records for ${userEmail} and updated total points to ${totalPoints}.` };
-
+        return { success: true, message: `Seeding complete. ${results.join(' ')}` };
     } catch (error) {
         console.error('Error seeding training history:', error);
         const errorMessage = error instanceof Error ? error.message : String(error);
