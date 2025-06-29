@@ -1,7 +1,10 @@
+
 'use server';
 
 import { personRepository } from '@/data';
 import type { Person, PersonCreationData, UserRole } from '@/lib/types';
+import { setPersonStatus as setPersonStatusAction } from '@/app/actions/memberActions';
+
 
 /**
  * Creates a new person document in Firestore.
@@ -66,6 +69,21 @@ export async function getAllPersons(): Promise<Person[]> {
 }
 
 /**
+ * Retrieves persons with pagination support.
+ * @param options Pagination options
+ * @returns An object containing the paginated results and total count
+ */
+export async function getPersonsPaginated(options: {
+  page: number;
+  pageSize: number;
+  orderBy?: { field: string; direction: 'asc' | 'desc' };
+  filters?: Record<string, any>;
+}): Promise<{ data: Person[]; total: number }> {
+  return personRepository.getPaginated(options);
+}
+
+
+/**
  * Retrieves all persons with a specific role.
  * @param role The role to filter by.
  * @returns An array of Person objects.
@@ -99,3 +117,9 @@ export async function reviewPerson(
 export async function getPersonsToReview(): Promise<Person[]> {
   return personRepository.getPersonsToReview();
 }
+
+export async function setPersonStatus(personId: string, status: Person['status']) {
+    return setPersonStatusAction(personId, status);
+}
+
+    

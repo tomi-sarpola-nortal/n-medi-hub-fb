@@ -1,3 +1,4 @@
+
 import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
   FieldValue,
@@ -283,6 +284,63 @@ export class FirebasePersonRepository implements IPersonRepository {
   }
 
   /**
+   * Retrieves persons with pagination support.
+   * @param options Pagination options
+   * @returns An object containing the paginated results and total count
+   */
+  async getPaginated(options: {
+    page: number;
+    pageSize: number;
+    orderBy?: { field: string; direction: 'asc' | 'desc' };
+    filters?: Record<string, any>;
+  }): Promise<{ data: Person[]; total: number }> {
+    try {
+      this.checkDb();
+      const { page, pageSize, orderBy, filters } = options;
+      
+      // Start with a base query
+      let query: any = db.collection(PERSONS_COLLECTION);
+      
+      // Apply filters if provided
+      if (filters) {
+        Object.entries(filters).forEach(([field, value]) => {
+          if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+            query = query.where(field, '==', value);
+          }
+        });
+      }
+      
+      // Get total count (need to do this before applying pagination)
+      const countSnapshot = await query.get();
+      const total = countSnapshot.size;
+      
+      // Apply sorting
+      if (orderBy) {
+        query = query.orderBy(orderBy.field, orderBy.direction);
+      }
+      
+      // Apply pagination
+      const offset = (page - 1) * pageSize;
+      query = query.limit(pageSize);
+      
+      if (offset > 0) {
+        query = query.offset(offset);
+      }
+      
+      // Execute the query
+      const querySnapshot = await query.get();
+      
+      // Convert to Person objects
+      const data = querySnapshot.docs.map((doc: any) => this.snapshotToPerson(doc));
+      
+      return { data, total };
+    } catch (error) {
+      console.error("Error getting paginated persons:", error);
+      throw new DatabaseError("Failed to get paginated persons", error as Error);
+    }
+  }
+
+  /**
    * Retrieves all persons with a specific role.
    * @param role The role to filter by.
    * @returns An array of Person objects.
@@ -450,3 +508,4 @@ export class FirebasePersonRepository implements IPersonRepository {
     }
   }
 }
+    
