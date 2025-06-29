@@ -37,11 +37,6 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       href: "/settings",
       icon: Settings,
     },
-    {
-      title: "sidebar_developer_module",
-      href: "/developer",
-      icon: Database,
-    },
   ],
   lk_member: [
     {
@@ -68,11 +63,6 @@ export const navConfig: Record<UserRole, NavItem[]> = {
       title: "sidebar_settings",
       href: "/settings",
       icon: Settings,
-    },
-    {
-      title: "sidebar_developer_module",
-      href: "/developer",
-      icon: Database,
     },
   ],
   ozak_employee: [

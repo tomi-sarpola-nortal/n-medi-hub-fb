@@ -113,7 +113,7 @@ export function AppSidebar() {
 
         <SidebarContent className="flex-grow p-4">
           <SidebarMenu>
-            {developerMenuItem}
+            {/* Main content is empty for logged out users */}
           </SidebarMenu>
         </SidebarContent>
         
@@ -124,6 +124,7 @@ export function AppSidebar() {
                 <LanguageSwitcher />
               </div>
             </SidebarMenuItem>
+            {developerMenuItem}
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
@@ -189,7 +190,6 @@ export function AppSidebar() {
               </SidebarMenuItem>
             );
           })}
-          {developerMenuItem}
         </SidebarMenu>
       </SidebarContent>
 
@@ -200,6 +200,7 @@ export function AppSidebar() {
                  <LanguageSwitcher />
                </div>
             </SidebarMenuItem>
+            {developerMenuItem}
             {user && (
               <SidebarMenuItem>
                   <SidebarMenuButton
