@@ -13,6 +13,7 @@ import {
   type User as FirebaseUser // Alias to avoid naming conflict
 } from 'firebase/auth';
 import { getPersonById } from '@/services/personService';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: Person | null;
@@ -51,6 +52,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // This case might happen if Firestore document creation failed after auth user creation
           // Or if it's a new user whose profile isn't created yet (should be handled during registration)
           console.warn(`No Firestore profile found for UID: ${firebaseUser.uid}. Logging out.`);
+          toast({
+            title: "Profile Error",
+            description: "Your profile could not be loaded. Please try logging in again.",
+            variant: "destructive",
+          });
           await signOut(auth); // Log out to prevent inconsistent state
           setUser(null);
         }
