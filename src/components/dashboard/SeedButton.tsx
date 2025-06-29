@@ -13,7 +13,7 @@ export default function SeedButton() {
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [isChambersLoading, setIsChambersLoading] = useState(false);
   const [isZfdGroupsLoading, setIsZfdGroupsLoading] = useState(false);
-  const [isRepresentationsLoading, setIsRepresentationsLoading] = useState(false);
+  const [isOtherUsersLoading, setIsOtherUsersLoading] = useState(false);
   const [isDemoUsersLoading, setIsDemoUsersLoading] = useState(false);
 
 
@@ -112,12 +112,12 @@ export default function SeedButton() {
     setIsZfdGroupsLoading(false);
   };
 
-  const handleSeedRepresentations = async () => {
-    setIsRepresentationsLoading(true);
+  const handleSeedOtherUsers = async () => {
+    setIsOtherUsersLoading(true);
     try {
       const result = await seedUsersAndRepresentations();
       toast({
-        title: "Seeding Report (Representations)",
+        title: "Seeding Report (Other Users & Reps)",
         description: result.message,
       });
     } catch (error) {
@@ -128,7 +128,7 @@ export default function SeedButton() {
         variant: "destructive",
       });
     }
-    setIsRepresentationsLoading(false);
+    setIsOtherUsersLoading(false);
   };
   
   const handleSeedDemoUsers = async () => {
@@ -155,6 +155,9 @@ export default function SeedButton() {
         <Button onClick={handleSeedDemoUsers} disabled={isDemoUsersLoading} variant="destructive" className="w-full sm:w-auto">
           {isDemoUsersLoading ? "Seeding..." : "Seed Demo Users"}
         </Button>
+        <Button onClick={handleSeedOtherUsers} disabled={isOtherUsersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isOtherUsersLoading ? "Seeding..." : "Seed Other Users"}
+        </Button>
         <Button onClick={handleSeedZfdGroups} disabled={isZfdGroupsLoading} variant="destructive" className="w-full sm:w-auto">
           {isZfdGroupsLoading ? "Seeding..." : "Seed ZFD Groups"}
         </Button>
@@ -169,9 +172,6 @@ export default function SeedButton() {
         </Button>
         <Button onClick={handleSeedStateChambers} disabled={isChambersLoading} variant="destructive" className="w-full sm:w-auto">
           {isChambersLoading ? "Seeding..." : "Seed State Chambers"}
-        </Button>
-        <Button onClick={handleSeedRepresentations} disabled={isRepresentationsLoading} variant="destructive" className="w-full sm:w-auto">
-          {isRepresentationsLoading ? "Seeding..." : "Seed Representations"}
         </Button>
     </div>
   );
