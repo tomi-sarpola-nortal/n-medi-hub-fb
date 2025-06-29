@@ -12,10 +12,10 @@ export default function Logo({ className, iconSize = 80 }: LogoProps) {
   return (
     <div className={cn("flex flex-col items-start", className)}>
       <Image
-        src="https://firebasestorage.googleapis.com/v0/b/zahn-aerzte-kammer-v6.firebasestorage.app/o/logos%2Flogo-oezaek.svg?alt=media&token=09df57b3-78e7-41fd-bbfe-8ce54d339c88"
-        alt="ÖZÄK Logo"
+        src="https://logowik.com/content/uploads/images/nortal8805.logowik.com.webp"
+        alt="Nortal Logo"
         width={iconSize}
-        height={iconSize}
+        height={iconSize / 3}
         className="h-auto"
         priority
       />

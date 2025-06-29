@@ -1,71 +1,69 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* hsl(210, 20%, 98%) - Cool Light Grey */
-    --foreground: 210 10% 23%; /* hsl(210, 10%, 23%) - Dark Blue Grey */
+    --background: 0 0% 100%; /* #FFFFFF White */
+    --foreground: 0 0% 11%; /* #1C1C1C Dark Grey */
     --card: 0 0% 100%; /* #FFFFFF White */
-    --card-foreground: 210 10% 23%; /* Dark Blue Grey */
+    --card-foreground: 0 0% 11%; /* #1C1C1C Dark Grey */
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 210 10% 23%; /* Dark Blue Grey */
-    --primary: 195 35% 45%; /* hsl(195, 35%, 45%) - Muted Teal */
+    --popover-foreground: 0 0% 11%; /* Dark Grey */
+    --primary: 140 100% 35%; /* #00B140 Nortal Green */
     --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 210 20% 94%; /* Lighter Cool Grey */
-    --secondary-foreground: 210 10% 23%; /* Dark Blue Grey */
-    --muted: 210 20% 94%; /* Lighter Cool Grey */
-    --muted-foreground: 210 10% 45%; /* Mid Blue Grey */
-    --accent: 200 100% 95%; /* hsl(200, 100%, 95%) - Very Light Blue */
-    --accent-foreground: 195, 35%, 35%; /* Darker Teal */
+    --secondary: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --secondary-foreground: 0 0% 11%; /* Dark Grey */
+    --muted: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --muted-foreground: 0 0% 45%; /* Mid Grey */
+    --accent: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --accent-foreground: 140 100% 35%; /* Nortal Green */
     --destructive: 0 84% 60%; /* Red */
     --destructive-foreground: 0 0% 100%; /* White */
-    --border: 210 20% 88%; /* Light Cool Grey Border */
-    --input: 210 20% 88%; /* Light Cool Grey Input */
-    --ring: 195 35% 45%; /* Muted Teal */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 0 0% 90%; /* Light Grey Border */
+    --input: 0 0% 90%; /* Light Grey Input */
+    --ring: 140 100% 35%; /* Nortal Green */
+    --chart-1: 140 100% 35%; /* Nortal Green */
+    --chart-2: 0 0% 11%; /* Dark Grey */
+    --chart-3: 0 0% 0%; /* Black */
+    --chart-4: 0 0% 96%; /* Light Grey */
+    --chart-5: 0 0% 45%; /* Mid Grey */
     --radius: 0.5rem;
 
     /* Status Badge Colors */
     --status-success-background: 140 80% 96%;
-    --status-success-foreground: 140 60% 30%;
+    --status-success-foreground: 140 100% 35%;
     --status-warning-background: 45 100% 96%;
     --status-warning-foreground: 45 80% 25%;
     --status-destructive-background: 0 100% 97%;
     --status-destructive-foreground: 0 70% 40%;
 
     /* Document Type Badge Colors */
-    --badge-vorlage-background: 212 100% 96%; /* Very Light Blue */
-    --badge-vorlage-foreground: 212 90% 45%; /* Darker Blue */
-    --badge-leitlinie-background: 45 100% 96%; /* Very Light Yellow */
-    --badge-leitlinie-foreground: 38 80% 30%; /* Dark Yellow */
-    --badge-empfehlung-background: 140 80% 96%; /* Very Light Green */
-    --badge-empfehlung-foreground: 140 60% 30%; /* Dark Green */
+    --badge-vorlage-background: 140 100% 96%; /* Very Light Green */
+    --badge-vorlage-foreground: 140 100% 35%; /* Nortal Green */
+    --badge-leitlinie-background: 0 0% 96%; /* Light Grey */
+    --badge-leitlinie-foreground: 0 0% 11%; /* Dark Grey */
+    --badge-empfehlung-background: 0 0% 96%; /* Light Grey */
+    --badge-empfehlung-foreground: 0 0% 0%; /* Black */
     
     /* ZFD Progress Colors */
-    --zfd-color-1: 221 71% 48%; /* Berufsbezogen - dark blue */
-    --zfd-color-2: 217 91% 69%; /* Frei - medium blue */
-    --zfd-color-3: 217 91% 85%; /* Literatur - light blue */
+    --zfd-color-1: 140 100% 35%; /* Nortal Green */
+    --zfd-color-2: 140 70% 45%; /* Medium Green */
+    --zfd-color-3: 140 50% 55%; /* Light Green */
 
     /* New Color for Progress */
-    --dark-blue: 214 100% 27%; /* #003A8C */
-
+    --dark-blue: 140 100% 35%; /* Nortal Green */
 
     /* Sidebar specific colors */
     --sidebar-background: 0 0% 100%; /* White */
-    --sidebar-foreground: 210 10% 23%; /* Dark Blue Grey */
-    --sidebar-border: 210 20% 94%; /* Lighter Cool Grey */
-    --sidebar-accent: 200 100% 95%; /* Very Light Blue */
-    --sidebar-accent-foreground: 195 35% 45%; /* Muted Teal */
+    --sidebar-foreground: 0 0% 11%; /* Dark Grey */
+    --sidebar-border: 0 0% 96%; /* Light Grey */
+    --sidebar-accent: 0 0% 96%; /* Light Grey */
+    --sidebar-accent-foreground: 140 100% 35%; /* Nortal Green */
     
     /* These are used by the sidebar component's variants */
     --sidebar-item-active-background: hsl(var(--sidebar-accent));
@@ -76,55 +74,55 @@ body {
   }
 
   .dark {
-    --background: 231 15% 18%; /* Dracula Background */
-    --foreground: 60 30% 96%; /* Dracula Foreground */
-    --card: 232 14% 31%; /* Dracula Current Line */
-    --card-foreground: 60 30% 96%;
-    --popover: 232 14% 31%;
-    --popover-foreground: 60 30% 96%;
-    --primary: 265 89% 78%; /* Dracula Purple */
-    --primary-foreground: 231 15% 18%; /* Dracula Background for contrast on buttons */
-    --secondary: 232 14% 25%; /* Darker version of card bg */
-    --secondary-foreground: 60 30% 96%;
-    --muted: 232 14% 25%;
-    --muted-foreground: 225 27% 51%; /* Dracula Comment */
-    --accent: 232 14% 25%;
-    --accent-foreground: 60 30% 96%;
-    --destructive: 0 100% 66%; /* Dracula Red */
-    --destructive-foreground: 60 30% 96%;
-    --border: 232 14% 25%;
-    --input: 232 14% 31%;
-    --ring: 265 89% 78%; /* Dracula Purple */
+    --background: 0 0% 11%; /* #1C1C1C Dark Grey */
+    --foreground: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --card: 0 0% 15%; /* Slightly lighter dark grey */
+    --card-foreground: 0 0% 96%; /* Light Grey */
+    --popover: 0 0% 15%; /* Slightly lighter dark grey */
+    --popover-foreground: 0 0% 96%; /* Light Grey */
+    --primary: 140 100% 35%; /* #00B140 Nortal Green */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 15%; /* Darker version of card bg */
+    --secondary-foreground: 0 0% 96%; /* Light Grey */
+    --muted: 0 0% 15%; /* Darker version of card bg */
+    --muted-foreground: 0 0% 65%; /* Lighter grey */
+    --accent: 0 0% 15%; /* Darker version of card bg */
+    --accent-foreground: 140 100% 35%; /* Nortal Green */
+    --destructive: 0 100% 66%; /* Brighter Red */
+    --destructive-foreground: 0 0% 96%; /* Light Grey */
+    --border: 0 0% 20%; /* Darker border */
+    --input: 0 0% 15%; /* Slightly lighter dark grey */
+    --ring: 140 100% 35%; /* Nortal Green */
 
     /* Status Badge Colors */
-    --status-success-background: 122 83% 20%;
-    --status-success-foreground: 122 83% 85%;
+    --status-success-background: 140 83% 20%;
+    --status-success-foreground: 140 83% 85%;
     --status-warning-background: 48 83% 25%;
     --status-warning-foreground: 48 96% 77%;
     --status-destructive-background: 0 70% 25%;
     --status-destructive-foreground: 0 100% 80%;
     
     /* Document Type Badge Colors */
-    --badge-vorlage-background: 231 60% 25%;
-    --badge-vorlage-foreground: 231 80% 85%;
-    --badge-leitlinie-background: 60 80% 25%;
-    --badge-leitlinie-foreground: 60 95% 77%;
-    --badge-empfehlung-background: 122 83% 20%;
-    --badge-empfehlung-foreground: 122 83% 85%;
+    --badge-vorlage-background: 140 60% 25%;
+    --badge-vorlage-foreground: 140 80% 85%;
+    --badge-leitlinie-background: 0 0% 25%;
+    --badge-leitlinie-foreground: 0 0% 85%;
+    --badge-empfehlung-background: 0 0% 25%;
+    --badge-empfehlung-foreground: 0 0% 85%;
 
     /* ZFD Progress Colors */
-    --zfd-color-1: 217 91% 69%;
-    --zfd-color-2: 220 85% 75%;
-    --zfd-color-3: 220 80% 85%;
+    --zfd-color-1: 140 100% 35%;
+    --zfd-color-2: 140 70% 45%;
+    --zfd-color-3: 140 50% 55%;
 
     /* New Color for Progress */
-    --dark-blue: 214 100% 27%; /* #003A8C */
+    --dark-blue: 140 100% 35%; /* Nortal Green */
 
-    --sidebar-background: 231 15% 18%; 
-    --sidebar-foreground: 60 30% 96%; 
-    --sidebar-border: 232 14% 25%;
-    --sidebar-accent: 232 14% 31%; 
-    --sidebar-accent-foreground: 265 89% 78%;
+    --sidebar-background: 0 0% 11%; 
+    --sidebar-foreground: 0 0% 96%; 
+    --sidebar-border: 0 0% 20%;
+    --sidebar-accent: 0 0% 15%; 
+    --sidebar-accent-foreground: 140 100% 35%;
   }
 }
 

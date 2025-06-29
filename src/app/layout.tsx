@@ -1,11 +1,10 @@
-
 import './globals.css';
 import type { Metadata } from 'next';
 import { Providers } from '@/context/providers';
 
 export const metadata: Metadata = {
-  title: 'Zahn Aerzte Kammer V6',
-  description: 'Dental Chamber Management Portal',
+  title: 'Medical Chamber Portal',
+  description: 'Medical Chamber Management Portal',
 };
 
 export default function RootLayout({
