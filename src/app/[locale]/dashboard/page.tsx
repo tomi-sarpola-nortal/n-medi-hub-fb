@@ -51,7 +51,7 @@ export default function DashboardPage() {
       }
     }
   }, [user, loading, router, locale]);
-*/
+
 
   if (loading || !user || !t || user.status === 'pending') {
     return (
@@ -62,6 +62,7 @@ export default function DashboardPage() {
       </AppLayout>
     );
   }
+  */
   
   const pageTitle = t.page_title || "Dashboard";
 
