@@ -45,15 +45,22 @@ const organizersToSeed: TrainingOrganizerCreationData[] = [
 ];
 
 const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
-    { id: 'wien', data: { name: 'Ärztebüro Wien', address: 'Kohlmarkt 11/6\n1010 Wien', phone: '+43 1 513 37 31', email: 'office@wr.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr' } },
-    { id: 'noe', data: { name: 'Ärztebüro Niederösterreich', address: 'Kremser Gasse 20\n3100 St. Pölten', phone: '+43 2742 35 35 70', email: 'office@noe.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
-    { id: 'ooe', data: { name: 'Ärztebüro Oberösterreich', address: 'Europaplatz 7\n4020 Linz', phone: '+43 505 11 40 20', email: 'office@ooe.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 12:00 Uhr' } },
-    { id: 'bgld', data: { name: 'Ärztebüro Burgenland', address: 'Esterházyplatz 1\n7000 Eisenstadt', phone: '+43 2682 66 5 66', email: 'office@bgld.aerztekammer.at', officeHours: 'Mo, Di, Do: 8:00 - 16:00 Uhr\nMi, Fr: 8:00 - 12:00 Uhr' } },
-    { id: 'ktn', data: { name: 'Ärztebüro Kärnten', address: 'St. Veiter Straße 34/2\n9020 Klagenfurt', phone: '+43 463 56 3 99', email: 'office@ktn.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
-    { id: 'sbg', data: { name: 'Ärztebüro Salzburg', address: 'Glockengasse 4\n5020 Salzburg', phone: '+43 662 87 34 88', email: 'office@sbg.aerztekammer.at', officeHours: 'Mo-Fr: 8:00 - 12:00 Uhr' } },
-    { id: 'stmk', data: { name: 'Ärztebüro Steiermark', address: 'Marburger Kai 51/2\n8010 Graz', phone: '+43 316 82 82 02', email: 'office@stmk.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
-    { id: 'tirol', data: { name: 'Ärztebüro Tirol', address: 'Anichstraße 7/4\n6020 Innsbruck', phone: '+43 512 58 75 75', email: 'office@tirol.aerztekammer.at', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 12:00 Uhr' } },
-    { id: 'vbg', data: { name: 'Ärztebüro Vorarlberg', address: 'Rheinstraße 61\n6900 Bregenz', phone: '+43 5574 45 5 15', email: 'office@vbg.aerztekammer.at', officeHours: 'Mo, Mi, Fr: 8:00 - 12:00 Uhr' } },
+    { id: 'bw', data: { name: 'Ärztekammer Baden-Württemberg', address: 'Jahnstraße 5, 70597 Stuttgart', phone: '+49 711 76981-0', email: 'info@laek-bw.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 12:00 Uhr' } },
+    { id: 'by', data: { name: 'Bayerische Landesärztekammer', address: 'Mühlbaurstraße 16, 81677 München', phone: '+49 89 4147-0', email: 'info@blaek.de', officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'be', data: { name: 'Ärztekammer Berlin', address: 'Friedrichstraße 16, 10969 Berlin', phone: '+49 30 400456-0', email: 'kammer@aekb.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'bb', data: { name: 'Landesärztekammer Brandenburg', address: 'Dreifertstraße 12, 03044 Cottbus', phone: '+49 355 78010-0', email: 'info@laekb.de', officeHours: 'Mo-Do: 8:30 - 15:30 Uhr\nFr: 8:30 - 12:00 Uhr' } },
+    { id: 'hb', data: { name: 'Ärztekammer Bremen', address: 'Schwachhauser Heerstraße 30, 28209 Bremen', phone: '+49 421 3404-200', email: 'info@aekhb.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 13:00 Uhr' } },
+    { id: 'hh', data: { name: 'Ärztekammer Hamburg', address: 'Weidestraße 122 B, 22083 Hamburg', phone: '+49 40 227197-0', email: 'info@aekhh.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 14:00 Uhr' } },
+    { id: 'he', data: { name: 'Landesärztekammer Hessen', address: 'Im Vogelsgesang 3, 60488 Frankfurt am Main', phone: '+49 69 97672-0', email: 'info@laekh.de', officeHours: 'Mo-Fr: 8:00 - 16:30 Uhr' } },
+    { id: 'mv', data: { name: 'Ärztekammer Mecklenburg-Vorpommern', address: 'August-Bebel-Straße 9a, 18055 Rostock', phone: '+49 381 49280-0', email: 'info@aek-mv.de', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'ni', data: { name: 'Ärztekammer Niedersachsen', address: 'Berliner Allee 20, 30175 Hannover', phone: '+49 511 380-02', email: 'info@aekn.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'nw', data: { name: 'Ärztekammer Nordrhein', address: 'Tersteegenstraße 9, 40474 Düsseldorf', phone: '+49 211 4302-0', email: 'aerztekammer.nordrhein@aekno.de', officeHours: 'Mo-Fr: 8:00 - 16:00 Uhr' } },
+    { id: 'rp', data: { name: 'Landesärztekammer Rheinland-Pfalz', address: 'Deutschhausplatz 3, 55116 Mainz', phone: '+49 6131 28822-0', email: 'info@laek-rlp.de', officeHours: 'Mo-Do: 8:30 - 16:30 Uhr\nFr: 8:30 - 12:30 Uhr' } },
+    { id: 'sl', data: { name: 'Ärztekammer des Saarlandes', address: 'Faktoreistraße 4, 66111 Saarbrücken', phone: '+49 681 4003-0', email: 'info@aeksaar.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'sn', data: { name: 'Sächsische Landesärztekammer', address: 'Schützenhöhe 16, 01099 Dresden', phone: '+49 351 8267-0', email: 'dresden@slaek.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'st', data: { name: 'Ärztekammer Sachsen-Anhalt', address: 'Doctor-Eisenbart-Ring 2, 39120 Magdeburg', phone: '+49 391 6054-6', email: 'info@aeksa.de', officeHours: 'Mo-Fr: 8:30 - 15:30 Uhr' } },
+    { id: 'sh', data: { name: 'Ärztekammer Schleswig-Holstein', address: 'Bismarckallee 8-12, 23795 Bad Segeberg', phone: '+49 4551 803-0', email: 'info@aeksh.de', officeHours: 'Mo-Fr: 9:00 - 16:00 Uhr' } },
+    { id: 'th', data: { name: 'Landesärztekammer Thüringen', address: 'Im Semmicht 33, 07751 Jena-Maua', phone: '+49 3641 614-0', email: 'info@laek-thueringen.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
 ];
 
 

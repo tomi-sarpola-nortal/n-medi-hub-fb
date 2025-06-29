@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react'; 
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
-import { getRegistrationData, updateRegistrationData, type RegistrationData } from '@/lib/registrationStore';
+import { getRegistrationData, updateRegistrationData, type RegistrationData, STATES_MAP } from '@/lib/registrationStore';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { uploadFile } from '@/services/storageService';
 import Link from 'next/link';
@@ -196,7 +196,7 @@ export default function CreateMemberStep2Page() {
                             <SelectItem value="other">{t.nationality_other}</SelectItem>
                         </SelectContent>
                     </Select>
-                )} />
+                 )} />
               </LabelledInput>
               <LabelledInput id="streetAddress" label={`${t.register_step2_label_streetAddress}*`} error={form.formState.errors.streetAddress}>
                 <Input id="streetAddress" {...form.register('streetAddress')} />
@@ -210,8 +210,9 @@ export default function CreateMemberStep2Page() {
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <SelectTrigger id="stateOrProvince"><SelectValue placeholder={t.register_select_placeholder} /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Wien">{t.state_wien}</SelectItem><SelectItem value="NÖ">{t.state_noe}</SelectItem><SelectItem value="OÖ">{t.state_ooe}</SelectItem>
-                            <SelectItem value="Bayern">{t.state_bayern}</SelectItem><SelectItem value="Baden-Württemberg">{t.state_bw}</SelectItem>
+                            {Object.entries(STATES_MAP).map(([name, key]) => (
+                                <SelectItem key={key} value={name}>{t[key] || name}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                  )} />

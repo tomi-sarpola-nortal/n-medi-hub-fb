@@ -70,6 +70,9 @@ This guide provides step-by-step instructions for deploying this application to 
 The application requires several composite indexes in Firestore for optimal query performance. The definitions for these indexes are located in the `firestore.indexes.json` file at the root of the project.
 
 To create these indexes in your Firebase project, run the following command from your terminal:
+
+If you haven't set a default Firebase project for your local environment, you may need to run `firebase use --add` first. See the [Firebase CLI documentation](https://firebase.google.com/docs/cli#project_aliases) for more details on managing projects.
+
 ```bash
 firebase deploy --only firestore:indexes
 ```

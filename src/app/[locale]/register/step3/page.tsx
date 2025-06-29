@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, UploadCloud, FileText as FileIcon } from 'lucide-react'; 
 import AuthLayout from '@/components/auth/AuthLayout';
 import RegistrationStepper from '@/components/auth/RegistrationStepper';
-import { getRegistrationData, updateRegistrationData, type RegistrationData } from '@/lib/registrationStore';
+import { getRegistrationData, updateRegistrationData, type RegistrationData, STATES_MAP } from '@/lib/registrationStore';
 import { DatePickerInput } from '@/components/ui/date-picker';
 import { uploadFile } from '@/services/storageService';
 
@@ -319,11 +319,9 @@ export default function RegisterStep3PersonalDataPage() {
                                 <SelectValue placeholder={t.register_select_placeholder || "Please select"} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Wien">{t.state_wien || "Vienna"}</SelectItem>
-                                <SelectItem value="NÖ">{t.state_noe || "Lower Austria"}</SelectItem>
-                                <SelectItem value="OÖ">{t.state_ooe || "Upper Austria"}</SelectItem>
-                                <SelectItem value="Bayern">{t.state_bayern || "Bavaria"}</SelectItem>
-                                <SelectItem value="Baden-Württemberg">{t.state_bw || "Baden-Württemberg"}</SelectItem>
+                                {Object.entries(STATES_MAP).map(([name, key]) => (
+                                    <SelectItem key={key} value={name}>{t[key] || name}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     )}

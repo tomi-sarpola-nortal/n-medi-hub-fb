@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,7 @@ import { uploadFile, deleteFileByUrl } from '@/services/storageService';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { STATES_MAP } from '@/lib/registrationStore';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -300,11 +302,9 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
                         <SelectTrigger><SelectValue placeholder={t.register_select_placeholder || "Please select"} /></SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="Wien">{t.state_wien || "Vienna"}</SelectItem>
-                            <SelectItem value="NÖ">{t.state_noe || "Lower Austria"}</SelectItem>
-                            <SelectItem value="OÖ">{t.state_ooe || "Upper Austria"}</SelectItem>
-                            <SelectItem value="Bayern">{t.state_bayern || "Bavaria"}</SelectItem>
-                            <SelectItem value="Baden-Württemberg">{t.state_bw || "Baden-Württemberg"}</SelectItem>
+                            {Object.entries(STATES_MAP).map(([name, key]) => (
+                                <SelectItem key={key} value={name}>{t[key] || name}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                     <FormMessage />

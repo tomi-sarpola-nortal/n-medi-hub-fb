@@ -1,3 +1,4 @@
+
 // A very simple in-memory store for multi-step registration data.
 
 import type { UserRole } from "./types";
@@ -49,12 +50,22 @@ export const NATIONALITIES_MAP: Record<string, string> = {
 };
 
 export const STATES_MAP: Record<string, string> = {
-  "Wien": "state_wien",
-  "NÖ": "state_noe",
-  "OÖ": "state_ooe",
-  "Bayern": "state_bayern",
-  "Baden-Württemberg": "state_bw"
-  // Add other states as needed
+  "Baden-Württemberg": "state_bw",
+  "Bayern": "state_by",
+  "Berlin": "state_be",
+  "Brandenburg": "state_bb",
+  "Bremen": "state_hb",
+  "Hamburg": "state_hh",
+  "Hessen": "state_he",
+  "Mecklenburg-Vorpommern": "state_mv",
+  "Niedersachsen": "state_ni",
+  "Nordrhein-Westfalen": "state_nw",
+  "Rheinland-Pfalz": "state_rp",
+  "Saarland": "state_sl",
+  "Sachsen": "state_sn",
+  "Sachsen-Anhalt": "state_st",
+  "Schleswig-Holstein": "state_sh",
+  "Thüringen": "state_th"
 };
 
 // Import the RegistrationFormData type from the consolidated types file
