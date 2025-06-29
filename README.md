@@ -65,9 +65,28 @@ This guide provides step-by-step instructions for deploying this application to 
 3.  **Storage**:
     *   Go to **Build > Storage**.
     *   Click "Get started" and follow the prompts to enable it.
-    *   (Optional) You can manually create the folder structure (`users`, `document_templates`, `logos`) in the Storage bucket via the console.
+    
+4. **Install Firebase Admin SDK and seed Storage**
 
-### Step 6: Set Up Environment Variables
+Make sure you have the FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, and NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variables set correctly in your environment (e.g., in your .env file)
+
+To run the script for creating Storage folders, you need to install the Firebase Admin SDK:\n
+
+```bash
+    npm install firebase-admin
+```
+Install dotenv package that loads environment variables from a .env file into process.env.
+
+
+```bash
+    npm install dotenv
+```
+You can create the folder structure (`users`, `document_templates`, `logos`) in the Storage bucket via the console or execute the script using Node.js:
+
+```bash
+    node firebase.storage.setupFolders.js
+```
+
 
 The application connects to Firebase using environment variables.
 
@@ -122,3 +141,11 @@ Once your environment is deployed and running:
     *   **Seed Training Organizers**: Adds a list of known training organizers.
     *   **Seed State Chambers**: Populates the contact information for the state chambers.
 3.  The other seed buttons (`Seed Training History`, `Seed Representations`) are for creating test data and should **not** be used in a production environment.
+
+4. **Seed Firebase Auth**
+
+Create the three demo users in your Firebase Authentication. If the users already exist, it might throw an error
+
+```bash
+    node firebase.auth.createDemoUsers.js
+```
