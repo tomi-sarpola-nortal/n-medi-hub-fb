@@ -1,4 +1,4 @@
-# **App Name**: Zahn Aerzte Kammer V6
+# **App Name**: Medical Bureau Portal
 
 ## Core Features:
 

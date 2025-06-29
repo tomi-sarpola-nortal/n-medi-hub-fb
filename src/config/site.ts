@@ -1,6 +1,6 @@
 export const siteConfig = {
-    name: "Austrian Medical Chamber",
-    description: "Medical Chamber Management System for Austria.",
+    name: "Medical Bureau Portal",
+    description: "Medical Bureau Management System for the region.",
     url: "https://yourdomain.com", // Replace with actual domain
     ogImage: "https://yourdomain.com/og.jpg", // Replace with actual OG image
     links: {
