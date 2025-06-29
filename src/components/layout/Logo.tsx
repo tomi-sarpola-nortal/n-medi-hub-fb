@@ -12,7 +12,7 @@ export default function Logo({ className, iconSize = 80 }: LogoProps) {
   return (
     <div className={cn("flex flex-col items-start", className)}>
       <Image
-        src="https://logowik.com/content/uploads/images/nortal8805.logowik.com.webp"
+        src="/nortal-logo.webp"
         alt="Nortal Logo"
         width={iconSize}
         height={iconSize / 3}
