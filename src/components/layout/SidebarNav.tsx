@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/auth-context";
 import { navConfig } from "@/config/nav";
-import { LogOut, UserCircle } from "lucide-react";
+import { LogOut, UserCircle, Database } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
@@ -51,9 +51,9 @@ export function AppSidebar() {
   }, [locale]);
 
 
-  if (authLoading || !t) {
+  if (!t) {
     return (
-       <Sidebar collapsible="none">
+      <Sidebar collapsible="none">
         <SidebarHeader className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden">
              <Skeleton className="h-10 w-24 rounded-md" />
@@ -80,8 +80,56 @@ export function AppSidebar() {
     );
   }
 
-  if (!user) return null;
-  
+  // Always show the Developer Module link, regardless of user authentication
+  const developerMenuItem = (
+    <SidebarMenuItem key="/developer">
+      <Link 
+        href={`/${locale}/developer`}
+        legacyBehavior={false}
+        passHref={false}
+      >
+        <SidebarMenuButton
+          isActive={pathname === `/${locale}/developer` || pathname.startsWith(`/${locale}/developer`)}
+          tooltip={{ children: t.sidebar_developer_module || "Developer Module", side: "right", align: "center" }}
+          aria-label={t.sidebar_developer_module || "Developer Module"}
+          className="font-medium"
+        >
+          <Database className="h-5 w-5"/>
+          <span>{t.sidebar_developer_module || "Developer Module"}</span>
+        </SidebarMenuButton>
+      </Link>
+    </SidebarMenuItem>
+  );
+
+  // If no user is logged in, show a minimal sidebar with just the developer module
+  if (!user) {
+    return (
+      <Sidebar collapsible="none">
+        <SidebarHeader className="flex items-center justify-between p-4">
+          <Link href={`/${locale}/login`} className="flex items-center gap-3 overflow-hidden">
+            <Logo iconSize={190} />
+          </Link>
+        </SidebarHeader>
+
+        <SidebarContent className="flex-grow p-4">
+          <SidebarMenu>
+            {developerMenuItem}
+          </SidebarMenu>
+        </SidebarContent>
+        
+        <SidebarFooter className="p-4 border-t border-sidebar-border mt-auto">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="px-2">
+                <LanguageSwitcher />
+              </div>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+    );
+  }
+
   const userNavItems = navConfig[user.role] || [];
   const isPending = user.status === 'pending';
 
@@ -141,6 +189,7 @@ export function AppSidebar() {
               </SidebarMenuItem>
             );
           })}
+          {developerMenuItem}
         </SidebarMenu>
       </SidebarContent>
 
@@ -151,15 +200,17 @@ export function AppSidebar() {
                  <LanguageSwitcher />
                </div>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton
-                    onClick={logout}
-                    className="text-sidebar-foreground font-medium"
-                >
-                    <LogOut className="h-5 w-5"/>
-                    <span>{t.sidebar_logout || "Abmelden"}</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
+            {user && (
+              <SidebarMenuItem>
+                  <SidebarMenuButton
+                      onClick={logout}
+                      className="text-sidebar-foreground font-medium"
+                  >
+                      <LogOut className="h-5 w-5"/>
+                      <span>{t.sidebar_logout || "Abmelden"}</span>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
          </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

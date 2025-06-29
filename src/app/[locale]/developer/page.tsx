@@ -1,4 +1,3 @@
-
 "use client";
 
 import AppLayout from '@/components/layout/AppLayout';
@@ -67,7 +66,8 @@ export default function DeveloperPage() {
 
   const pageTitle = t.developer_module_page_title || "Developer Module";
 
-  if (loading || !user) {
+  // Remove the loading check that depends on user authentication
+  if (Object.keys(t).length === 0) {
     return (
       <AppLayout pageTitle={pageTitle} locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
@@ -97,21 +97,23 @@ export default function DeveloperPage() {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center gap-2">
-                        <UserCog className="h-5 w-5 text-primary" />
-                        <CardTitle>User State Testing</CardTitle>
-                    </div>
-                    <CardDescription>Set specific users to certain states for testing UI and logic flows.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button onClick={handleUpdateStatus} disabled={isUpdatingStatus}>
-                        {isUpdatingStatus && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Set sabine.mueller@example.com to Pending
-                    </Button>
-                </CardContent>
-            </Card>
+            {user && (
+              <Card>
+                  <CardHeader>
+                      <div className="flex items-center gap-2">
+                          <UserCog className="h-5 w-5 text-primary" />
+                          <CardTitle>User State Testing</CardTitle>
+                      </div>
+                      <CardDescription>Set specific users to certain states for testing UI and logic flows.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <Button onClick={handleUpdateStatus} disabled={isUpdatingStatus}>
+                          {isUpdatingStatus && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Set sabine.mueller@example.com to Pending
+                      </Button>
+                  </CardContent>
+              </Card>
+            )}
 
             <Card>
                 <CardHeader>
