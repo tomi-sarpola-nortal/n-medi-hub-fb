@@ -342,9 +342,9 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
 export async function seedDemoUsers(): Promise<{ success: boolean; message: string }> {
   try {
     const demoUsers = [
-      { email: process.env.DENTIST_EMAIL, name: 'Dr. Sabine Mueller', role: 'dentist' as UserRole, dentistId: '12345' },
-      { email: process.env.DENTIST2_EMAIL, name: 'Dr. Sarah Miller', role: 'dentist' as UserRole, dentistId: '54321' },
-      { email: process.env.LK_MEMBER_EMAIL, name: 'Max Sample', role: 'lk_member' as UserRole, dentistId: undefined },
+      { email: process.env.DENTIST_EMAIL, firstName: 'Asif', lastName: 'Adidas', role: 'dentist' as UserRole, dentistId: '12345', title: 'Dr.' },
+      { email: process.env.DENTIST2_EMAIL, firstName: 'Sarah', lastName: 'Miller', role: 'dentist' as UserRole, dentistId: '54321', title: 'Dr.' },
+      { email: process.env.LK_MEMBER_EMAIL, firstName: 'Max', lastName: 'Sample', role: 'lk_member' as UserRole, dentistId: undefined, title: undefined },
     ];
 
     let createdCount = 0;
@@ -365,8 +365,11 @@ export async function seedDemoUsers(): Promise<{ success: boolean; message: stri
 
       try {
         const authUser = await adminAuth.getUserByEmail(demoUser.email);
+        
+        const constructedName = [demoUser.title, demoUser.firstName, demoUser.lastName].filter(Boolean).join(' ');
+
         const personData: PersonCreationData = {
-          name: demoUser.name,
+          name: constructedName,
           email: demoUser.email,
           role: demoUser.role,
           status: 'active',
@@ -375,9 +378,9 @@ export async function seedDemoUsers(): Promise<{ success: boolean; message: stri
           dentistId: demoUser.dentistId,
           otpEnabled: false,
           notificationSettings: { inApp: true, email: false },
-          firstName: demoUser.name.split(' ').slice(1).join(' '),
-          lastName: demoUser.name.split(' ').pop() || '',
-          title: demoUser.role === 'dentist' ? 'Dr.' : undefined,
+          firstName: demoUser.firstName,
+          lastName: demoUser.lastName,
+          title: demoUser.title,
           avatarUrl: `https://avatar.vercel.sh/${demoUser.email}.png?size=100`,
         };
 
