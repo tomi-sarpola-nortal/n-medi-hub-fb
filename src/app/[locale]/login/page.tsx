@@ -215,7 +215,7 @@ export default function LoginPage() {
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7" 
+                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
                                         onClick={() => fillLoginForm('adasd@asdas.com', '-dkwfFv8WDGL=tR')}
                                     >
                                         Use these credentials
@@ -227,7 +227,7 @@ export default function LoginPage() {
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7" 
+                                        className="mt-1 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
                                         onClick={() => fillLoginForm('sarah.miller@example.com', 'TestTest24')}
                                     >
                                         Use these credentials
@@ -242,7 +242,7 @@ export default function LoginPage() {
                             <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="mt-1 ml-2 text-xs h-7" 
+                                className="mt-1 ml-2 text-xs h-7 bg-green-100 hover:bg-green-200 border-green-200" 
                                 onClick={() => fillLoginForm('max.sample@example.com', '-dkwfFv8WDGL=tR')}
                             >
                                 Use these credentials
