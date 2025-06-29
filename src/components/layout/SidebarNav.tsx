@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; 
+import { usePathname, useRouter } from "next/navigation"; 
 import {
   Sidebar,
   SidebarHeader,
@@ -41,6 +41,7 @@ const getClientTranslations = (locale: string) => {
 export function AppSidebar() {
   const { user, logout, loading: authLoading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const { state } = useSidebar(); 
   
   const potentialLocale = pathname.split('/')[1];
@@ -51,6 +52,14 @@ export function AppSidebar() {
   useEffect(() => {
     setT(getClientTranslations(locale));
   }, [locale]);
+
+  const handleLogoutClick = () => {
+    if (user) {
+      logout();
+    } else {
+      router.push(`/${locale}/login`);
+    }
+  };
 
 
   if (!t) {
@@ -153,7 +162,7 @@ export function AppSidebar() {
                <LanguageSwitcher />
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <Button asChild variant="default" className="w-full justify-start">
+              <Button asChild variant="ghost" className="w-full justify-start h-8 px-3 text-sm">
                   <Link href={`/${locale}/developer`}>
                       <Database className="h-5 w-5"/>
                       <span>{t.sidebar_developer_module || "Developer Module"}</span>
@@ -162,8 +171,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <Button
-                    onClick={user ? logout : undefined}
-                    disabled={!user}
+                    onClick={handleLogoutClick}
                     variant="outline"
                     className="w-full justify-start"
                 >
