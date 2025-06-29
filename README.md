@@ -65,7 +65,17 @@ This guide provides step-by-step instructions for deploying this application to 
     *   Go to **Build > Storage**.
     *   Click "Get started" and follow the prompts to enable it.
     
-4. **Install Firebase Admin SDK and seed Storage**
+### Step 6: Deploy Firestore Indexes
+
+The application requires several composite indexes in Firestore for optimal query performance. The definitions for these indexes are located in the `firestore.indexes.json` file at the root of the project.
+
+To create these indexes in your Firebase project, run the following command from your terminal:
+```bash
+firebase deploy --only firestore:indexes
+```
+This command only needs to be run once, or whenever the `firestore.indexes.json` file is updated.
+
+### Step 7: Install Firebase Admin SDK and seed Storage
 
 Make sure you have the FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, and NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variables set correctly in your environment (e.g., in your .env file)
 
@@ -104,7 +114,7 @@ The application connects to Firebase using environment variables.
         *   `private_key` -> `FIREBASE_PRIVATE_KEY`
     *   **Important**: The `private_key` contains newline characters (`\n`). You must wrap the entire key in double quotes (`"`) to ensure it's parsed correctly.
 
-### Step 7: Deploy Email Extension
+### Step 8: Deploy Email Extension
 
 This application uses the "Trigger Email" Firebase Extension to send emails.
 
@@ -129,7 +139,7 @@ Please consult the documentation for your specific SMTP provider for instruction
 **This step is mandatory for reliable email delivery.** Without it, your emails will likely be marked as spam or blocked entirely.
 
 
-### Step 8: Deploy and Seed the Database
+### Step 9: Deploy and Seed the Database
 
 Once your environment is deployed and running:
 
@@ -141,7 +151,7 @@ Once your environment is deployed and running:
     *   **Seed State Chambers**: Populates the contact information for the state chambers.
 3.  The other seed buttons (`Seed Training History`, `Seed Representations`) are for creating test data and should **not** be used in a production environment.
 
-4. **Seed Firebase Auth**
+### Step 10: Seed Firebase Auth
 
 Create the three demo users in your Firebase Authentication. If the users already exist, it might throw an error
 
