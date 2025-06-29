@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAuth } from '@/context/auth-context';
@@ -51,9 +50,10 @@ export default function DashboardPage() {
       }
     }
   }, [user, loading, router, locale]);
+*/
 
-
-  if (loading || !user || !t || user.status === 'pending') {
+  // Show loading while translations are being loaded
+  if (loading || !t) {
     return (
       <AppLayout pageTitle="Dashboard" locale={locale}>
         <div className="flex-1 space-y-8 p-4 md:p-8 flex justify-center items-center">
@@ -62,12 +62,11 @@ export default function DashboardPage() {
       </AppLayout>
     );
   }
-  */
   
   const pageTitle = t.page_title || "Dashboard";
 
   const renderDashboardByRole = () => {
-    switch(user.role) {
+    switch(user?.role) {
       case 'dentist':
         return <DentistDashboard user={user} t={t!} />;
       case 'lk_member':
