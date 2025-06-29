@@ -1,14 +1,14 @@
-
 "use client";
 
 import { storage } from '@/lib/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL, deleteObject, getBlob } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
+import { ConfigurationError, FileOperationError } from '@/lib/errors';
 
 // Helper function to ensure Storage is initialized
 const checkStorage = () => {
   if (!storage) {
-    throw new Error("Firebase Storage is not initialized. Please check your Firebase configuration.");
+    throw new ConfigurationError("Firebase Storage is not initialized. Please check your Firebase configuration.");
   }
 };
 
@@ -19,18 +19,23 @@ const checkStorage = () => {
  * @returns The public download URL of the uploaded file.
  */
 export async function uploadFile(file: File, path: string): Promise<string> {
-  checkStorage();
+  try {
+    checkStorage();
 
-  // Use the original file name for registrations, as it's more descriptive
-  const storageRef = ref(storage, `${path}/${file.name}`);
+    // Use the original file name for registrations, as it's more descriptive
+    const storageRef = ref(storage, `${path}/${file.name}`);
 
-  // Upload the file
-  const snapshot = await uploadBytes(storageRef, file);
+    // Upload the file
+    const snapshot = await uploadBytes(storageRef, file);
 
-  // Get the public URL
-  const downloadURL = await getDownloadURL(snapshot.ref);
+    // Get the public URL
+    const downloadURL = await getDownloadURL(snapshot.ref);
 
-  return downloadURL;
+    return downloadURL;
+  } catch (error) {
+    console.error("File upload failed:", error);
+    throw new FileOperationError(`Failed to upload file ${file.name} to path ${path}`, error as Error);
+  }
 }
 
 
@@ -42,23 +47,28 @@ export async function uploadFile(file: File, path: string): Promise<string> {
  * @returns The download URL of the newly created file.
  */
 export async function copyFileToNewLocation(sourceUrl: string, targetPathWithFileName: string): Promise<string> {
-  checkStorage();
-  
-  // 1. Get reference to the source file
-  const sourceRef = ref(storage, sourceUrl);
-  
-  // 2. Download the file's data as a Blob
-  const blob = await getBlob(sourceRef);
+  try {
+    checkStorage();
+    
+    // 1. Get reference to the source file
+    const sourceRef = ref(storage, sourceUrl);
+    
+    // 2. Download the file's data as a Blob
+    const blob = await getBlob(sourceRef);
 
-  // 3. Create a reference to the new location
-  const targetRef = ref(storage, targetPathWithFileName);
+    // 3. Create a reference to the new location
+    const targetRef = ref(storage, targetPathWithFileName);
 
-  // 4. Upload the blob to the new location
-  await uploadBytes(targetRef, blob);
+    // 4. Upload the blob to the new location
+    await uploadBytes(targetRef, blob);
 
-  // 5. Get and return the new download URL
-  const newDownloadURL = await getDownloadURL(targetRef);
-  return newDownloadURL;
+    // 5. Get and return the new download URL
+    const newDownloadURL = await getDownloadURL(targetRef);
+    return newDownloadURL;
+  } catch (error) {
+    console.error("File copy failed:", error);
+    throw new FileOperationError(`Failed to copy file from ${sourceUrl} to ${targetPathWithFileName}`, error as Error);
+  }
 }
 
 
@@ -72,9 +82,9 @@ export async function deleteFileByUrl(fileUrl: string): Promise<void> {
     return;
   }
 
-  checkStorage();
-
   try {
+    checkStorage();
+
     // Create a reference from the file URL.
     // This works for both gs:// and https:// URLs.
     const fileRef = ref(storage, fileUrl);
@@ -88,7 +98,7 @@ export async function deleteFileByUrl(fileUrl: string): Promise<void> {
       console.warn(`File not found, could not delete. This may not be an error: ${fileUrl}`);
     } else {
       console.error(`Error deleting file ${fileUrl}:`, error);
-      // We don't re-throw the error to prevent the main operation (like updating a profile) from failing.
+      throw new FileOperationError(`Failed to delete file at ${fileUrl}`, error);
     }
   }
 }

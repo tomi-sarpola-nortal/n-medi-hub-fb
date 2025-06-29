@@ -1,5 +1,5 @@
-
 import admin from 'firebase-admin';
+import { ConfigurationError } from './errors';
 
 // This function checks if the required environment variables are set.
 const hasFirebaseAdminConfig = () => {
@@ -26,6 +26,7 @@ if (!admin.apps.length) {
             console.log("Firebase Admin SDK initialized successfully.");
         } catch (error: any) {
             console.error("Firebase Admin SDK initialization error:", error.message);
+            throw new ConfigurationError(`Firebase Admin SDK initialization failed: ${error.message}`);
         }
     } else {
         console.warn("Firebase Admin SDK credentials are not set in environment variables. Admin features will be unavailable.");
@@ -35,3 +36,6 @@ if (!admin.apps.length) {
 // Export auth and db services, which will be functional only if initialization succeeded.
 export const adminAuth = admin.apps.length ? admin.auth() : ({} as admin.auth.Auth);
 export const adminDb = admin.apps.length ? admin.firestore() : ({} as admin.firestore.Firestore);
+export const adminStorage = admin.apps.length && process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET 
+    ? admin.storage().bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) 
+    : null;

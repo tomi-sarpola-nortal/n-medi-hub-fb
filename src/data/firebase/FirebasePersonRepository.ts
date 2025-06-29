@@ -11,20 +11,26 @@ import { createNotification } from '@/services/notificationService';
 import { sendEmail } from '@/services/emailService';
 import { getTranslations } from '@/lib/translations';
 import { IPersonRepository } from '../interfaces/IPersonRepository';
+import { 
+  DatabaseError, 
+  NotFoundError, 
+  ValidationError,
+  ConfigurationError
+} from '@/lib/errors';
 
 const PERSONS_COLLECTION = 'persons';
 
 export class FirebasePersonRepository implements IPersonRepository {
   private checkDb() {
     if (!db) {
-      throw new Error("Firestore is not initialized. Please check your Firebase configuration in the .env file.");
+      throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration in the .env file.");
     }
   }
 
   private snapshotToPerson(snapshot: DocumentSnapshot<any> | QueryDocumentSnapshot<any>): Person {
     const data = snapshot.data();
     if (!data) {
-      throw new Error(`Document data is undefined for snapshot ID: ${snapshot.id}`);
+      throw new ValidationError(`Document data is undefined for snapshot ID: ${snapshot.id}`);
     }
 
     // Helper to safely convert Firestore Timestamps or date strings to YYYY-MM-DD strings
@@ -127,45 +133,50 @@ export class FirebasePersonRepository implements IPersonRepository {
     personData: PersonCreationData,
     locale: string
   ): Promise<void> {
-    this.checkDb();
-    const personDocRef = db.collection(PERSONS_COLLECTION).doc(uid);
-    
-    const dataToSet = Object.fromEntries(
-      Object.entries(personData).filter(([_, v]) => v !== undefined && v !== null)
-    );
-
-    await personDocRef.set({
-      ...dataToSet, 
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-
-    if (personData.status === 'pending') {
-      const t = getTranslations(locale);
-      const chamberMembers = await this.getByRole('lk_member');
+    try {
+      this.checkDb();
+      const personDocRef = db.collection(PERSONS_COLLECTION).doc(uid);
       
-      const notificationPromises = chamberMembers.map(async (member) => {
-        if (member.notificationSettings?.inApp) {
-          await createNotification({
-            userId: member.id,
-            message: t.notification_new_registration_review.replace('{targetName}', personData.name),
-            link: `/member-overview/${uid}/review`,
-            isRead: false,
-          });
-        }
-        if (member.notificationSettings?.email && member.email) {
-          await sendEmail({
-            to: [member.email],
-            message: {
-              subject: t.email_subject_new_registration,
-              html: t.email_body_new_registration
-                .replace('{targetName}', member.name)
-                .replace('{actorName}', personData.name)
-            }
-          });
-        }
+      const dataToSet = Object.fromEntries(
+        Object.entries(personData).filter(([_, v]) => v !== undefined && v !== null)
+      );
+
+      await personDocRef.set({
+        ...dataToSet, 
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       });
-      await Promise.all(notificationPromises);
+
+      if (personData.status === 'pending') {
+        const t = getTranslations(locale);
+        const chamberMembers = await this.getByRole('lk_member');
+        
+        const notificationPromises = chamberMembers.map(async (member) => {
+          if (member.notificationSettings?.inApp) {
+            await createNotification({
+              userId: member.id,
+              message: t.notification_new_registration_review.replace('{targetName}', personData.name),
+              link: `/member-overview/${uid}/review`,
+              isRead: false,
+            });
+          }
+          if (member.notificationSettings?.email && member.email) {
+            await sendEmail({
+              to: [member.email],
+              message: {
+                subject: t.email_subject_new_registration,
+                html: t.email_body_new_registration
+                  .replace('{targetName}', member.name)
+                  .replace('{actorName}', personData.name)
+              }
+            });
+          }
+        });
+        await Promise.all(notificationPromises);
+      }
+    } catch (error) {
+      console.error("Error creating person:", error);
+      throw new DatabaseError(`Failed to create person with ID ${uid}`, error as Error);
     }
   }
 
@@ -175,13 +186,18 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns A Person object if found, otherwise null.
    */
   async getById(id: string): Promise<Person | null> {
-    this.checkDb();
-    const docRef = db.collection(PERSONS_COLLECTION).doc(id);
-    const docSnap = await docRef.get();
-    if (!docSnap.exists) {
-      return null;
+    try {
+      this.checkDb();
+      const docRef = db.collection(PERSONS_COLLECTION).doc(id);
+      const docSnap = await docRef.get();
+      if (!docSnap.exists) {
+        return null;
+      }
+      return this.snapshotToPerson(docSnap);
+    } catch (error) {
+      console.error(`Error getting person with ID ${id}:`, error);
+      throw new DatabaseError(`Failed to get person with ID ${id}`, error as Error);
     }
-    return this.snapshotToPerson(docSnap);
   }
 
   /**
@@ -193,17 +209,22 @@ export class FirebasePersonRepository implements IPersonRepository {
     id: string,
     updates: Partial<Person> 
   ): Promise<void> {
-    this.checkDb();
-    const docRef = db.collection(PERSONS_COLLECTION).doc(id);
-    
-    const dataToUpdate = Object.fromEntries(
-      Object.entries(updates).filter(([_, v]) => v !== undefined)
-    );
+    try {
+      this.checkDb();
+      const docRef = db.collection(PERSONS_COLLECTION).doc(id);
+      
+      const dataToUpdate = Object.fromEntries(
+        Object.entries(updates).filter(([_, v]) => v !== undefined)
+      );
 
-    await docRef.update({
-      ...dataToUpdate,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
+      await docRef.update({
+        ...dataToUpdate,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    } catch (error) {
+      console.error(`Error updating person with ID ${id}:`, error);
+      throw new DatabaseError(`Failed to update person with ID ${id}`, error as Error);
+    }
   }
 
   /**
@@ -212,13 +233,18 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns A Person object if found, otherwise null.
    */
   async findByEmail(email: string): Promise<Person | null> {
-    this.checkDb();
-    const q = db.collection(PERSONS_COLLECTION).where('email', '==', email);
-    const querySnapshot = await q.get();
-    if (querySnapshot.empty) {
-      return null;
+    try {
+      this.checkDb();
+      const q = db.collection(PERSONS_COLLECTION).where('email', '==', email);
+      const querySnapshot = await q.get();
+      if (querySnapshot.empty) {
+        return null;
+      }
+      return this.snapshotToPerson(querySnapshot.docs[0]);
+    } catch (error) {
+      console.error(`Error finding person by email ${email}:`, error);
+      throw new DatabaseError(`Failed to find person by email ${email}`, error as Error);
     }
-    return this.snapshotToPerson(querySnapshot.docs[0]);
   }
 
   /**
@@ -227,13 +253,18 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns A Person object if found, otherwise null.
    */
   async findByDentistId(dentistId: string): Promise<Person | null> {
-    this.checkDb();
-    const q = db.collection(PERSONS_COLLECTION).where('dentistId', '==', dentistId);
-    const querySnapshot = await q.get();
-    if (querySnapshot.empty) {
-      return null;
+    try {
+      this.checkDb();
+      const q = db.collection(PERSONS_COLLECTION).where('dentistId', '==', dentistId);
+      const querySnapshot = await q.get();
+      if (querySnapshot.empty) {
+        return null;
+      }
+      return this.snapshotToPerson(querySnapshot.docs[0]);
+    } catch (error) {
+      console.error(`Error finding person by dentist ID ${dentistId}:`, error);
+      throw new DatabaseError(`Failed to find person by dentist ID ${dentistId}`, error as Error);
     }
-    return this.snapshotToPerson(querySnapshot.docs[0]);
   }
 
   /**
@@ -241,9 +272,14 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns An array of Person objects.
    */
   async getAll(): Promise<Person[]> {
-    this.checkDb();
-    const querySnapshot = await db.collection(PERSONS_COLLECTION).get();
-    return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
+    try {
+      this.checkDb();
+      const querySnapshot = await db.collection(PERSONS_COLLECTION).get();
+      return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
+    } catch (error) {
+      console.error("Error getting all persons:", error);
+      throw new DatabaseError("Failed to get all persons", error as Error);
+    }
   }
 
   /**
@@ -252,10 +288,15 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns An array of Person objects.
    */
   async getByRole(role: UserRole): Promise<Person[]> {
-    this.checkDb();
-    const q = db.collection(PERSONS_COLLECTION).where('role', '==', role);
-    const querySnapshot = await q.get();
-    return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
+    try {
+      this.checkDb();
+      const q = db.collection(PERSONS_COLLECTION).where('role', '==', role);
+      const querySnapshot = await q.get();
+      return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
+    } catch (error) {
+      console.error(`Error getting persons by role ${role}:`, error);
+      throw new DatabaseError(`Failed to get persons by role ${role}`, error as Error);
+    }
   }
 
   /**
@@ -273,89 +314,97 @@ export class FirebasePersonRepository implements IPersonRepository {
     auditor: { id: string; name: string; role: UserRole; chamber: string; },
     locale: string = 'en'
   ): Promise<void> {
-    this.checkDb();
-    const person = await this.getById(personId);
-    if (!person) throw new Error("Person not found");
+    try {
+      this.checkDb();
+      const person = await this.getById(personId);
+      if (!person) throw new NotFoundError("Person", personId);
 
-    const t = getTranslations(locale);
-    const isNewRegistration = person.status === 'pending';
-    const isDataChange = person.status === 'active' && !!person.pendingData;
+      const t = getTranslations(locale);
+      const isNewRegistration = person.status === 'pending';
+      const isDataChange = person.status === 'active' && !!person.pendingData;
 
-    // Log the action
-    const logData: AuditLogCreationData = {
-      userId: auditor.id,
-      userName: auditor.name,
-      userRole: auditor.role,
-      userChamber: auditor.chamber,
-      collectionName: 'persons',
-      documentId: personId,
-      fieldName: isNewRegistration ? 'status' : 'pendingData',
-      operation: 'update',
-      impactedPersonId: personId,
-      impactedPersonName: person.name,
-      details: `${isNewRegistration ? 'Registration' : 'Data change'} ${decision}ed by ${auditor.name}${justification ? `: ${justification}` : ''}`,
-    };
-    await createAuditLog(logData);
+      // Log the action
+      const logData: AuditLogCreationData = {
+        userId: auditor.id,
+        userName: auditor.name,
+        userRole: auditor.role,
+        userChamber: auditor.chamber,
+        collectionName: 'persons',
+        documentId: personId,
+        fieldName: isNewRegistration ? 'status' : 'pendingData',
+        operation: 'update',
+        impactedPersonId: personId,
+        impactedPersonName: person.name,
+        details: `${isNewRegistration ? 'Registration' : 'Data change'} ${decision}ed by ${auditor.name}${justification ? `: ${justification}` : ''}`,
+      };
+      await createAuditLog(logData);
 
-    let updates: Partial<Person> = {};
-    let notificationKey: string = '';
-    let emailSubjectKey: string = '';
-    let emailBodyKey: string = '';
+      let updates: Partial<Person> = {};
+      let notificationKey: string = '';
+      let emailSubjectKey: string = '';
+      let emailBodyKey: string = '';
 
-    if (isDataChange) {
-      updates.hasPendingChanges = FieldValue.delete() as any;
-      updates.pendingData = FieldValue.delete() as any;
-      if (decision === 'approve') {
-        updates = { ...updates, ...person.pendingData! };
-        notificationKey = 'notification_data_change_approved';
-        emailSubjectKey = 'email_subject_data_change_approved';
-        emailBodyKey = 'email_body_data_change_approved';
-      } else {
-        updates.rejectionReason = justification;
-        notificationKey = 'notification_data_change_rejected';
-        emailSubjectKey = 'email_subject_data_change_rejected';
-        emailBodyKey = 'email_body_data_change_rejected';
-      }
-    } else if (isNewRegistration) {
-      if (decision === 'approve') {
-        updates.status = 'active';
-        if (!person.dentistId) {
-          updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      if (isDataChange) {
+        updates.hasPendingChanges = FieldValue.delete() as any;
+        updates.pendingData = FieldValue.delete() as any;
+        if (decision === 'approve') {
+          updates = { ...updates, ...person.pendingData! };
+          notificationKey = 'notification_data_change_approved';
+          emailSubjectKey = 'email_subject_data_change_approved';
+          emailBodyKey = 'email_body_data_change_approved';
+        } else {
+          updates.rejectionReason = justification;
+          notificationKey = 'notification_data_change_rejected';
+          emailSubjectKey = 'email_subject_data_change_rejected';
+          emailBodyKey = 'email_body_data_change_rejected';
         }
-        updates.rejectionReason = FieldValue.delete() as any;
-        notificationKey = 'notification_registration_approved';
-        emailSubjectKey = 'email_subject_registration_approved';
-        emailBodyKey = 'email_body_registration_approved';
-      } else {
-        updates.status = decision === 'deny' ? 'inactive' : 'rejected';
-        updates.rejectionReason = justification;
-        notificationKey = 'notification_registration_rejected';
-        emailSubjectKey = 'email_subject_registration_rejected';
-        emailBodyKey = 'email_body_registration_rejected';
-      }
-    } else {
-      throw new Error("No pending registration or data change to review for this user.");
-    }
-    
-    await this.update(personId, updates);
-
-    // Send notifications
-    if (person.notificationSettings?.inApp) {
-      await createNotification({ 
-        userId: person.id, 
-        message: t[notificationKey], 
-        link: `/settings`, 
-        isRead: false 
-      });
-    }
-    if (person.notificationSettings?.email && person.email) {
-      await sendEmail({
-        to: [person.email],
-        message: {
-          subject: t[emailSubjectKey],
-          html: t[emailBodyKey].replace('{targetName}', person.name)
+      } else if (isNewRegistration) {
+        if (decision === 'approve') {
+          updates.status = 'active';
+          if (!person.dentistId) {
+            updates.dentistId = `ZA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          }
+          updates.rejectionReason = FieldValue.delete() as any;
+          notificationKey = 'notification_registration_approved';
+          emailSubjectKey = 'email_subject_registration_approved';
+          emailBodyKey = 'email_body_registration_approved';
+        } else {
+          updates.status = decision === 'deny' ? 'inactive' : 'rejected';
+          updates.rejectionReason = justification;
+          notificationKey = 'notification_registration_rejected';
+          emailSubjectKey = 'email_subject_registration_rejected';
+          emailBodyKey = 'email_body_registration_rejected';
         }
-      });
+      } else {
+        throw new ValidationError("No pending registration or data change to review for this user.");
+      }
+      
+      await this.update(personId, updates);
+
+      // Send notifications
+      if (person.notificationSettings?.inApp) {
+        await createNotification({ 
+          userId: person.id, 
+          message: t[notificationKey], 
+          link: `/settings`, 
+          isRead: false 
+        });
+      }
+      if (person.notificationSettings?.email && person.email) {
+        await sendEmail({
+          to: [person.email],
+          message: {
+            subject: t[emailSubjectKey],
+            html: t[emailBodyKey].replace('{targetName}', person.name)
+          }
+        });
+      }
+    } catch (error) {
+      if (error instanceof NotFoundError || error instanceof ValidationError) {
+        throw error;
+      }
+      console.error(`Error reviewing person with ID ${personId}:`, error);
+      throw new DatabaseError(`Failed to review person with ID ${personId}`, error as Error);
     }
   }
 
@@ -364,25 +413,40 @@ export class FirebasePersonRepository implements IPersonRepository {
    * @returns An array of Person objects that need review.
    */
   async getPersonsToReview(): Promise<Person[]> {
-    this.checkDb();
-    const personsCollection = db.collection(PERSONS_COLLECTION);
-    
-    const q = personsCollection.where('status', 'in', ['pending', 'hasPendingChanges']);
-    const querySnapshot = await q.get();
+    try {
+      this.checkDb();
+      const personsCollection = db.collection(PERSONS_COLLECTION);
+      
+      const pendingQuery = personsCollection.where('status', '==', 'pending');
+      const changesQuery = personsCollection.where('hasPendingChanges', '==', true);
 
-    const personsMap = new Map<string, Person>();
+      const [pendingSnapshot, changesSnapshot] = await Promise.all([
+        pendingQuery.get(),
+        changesQuery.get()
+      ]);
 
-    querySnapshot.docs.forEach(doc => {
-      const person = this.snapshotToPerson(doc);
-      personsMap.set(person.id, person);
-    });
-    
-    const allPersons = Array.from(personsMap.values());
+      const personsMap = new Map<string, Person>();
 
-    return allPersons.sort((a, b) => {
-      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      return dateB - dateA;
-    });
+      pendingSnapshot.docs.forEach(doc => {
+        const person = this.snapshotToPerson(doc);
+        personsMap.set(person.id, person);
+      });
+
+      changesSnapshot.docs.forEach(doc => {
+        const person = this.snapshotToPerson(doc);
+        personsMap.set(person.id, person);
+      });
+      
+      const allPersons = Array.from(personsMap.values());
+
+      return allPersons.sort((a, b) => {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return dateB - dateA;
+      });
+    } catch (error) {
+      console.error("Error getting persons to review:", error);
+      throw new DatabaseError("Failed to get persons to review", error as Error);
+    }
   }
 }

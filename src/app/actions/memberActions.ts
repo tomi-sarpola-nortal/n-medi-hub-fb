@@ -1,89 +1,97 @@
-
 'use server';
 
-import { updatePerson, getPersonsByRole } from '@/services/personService';
+import { personRepository } from '@/data';
 import type { Person } from '@/lib/types';
 import { createNotification } from '@/services/notificationService';
 import { sendEmail } from '@/services/emailService';
 import { getTranslations } from '@/lib/translations';
-import { FieldValue } from 'firebase/firestore';
+import { withErrorHandling } from './errorHandler';
+import { ValidationError } from '@/lib/errors';
 
-
-export async function setPersonStatus(
-  personId: string,
-  status: Person['status']
-): Promise<{ success: boolean; message: string }> {
-  try {
-    await updatePerson(personId, { status });
+export const setPersonStatus = withErrorHandling(
+  async (
+    personId: string,
+    status: Person['status']
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!personId) {
+      throw new ValidationError("Person ID is required");
+    }
+    
+    if (!['pending', 'active', 'inactive', 'rejected'].includes(status)) {
+      throw new ValidationError(`Invalid status: ${status}`);
+    }
+    
+    await personRepository.update(personId, { status });
     return { success: true, message: `Successfully set user status to '${status}'.` };
-  } catch (error) {
-    console.error(`Error setting user status:`, error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return { success: false, message: `Error: ${errorMessage}` };
   }
-}
+);
 
-export async function requestDataChange(personId: string, updates: Partial<Person>, actor: Person, locale: string): Promise<{ success: boolean; message: string }> {
-  try {
+export const requestDataChange = withErrorHandling(
+  async (personId: string, updates: Partial<Person>, actor: Person, locale: string = 'en'): Promise<{ success: boolean; message: string }> => {
+    if (!personId) {
+      throw new ValidationError("Person ID is required");
+    }
+    
     // Store the changes in 'pendingData' and set a flag for easier querying
-    await updatePerson(personId, { pendingData: updates, hasPendingChanges: true });
+    await personRepository.update(personId, { pendingData: updates, hasPendingChanges: true });
     
     const t = getTranslations(locale);
-    const chamberMembers = await getPersonsByRole('lk_member');
+    const chamberMembers = await personRepository.getByRole('lk_member');
     
     const notificationPromises = chamberMembers.map(async (member) => {
-        if (member.notificationSettings?.inApp) {
-            await createNotification({
-                userId: member.id,
-                message: t.notification_new_data_change_review.replace('{actorName}', actor.name),
-                link: `/member-overview/${personId}/review`,
-                isRead: false,
-            });
-        }
-        if (member.notificationSettings?.email && member.email) {
-            await sendEmail({
-                to: [member.email],
-                message: {
-                    subject: t.email_subject_new_data_change_review,
-                    html: t.email_body_new_data_change_review
-                          .replace('{targetName}', member.name)
-                          .replace('{actorName}', actor.name)
-                }
-            });
-        }
+      if (member.notificationSettings?.inApp) {
+        await createNotification({
+          userId: member.id,
+          message: t.notification_new_data_change_review.replace('{actorName}', actor.name),
+          link: `/member-overview/${personId}/review`,
+          isRead: false,
+        });
+      }
+      if (member.notificationSettings?.email && member.email) {
+        await sendEmail({
+          to: [member.email],
+          message: {
+            subject: t.email_subject_new_data_change_review,
+            html: t.email_body_new_data_change_review
+                  .replace('{targetName}', member.name)
+                  .replace('{actorName}', actor.name)
+          }
+        });
+      }
     });
     
     await Promise.all(notificationPromises);
 
     return { success: true, message: 'Your changes have been submitted for review.' };
-  } catch (error) {
-    console.error('Error requesting data change:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return { success: false, message: `Error: ${errorMessage}` };
   }
-}
+);
 
-export async function deletePersonByAdmin(personId: string, token: string): Promise<{ success: boolean; message: string }> {
-  try {
+export const deletePersonByAdmin = withErrorHandling(
+  async (personId: string, token: string): Promise<{ success: boolean; message: string }> => {
+    if (!personId) {
+      throw new ValidationError("Person ID is required");
+    }
+    
+    if (!token) {
+      throw new ValidationError("Authentication token is required");
+    }
+
     const response = await fetch(`https://deleteuserdata-dsey7ysrrq-uc.a.run.app/${personId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: `API request failed with status ${response.status}` }));
-        throw new Error(errorData.message);
+      // Try to parse error message from the API if available
+      const errorData = await response.json().catch(() => ({ message: `API request failed with status ${response.status}` }));
+      throw new Error(errorData.message);
     }
     
-    // Assuming a successful response has a body with a message
+    // If the API call is successful, it means the user is deleted on the backend.
     const result = await response.json().catch(() => ({ message: "User deleted successfully." }));
-
+    
     return { success: true, message: result.message };
-  } catch (error) {
-    console.error("Error deleting user via admin action:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return { success: false, message: `Error: ${errorMessage}` };
   }
-}
+);

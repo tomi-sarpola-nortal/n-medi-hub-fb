@@ -8,13 +8,21 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { v4 as uuidv4 } from 'uuid';
 import type { DocumentTemplate, DocumentTemplateCreationData } from '@/lib/types';
 import { IDocumentTemplateRepository } from '../interfaces/IDocumentTemplateRepository';
+import { 
+  DatabaseError, 
+  FileOperationError, 
+  ConfigurationError 
+} from '@/lib/errors';
 
 const DOC_TEMPLATES_COLLECTION = 'document_templates';
 
 export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepository {
   private checkServices() {
-    if (!db || !storage) {
-      throw new Error("Firebase is not initialized. Please check your Firebase configuration.");
+    if (!db) {
+      throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration.");
+    }
+    if (!storage) {
+      throw new ConfigurationError("Firebase Storage is not initialized. Please check your Firebase configuration.");
     }
   }
 
@@ -34,33 +42,51 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
     metadata: Omit<DocumentTemplateCreationData, 'fileName' | 'fileUrl' | 'fileFormat'>,
     file: File
   ): Promise<string> {
-    this.checkServices();
+    try {
+      this.checkServices();
 
-    // Sanitize publisher name to create a valid path segment.
-    // Replaces non-alphanumeric characters with underscores and converts to lowercase.
-    const publisherPath = metadata.publisher.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-    const uniqueFileName = `${uuidv4()}-${file.name}`;
-    const storagePath = `${DOC_TEMPLATES_COLLECTION}/${publisherPath}/${uniqueFileName}`;
-    const storageRef = ref(storage, storagePath);
-    
-    // 1. Upload file to Storage
-    const snapshot = await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(snapshot.ref);
+      // Sanitize publisher name to create a valid path segment.
+      // Replaces non-alphanumeric characters with underscores and converts to lowercase.
+      const publisherPath = metadata.publisher.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+      const uniqueFileName = `${uuidv4()}-${file.name}`;
+      const storagePath = `${DOC_TEMPLATES_COLLECTION}/${publisherPath}/${uniqueFileName}`;
+      const storageRef = ref(storage, storagePath);
+      
+      // 1. Upload file to Storage
+      let snapshot;
+      try {
+        snapshot = await uploadBytes(storageRef, file);
+      } catch (error) {
+        throw new FileOperationError(`Failed to upload file ${file.name} to Storage`, error as Error);
+      }
+      
+      let downloadURL;
+      try {
+        downloadURL = await getDownloadURL(snapshot.ref);
+      } catch (error) {
+        throw new FileOperationError(`Failed to get download URL for file ${file.name}`, error as Error);
+      }
 
-    // 2. Create document in Firestore
-    const docData: DocumentTemplateCreationData = {
-      ...metadata,
-      fileName: file.name,
-      fileUrl: downloadURL,
-      fileFormat: this.getFileFormat(file.name),
-    };
-    
-    const docRef = await db.collection(DOC_TEMPLATES_COLLECTION).add({
-      ...docData,
-      lastChange: FieldValue.serverTimestamp(),
-    });
+      // 2. Create document in Firestore
+      const docData: DocumentTemplateCreationData = {
+        ...metadata,
+        fileName: file.name,
+        fileUrl: downloadURL,
+        fileFormat: this.getFileFormat(file.name),
+      };
+      
+      const docRef = await db.collection(DOC_TEMPLATES_COLLECTION).add({
+        ...docData,
+        lastChange: FieldValue.serverTimestamp(),
+      });
 
-    return docRef.id;
+      return docRef.id;
+    } catch (error) {
+      if (error instanceof FileOperationError || error instanceof ConfigurationError) {
+        throw error;
+      }
+      throw new DatabaseError(`Failed to add document template: ${metadata.title}`, error as Error);
+    }
   }
 
   /**
@@ -68,25 +94,29 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
    * @returns An array of DocumentTemplate objects.
    */
   async getAll(): Promise<DocumentTemplate[]> {
-    this.checkServices();
-    const templatesCollection = db.collection(DOC_TEMPLATES_COLLECTION);
-    const q = templatesCollection.orderBy('lastChange', 'desc');
-    const snapshot = await q.get();
+    try {
+      this.checkServices();
+      const templatesCollection = db.collection(DOC_TEMPLATES_COLLECTION);
+      const q = templatesCollection.orderBy('lastChange', 'desc');
+      const snapshot = await q.get();
 
-    return snapshot.docs.map(doc => {
-      const data = doc.data();
-      const lastChangeTimestamp = data.lastChange as Timestamp;
-      return {
-        id: doc.id,
-        title: data.title,
-        type: data.type,
-        publisher: data.publisher,
-        lastChange: lastChangeTimestamp ? lastChangeTimestamp.toDate().toISOString() : new Date(0).toISOString(),
-        fileName: data.fileName,
-        fileUrl: data.fileUrl,
-        fileFormat: data.fileFormat,
-      } as DocumentTemplate;
-    });
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        const lastChangeTimestamp = data.lastChange as Timestamp;
+        return {
+          id: doc.id,
+          title: data.title,
+          type: data.type,
+          publisher: data.publisher,
+          lastChange: lastChangeTimestamp ? lastChangeTimestamp.toDate().toISOString() : new Date(0).toISOString(),
+          fileName: data.fileName,
+          fileUrl: data.fileUrl,
+          fileFormat: data.fileFormat,
+        } as DocumentTemplate;
+      });
+    } catch (error) {
+      throw new DatabaseError("Failed to get document templates", error as Error);
+    }
   }
 
   /**
@@ -95,26 +125,33 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
    * @param fileUrl - The full download URL of the file to delete from Storage.
    */
   async delete(templateId: string, fileUrl: string): Promise<void> {
-    this.checkServices();
+    try {
+      this.checkServices();
 
-    // 1. Delete file from Storage
-    if (fileUrl) {
-      const fileRef = ref(storage, fileUrl);
-      try {
-        await deleteObject(fileRef);
-      } catch (error: any) {
-        // Log error but don't block Firestore deletion if file is already gone
-        console.error(`Failed to delete file from Storage (${fileUrl}):`, error);
-        if (error.code === 'storage/object-not-found') {
-          console.warn('File was not found in Storage, proceeding to delete Firestore document.');
-        } else {
-          throw error; // Re-throw if it's not a 'not found' error
+      // 1. Delete file from Storage
+      if (fileUrl) {
+        const fileRef = ref(storage, fileUrl);
+        try {
+          await deleteObject(fileRef);
+        } catch (error: any) {
+          // Log error but don't block Firestore deletion if file is already gone
+          console.error(`Failed to delete file from Storage (${fileUrl}):`, error);
+          if (error.code === 'storage/object-not-found') {
+            console.warn('File was not found in Storage, proceeding to delete Firestore document.');
+          } else {
+            throw new FileOperationError(`Failed to delete file from Storage: ${fileUrl}`, error);
+          }
         }
       }
-    }
 
-    // 2. Delete document from Firestore
-    const docRef = db.collection(DOC_TEMPLATES_COLLECTION).doc(templateId);
-    await docRef.delete();
+      // 2. Delete document from Firestore
+      const docRef = db.collection(DOC_TEMPLATES_COLLECTION).doc(templateId);
+      await docRef.delete();
+    } catch (error) {
+      if (error instanceof FileOperationError || error instanceof ConfigurationError) {
+        throw error;
+      }
+      throw new DatabaseError(`Failed to delete document template with ID ${templateId}`, error as Error);
+    }
   }
 }

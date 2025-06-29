@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -17,6 +16,8 @@ import { useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { uploadFile, deleteFileByUrl } from '@/services/storageService';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -57,7 +58,7 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(user.idDocumentName || null);
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<PersonalDataFormInputs>({
     resolver: zodResolver(FormSchema),
@@ -79,6 +80,8 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   const onSubmit = async (data: PersonalDataFormInputs) => {
     if (!authUser) return;
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
       const { idDocument, ...restOfData } = data;
 
@@ -115,9 +118,11 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
 
     } catch (error) {
       console.error("Failed to request data change:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to submit changes. Please try again.";
+      setErrorMessage(errorMessage);
       toast({
         title: t.settings_save_error_title || "Error",
-        description: (error as Error).message || "Failed to submit changes. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -139,6 +144,14 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   return (
     <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {errorMessage && (
+              <Alert variant="destructive">
+                <ExclamationTriangleIcon className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                  <FormField
                   control={form.control}
