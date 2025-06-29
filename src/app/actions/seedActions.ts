@@ -179,7 +179,7 @@ const historyToSeed: TrainingHistoryCreationData[] = [
 ];
 
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
-    const userEmail = process.env.DENTIST2_EMAIL || 'sarah.miller@example.com';
+    const userEmail = process.env.DENTIST2_EMAIL || 'adasd@asdas.com';
     try {
         const user = await findPersonByEmail(userEmail);
         if (!user) {
@@ -209,7 +209,7 @@ export async function seedTrainingHistory(): Promise<{ success: boolean; message
 
 
 export async function setSabineMuellerToPending(): Promise<{ success: boolean; message: string }> {
-  const userEmail = process.env.DENTIST_EMAIL || 'adasd@asdas.com';
+  const userEmail = process.env.DENTIST_EMAIL || 'sarah.miller@example.com';
   try {
     const user = await findPersonByEmail(userEmail);
     if (!user) {
@@ -275,7 +275,7 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
             }
         }
         
-        const sarahMillerEmail = process.env.DENTIST2_EMAIL || 'sarah.miller@example.com';
+        const sarahMillerEmail = process.env.DENTIST2_EMAIL || 'adasd@asdas.com';
         const sarahMiller = await findPersonByEmail(sarahMillerEmail);
         if (!sarahMiller) {
             return { success: false, message: `Could not find Sarah Miller (${sarahMillerEmail}). Please seed demo users first.` };
@@ -342,9 +342,9 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
 export async function seedDemoUsers(): Promise<{ success: boolean; message: string }> {
   try {
     const demoUsers = [
-      { email: process.env.DENTIST_EMAIL, firstName: 'Asif', lastName: 'Adidas', role: 'dentist' as UserRole, dentistId: '12345', title: 'Dr.' },
-      { email: process.env.DENTIST2_EMAIL, firstName: 'Sarah', lastName: 'Miller', role: 'dentist' as UserRole, dentistId: '54321', title: 'Dr.' },
-      { email: process.env.LK_MEMBER_EMAIL, firstName: 'Max', lastName: 'Sample', role: 'lk_member' as UserRole, dentistId: undefined, title: undefined },
+      { email: process.env.DENTIST_EMAIL, firstName: 'Sarah', lastName: 'Miller', role: 'dentist' as UserRole, dentistId: '12345', title: 'Dr.' },
+      { email: process.env.DENTIST2_EMAIL, firstName: 'Asif', lastName: 'Adidas', role: 'dentist' as UserRole, dentistId: '54321', title: 'Dr.' },
+      { email: process.env.LK_MEMBER_EMAIL, firstName: 'Max', lastName: 'Sample', role: 'lk_member' as UserRole, dentistId: '54326', title: 'Dr.' },
     ];
 
     let createdCount = 0;
