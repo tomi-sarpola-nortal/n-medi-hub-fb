@@ -5,5 +5,9 @@
   "developer_module_project_history_title": "Projekthistorie",
   "developer_module_project_history_desc": "Eine Zusammenfassung der implementierten Funktionen und der Projekthistorie anzeigen.",
   "developer_module_show_project_history_button": "Projekthistorie anzeigen",
-  "developer_module_show_prompt_history_button": "Prompt-Historie anzeigen"
+  "developer_module_show_prompt_history_button": "Prompt-Historie anzeigen",
+  "developer_module_db_indexing_title": "Datenbank-Indizierung",
+  "developer_module_db_indexing_desc": "Die folgenden zusammengesetzten Indizes sind für eine optimale Abfrageleistung erforderlich. Diese Datei befindet sich im Stammverzeichnis des Projekts.",
+  "developer_module_db_indexing_instruction": "Um diese Indizes in Ihrem Firebase-Projekt zu erstellen, führen Sie den folgenden Befehl in Ihrem Terminal aus:"
 }
+

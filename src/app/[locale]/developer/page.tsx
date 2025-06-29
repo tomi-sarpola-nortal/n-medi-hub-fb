@@ -6,7 +6,7 @@ import SeedButton from '@/components/dashboard/SeedButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, Database, BookMarked, UserCog } from 'lucide-react';
+import { Loader2, Database, BookMarked, UserCog, UploadCloud } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -95,6 +95,22 @@ export default function DeveloperPage() {
                 </CardHeader>
                 <CardContent>
                     <SeedButton />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <UploadCloud className="h-5 w-5 text-primary" />
+                        <CardTitle>{t.developer_module_db_indexing_title || "Database Indexing"}</CardTitle>
+                    </div>
+                    <CardDescription>{t.developer_module_db_indexing_desc || "The following composite indexes are required for optimal query performance. This file is located at the root of the project."}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="mb-2 text-sm">{t.developer_module_db_indexing_instruction || "To create these indexes in your Firebase project, run the following command from your terminal:"}</p>
+                    <pre className="bg-muted p-4 rounded-md text-sm text-foreground overflow-x-auto">
+                        <code>firebase deploy --only firestore:indexes</code>
+                    </pre>
                 </CardContent>
             </Card>
 
