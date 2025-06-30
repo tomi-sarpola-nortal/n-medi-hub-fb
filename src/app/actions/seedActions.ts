@@ -23,23 +23,27 @@ const zfdGroupsToSeed: { id: string, data: ZfdGroupCreationData }[] = [
 ];
 
 const categoriesToSeed: TrainingCategoryCreationData[] = [
-  { name: 'Zahn-, Mund- und Kieferkrankheiten', abbreviation: 'ZMK', isActive: true, zfdGroupId: 'berufsbezogen' },
-  { name: 'Literatur', abbreviation: 'Literatur', isActive: true, zfdGroupId: 'literatur' },
-  { name: 'Kieferorthopädie', abbreviation: 'KFO', isActive: true, zfdGroupId: 'berufsbezogen' },
-  { name: 'Parodontologie', abbreviation: 'PARO', isActive: true, zfdGroupId: 'berufsbezogen' },
-  { name: 'Implantologie', abbreviation: 'IMPL', isActive: true, zfdGroupId: 'berufsbezogen' },
-  { name: 'Frei wählbare Fortbildung', abbreviation: 'Frei', isActive: true, zfdGroupId: 'frei' }
+  { name: 'Allgemeine Medizin', abbreviation: 'AM', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Innere Medizin', abbreviation: 'IM', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Pädiatrie', abbreviation: 'PAED', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Notfallmedizin', abbreviation: 'NM', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Dermatologie', abbreviation: 'DERM', isActive: true, zfdGroupId: 'berufsbezogen' },
+  { name: 'Literatur/Webinare', abbreviation: 'LIT', isActive: true, zfdGroupId: 'literatur' },
+  { name: 'Frei wählbare Fortbildung', abbreviation: 'FREI', isActive: true, zfdGroupId: 'frei' }
 ];
 
 const organizersToSeed: TrainingOrganizerCreationData[] = [
   { name: 'Charité - Universitätsmedizin Berlin', isActive: true },
   { name: 'Klinikum der Universität München (LMU)', isActive: true },
   { name: 'Universitätsklinikum Heidelberg', isActive: true },
-  { name: 'Deutsche Gesellschaft für Zahn-, Mund- und Kieferheilkunde (DGZMK)', isActive: true },
-  { name: 'Bundeszahnärztekammer (BZÄK)', isActive: true },
+  { name: 'Deutsche Gesellschaft für Innere Medizin (DGIM)', isActive: true },
+  { name: 'Bundesärztekammer (BÄK)', isActive: true },
   { name: 'Springer Medizin', isActive: true },
   { name: 'Deutscher Ärzte-Verlag', isActive: true },
-  { name: 'Akademie für zahnärztliche Fortbildung Karlsruhe', isActive: true },
+  { name: 'Akademie für ärztliche Fortbildung', isActive: true },
+  { name: 'Medical Tribune', isActive: true },
+  { name: 'Elsevier', isActive: true },
+  { name: 'Thieme', isActive: true },
 ];
 
 const bureausToSeed: { id: string, data: StateBureauCreationData }[] = [
@@ -168,27 +172,25 @@ export async function seedZfdGroups(): Promise<{ success: boolean; message: stri
 // ===================================================================================
 
 const historyToSeedForAsif: TrainingHistoryCreationData[] = [
-  // This data is crafted to match the ZFD totals in the screenshot (97 points)
-  // and the order of visible items.
-  { date: "2025-05-22", title: "Modern Procedures in Implantology", category: "IMPL", points: 15, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-15", title: "Digital Workflows in Medical Practice", category: "ZMK", points: 5, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-03", title: "Advances in Periodontology", category: "PARO", points: 5, organizer: "Klinikum der Universität München (LMU)", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-20", title: "Current Trends in Orthodontics", category: "KFO", points: 10, organizer: "Deutsche Gesellschaft für Zahn-, Mund- und Kieferheilkunde (DGZMK)", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-10", title: "Webinar: New Materials in Prosthetics", category: "Literatur", points: 10, organizer: "Springer Medizin", zfdGroupId: 'literatur' },
-  { date: "2025-03-28", title: "Practice Management and Communication", category: "Frei", points: 8, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
-  { date: "2025-03-05", title: "Annual Subscription 'Medical Magazine'", category: "Literatur", points: 10, organizer: "Medical Tribune", zfdGroupId: 'literatur' },
-  { date: "2025-02-25", title: "Implant Prosthetics for Advanced Practitioners", category: "IMPL", points: 10, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-02-01", title: "Workshop: Legal Foundations", category: "Frei", points: 4, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'frei' },
-  { date: "2025-01-15", title: "Annual Subscription 'Quintessence Medicine'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
-  { date: "2024-12-10", title: "Annual Subscription 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
+  { date: "2025-05-22", title: "EKG-Basiskurs für die Praxis", category: "AM", points: 15, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-15", title: "Digital Workflows in Medical Practice", category: "AM", points: 5, organizer: "Bundesärztekammer (BÄK)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-03", title: "Update Onkologie", category: "IM", points: 5, organizer: "Klinikum der Universität München (LMU)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-20", title: "Pädiatrische Notfälle", category: "PAED", points: 10, organizer: "Deutsche Gesellschaft für Innere Medizin (DGIM)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-10", title: "Webinar: Neue Therapieansätze in der Dermatologie", category: "LIT", points: 10, organizer: "Springer Medizin", zfdGroupId: 'literatur' },
+  { date: "2025-03-28", title: "Practice Management and Communication", category: "FREI", points: 8, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
+  { date: "2025-03-05", title: "Annual Subscription 'Medical Magazine'", category: "LIT", points: 10, organizer: "Medical Tribune", zfdGroupId: 'literatur' },
+  { date: "2025-02-25", title: "Ultraschall-Grundkurs", category: "AM", points: 10, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-02-01", title: "Workshop: Legal Foundations", category: "FREI", points: 4, organizer: "Bundesärztekammer (BÄK)", zfdGroupId: 'frei' },
+  { date: "2025-01-15", title: "Annual Subscription 'Lancet'", category: "LIT", points: 10, organizer: "Elsevier", zfdGroupId: 'literatur' },
+  { date: "2024-12-10", title: "Annual Subscription 'Ärzteblatt'", category: "LIT", points: 10, organizer: "Deutscher Ärzte-Verlag", zfdGroupId: 'literatur' },
 ];
 
 const historyToSeedForSarah: TrainingHistoryCreationData[] = [
-    { date: "2025-06-10", title: "Emergency Management in the Dental Office", category: "ZMK", points: 10, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'berufsbezogen' },
-    { date: "2025-05-20", title: "Pediatric Dentistry Update", category: "ZMK", points: 8, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
-    { date: "2025-04-18", title: "Advanced Endodontics Workshop", category: "ZMK", points: 12, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
-    { date: "2025-03-15", title: "Journal Club: Periodontology Research", category: "Literatur", points: 5, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
-    { date: "2025-02-20", title: "Ethical Considerations in Dentistry", category: "Frei", points: 5, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
+    { date: "2025-06-10", title: "Emergency Management in the Medical Office", category: "NM", points: 10, organizer: "Bundesärztekammer (BÄK)", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-05-20", title: "Pediatric Care Update", category: "PAED", points: 8, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-04-18", title: "Advanced Life Support (ALS)", category: "NM", points: 12, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-03-15", title: "Journal Club: Cardiology Research", category: "LIT", points: 5, organizer: "Elsevier", zfdGroupId: 'literatur' },
+    { date: "2025-02-20", title: "Ethical Considerations in Medicine", category: "FREI", points: 5, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
 ];
 
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
