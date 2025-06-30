@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -10,7 +11,7 @@ import {
 import type { Notification } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Bell, MailCheck } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -43,8 +44,9 @@ export default function NotificationBell() {
     startTransition(async () => {
       if (!notification.isRead) {
         await markNotificationAsRead(notification.id);
+        // Optimistically update the local state to hide the notification
         setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true } : n));
-        setUnreadCount(prev => prev - 1);
+        setUnreadCount(prev => Math.max(0, prev - 1));
       }
       router.push(notification.link);
       setIsOpen(false);
@@ -55,10 +57,13 @@ export default function NotificationBell() {
     if (!user?.id || unreadCount === 0) return;
     startTransition(async () => {
         await markAllNotificationsAsRead(user.id);
+        // Optimistically update the local state to hide all notifications
         setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
         setUnreadCount(0);
     });
   };
+
+  const unreadNotifications = notifications.filter(n => !n.isRead);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -89,25 +94,19 @@ export default function NotificationBell() {
             )}
         </div>
         <ScrollArea className="h-96">
-            {notifications.length === 0 ? (
+            {unreadNotifications.length === 0 ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">
-                    You have no notifications.
+                    You have no new notifications.
                 </div>
             ) : (
-                notifications.map((notification) => (
+                unreadNotifications.map((notification) => (
                     <div
                         key={notification.id}
-                        className={cn(
-                            'p-3 flex items-start gap-3 hover:bg-accent cursor-pointer',
-                            !notification.isRead && 'bg-accent/50'
-                        )}
+                        className="p-3 flex items-start gap-3 hover:bg-accent cursor-pointer bg-accent/50"
                         onClick={() => handleNotificationClick(notification)}
                     >
                         <div
-                            className={cn(
-                                'h-2 w-2 rounded-full mt-1.5 flex-shrink-0',
-                                !notification.isRead ? 'bg-primary' : 'bg-transparent'
-                            )}
+                            className="h-2 w-2 rounded-full mt-1.5 flex-shrink-0 bg-primary"
                         />
                         <div className="flex-1">
                             <p className="text-sm">{notification.message}</p>
