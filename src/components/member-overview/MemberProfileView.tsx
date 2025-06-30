@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -13,7 +14,7 @@ import type { Person, TrainingHistory, UserRole } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import MemberRepresentationsTab from '@/components/member-overview/MemberRepresentationsTab';
-import MemberDangerZoneActions from '@/components/member-overview/MemberInactiveAction';
+import MemberAdminActions from '@/components/member-overview/MemberInactiveAction';
 import ResetPasswordButton from '@/components/member-overview/ResetPasswordButton';
 import { useAuth } from '@/context/auth-context';
 import { logGeneralAudit } from '@/app/actions/auditActions';
@@ -58,7 +59,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale, 
   useEffect(() => {
     // Log the initial view of master data and training history
     if (viewer && person && viewer.id !== person.id) {
-        const auditor = { id: viewer.id, name: viewer.name, role: viewer.role as UserRole, chamber: viewer.stateChamberId || 'wien' };
+        const auditor = { id: viewer.id, name: viewer.name, role: viewer.role as UserRole, bureau: viewer.stateBureauId || 'wien' };
         const impacted = { id: person.id, name: person.name };
         
         logGeneralAudit({
@@ -75,7 +76,7 @@ export default function MemberProfileView({ person, trainingHistory, t, locale, 
   const handleTabChange = (tabValue: string) => {
     setActiveTab(tabValue);
     if (tabValue === 'vertretungen' && !repsViewLogged && viewer && person && viewer.id !== person.id) {
-        const auditor = { id: viewer.id, name: viewer.name, role: viewer.role as UserRole, chamber: viewer.stateChamberId || 'wien' };
+        const auditor = { id: viewer.id, name: viewer.name, role: viewer.role as UserRole, bureau: viewer.stateBureauId || 'wien' };
         const impacted = { id: person.id, name: person.name };
 
         logGeneralAudit({
@@ -234,19 +235,17 @@ export default function MemberProfileView({ person, trainingHistory, t, locale, 
                         </div>
                     </div>
 
-                    {person.status === 'active' && (
-                        <Card className="border-destructive mt-6">
-                            <CardHeader>
-                                <div className="flex items-center gap-3">
-                                <AlertTriangle className="h-6 w-6 text-destructive" />
-                                <CardTitle className="text-destructive">{t.settings_danger_zone_title || "Danger Zone"}</CardTitle>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <MemberDangerZoneActions member={person} t={t} />
-                            </CardContent>
-                        </Card>
-                    )}
+                    <Card className="border-destructive mt-6">
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                            <AlertTriangle className="h-6 w-6 text-destructive" />
+                            <CardTitle className="text-destructive">{t.settings_danger_zone_title || "Danger Zone"}</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <MemberAdminActions member={person} t={t} />
+                        </CardContent>
+                    </Card>
                 </TabsContent>
                 <TabsContent value="fortbildungen" className="mt-6">
                     <Card>
