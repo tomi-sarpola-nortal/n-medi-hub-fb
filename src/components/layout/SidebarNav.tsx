@@ -101,7 +101,7 @@ export function AppSidebar() {
            <div className="flex flex-col">
               <Logo iconSize={190} />
               <p
-                className="pl-10 font-headline text-xl font-bold"
+                className="pl-[14px] font-headline text-xl font-bold"
                 style={{ color: '#372165' }}
               >
                 Medical Hub
