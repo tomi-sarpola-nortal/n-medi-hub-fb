@@ -300,48 +300,63 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
             }
         }
         
-        const sarahMillerEmail = process.env.DENTIST2_EMAIL || 'adasd@asdas.com';
-        const sarahMiller = await findPersonByEmail(sarahMillerEmail);
+        const asifAdidasEmail = process.env.DENTIST2_EMAIL || 'adasd@asdas.com';
+        const sarahMillerEmail = process.env.DENTIST_EMAIL || 'sarah.miller@example.com';
+
+        const [asifAdidas, sarahMiller] = await Promise.all([
+            findPersonByEmail(asifAdidasEmail),
+            findPersonByEmail(sarahMillerEmail)
+        ]);
+
+        if (!asifAdidas) {
+            return { success: false, message: `Could not find Asif Adidas (${asifAdidasEmail}). Please seed demo users first.` };
+        }
         if (!sarahMiller) {
             return { success: false, message: `Could not find Sarah Miller (${sarahMillerEmail}). Please seed demo users first.` };
         }
+        userNamesMap.set(asifAdidas.id, asifAdidas.name);
         userNamesMap.set(sarahMiller.id, sarahMiller.name);
 
+
         const representationsToCreate: RepresentationCreationData[] = [
+            // Asif represents others
             {
-                representingPersonId: sarahMiller.id, representedPersonId: userMap.get('mark.weaver@example.com')!,
-                representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Mark Weaver (ID: 78954)',
+                representingPersonId: asifAdidas.id, representedPersonId: userMap.get('mark.weaver@example.com')!,
+                representingPersonName: asifAdidas.name, representedPersonName: userNamesMap.get(userMap.get('mark.weaver@example.com')!)!,
                 startDate: '2025-05-15T08:00:00', endDate: '2025-05-15T15:00:00', durationHours: 7, status: 'confirmed', confirmedAt: '2025-05-22T09:00:00'
             },
             {
-                representingPersonId: sarahMiller.id, representedPersonId: userMap.get('julia.smith@example.com')!,
-                representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Julia Smith (ID: 65412)',
+                representingPersonId: asifAdidas.id, representedPersonId: userMap.get('julia.smith@example.com')!,
+                representingPersonName: asifAdidas.name, representedPersonName: userNamesMap.get(userMap.get('julia.smith@example.com')!)!,
                 startDate: '2025-05-01T08:00:00', endDate: '2025-05-02T19:00:00', durationHours: 13, status: 'pending'
             },
+            // Sarah represents others
             {
                 representingPersonId: sarahMiller.id, representedPersonId: userMap.get('thomas.miller@example.com')!,
-                representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Thomas Miller (ID: 34567)',
+                representingPersonName: sarahMiller.name, representedPersonName: userNamesMap.get(userMap.get('thomas.miller@example.com')!)!,
                 startDate: '2025-04-15T08:00:00', endDate: '2025-04-15T18:00:00', durationHours: 8, status: 'confirmed', confirmedAt: '2025-04-21T09:00:00'
             },
             {
                 representingPersonId: sarahMiller.id, representedPersonId: userMap.get('sarah.baker@example.com')!,
-                representingPersonName: sarahMiller.name, representedPersonName: 'Dr. Sarah Baker (ID: 23456)',
-                startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:30:00', durationHours: 6.5, status: 'confirmed', confirmedAt: '2025-04-12T09:00:00'
+                representingPersonName: sarahMiller.name, representedPersonName: userNamesMap.get(userMap.get('sarah.baker@example.com')!)!,
+                startDate: '2025-04-01T07:00:00', endDate: '2025-04-01T13:30:00', durationHours: 6.5, status: 'declined'
             },
+            // Others represent Asif
             {
-                representingPersonId: userMap.get('lucas.hoffman@example.com')!, representedPersonId: sarahMiller.id,
-                representingPersonName: userNamesMap.get(userMap.get('lucas.hoffman@example.com')!)!, representedPersonName: sarahMiller.name,
+                representingPersonId: userMap.get('lucas.hoffman@example.com')!, representedPersonId: asifAdidas.id,
+                representingPersonName: userNamesMap.get(userMap.get('lucas.hoffman@example.com')!)!, representedPersonName: asifAdidas.name,
                 startDate: '2025-05-10T08:30:00', endDate: '2025-05-10T17:00:00', durationHours: 8.5, status: 'pending'
             },
             {
-                representingPersonId: userMap.get('lucas.hoffman@example.com')!, representedPersonId: sarahMiller.id,
-                representingPersonName: userNamesMap.get(userMap.get('lucas.hoffman@example.com')!)!, representedPersonName: sarahMiller.name,
-                startDate: '2025-05-11T15:00:00', endDate: '2025-05-11T18:00:00', durationHours: 3, status: 'pending'
-            },
-            {
-                representingPersonId: userMap.get('anna.taylor@example.com')!, representedPersonId: sarahMiller.id,
-                representingPersonName: userNamesMap.get(userMap.get('anna.taylor@example.com')!)!, representedPersonName: sarahMiller.name,
+                representingPersonId: userMap.get('anna.taylor@example.com')!, representedPersonId: asifAdidas.id,
+                representingPersonName: userNamesMap.get(userMap.get('anna.taylor@example.com')!)!, representedPersonName: asifAdidas.name,
                 startDate: '2025-05-02T10:00:00', endDate: '2025-05-02T17:00:00', durationHours: 7, status: 'pending'
+            },
+            // Others represent Sarah
+             {
+                representingPersonId: userMap.get('mark.weaver@example.com')!, representedPersonId: sarahMiller.id,
+                representingPersonName: userNamesMap.get(userMap.get('mark.weaver@example.com')!)!, representedPersonName: sarahMiller.name,
+                startDate: '2025-05-11T15:00:00', endDate: '2025-05-11T18:00:00', durationHours: 3, status: 'pending'
             },
              {
                 representingPersonId: userMap.get('thomas.miller@example.com')!, representedPersonId: sarahMiller.id,

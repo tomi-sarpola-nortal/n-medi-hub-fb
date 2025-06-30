@@ -2,8 +2,8 @@ import { test as setup, expect } from '@playwright/test';
 import { DENTIST_AUTH_FILE, LK_MEMBER_AUTH_FILE } from '../playwright.config';
 
 const doctorUser = {
-  email: process.env.DENTIST2_EMAIL || 'sarah.miller@example.com',
-  password: process.env.DENTIST2_PASSWORD || 'TestTest24',
+  email: process.env.DENTIST_EMAIL || 'sarah.miller@example.com',
+  password: process.env.DENTIST_PASSWORD || 'TestTest24',
 };
 
 const bureauMemberUser = {
