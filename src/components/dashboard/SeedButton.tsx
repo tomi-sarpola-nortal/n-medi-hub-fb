@@ -117,7 +117,7 @@ export default function SeedButton() {
     try {
       const result = await seedUsersAndRepresentations();
       toast({
-        title: "Seeding Report (Other Users & Reps)",
+        title: "Seeding Report (Representations)",
         description: result.message,
       });
     } catch (error) {
@@ -152,12 +152,6 @@ export default function SeedButton() {
 
   return (
     <div className="flex flex-wrap gap-4">
-        <Button onClick={handleSeedDemoUsers} disabled={isDemoUsersLoading} variant="destructive" className="w-full sm:w-auto">
-          {isDemoUsersLoading ? "Seeding..." : "Seed Demo Users"}
-        </Button>
-        <Button onClick={handleSeedOtherUsers} disabled={isOtherUsersLoading} variant="destructive" className="w-full sm:w-auto">
-          {isOtherUsersLoading ? "Seeding..." : "Seed Other Users"}
-        </Button>
         <Button onClick={handleSeedZfdGroups} disabled={isZfdGroupsLoading} variant="destructive" className="w-full sm:w-auto">
           {isZfdGroupsLoading ? "Seeding..." : "Seed ZFD Groups"}
         </Button>
@@ -167,11 +161,17 @@ export default function SeedButton() {
         <Button onClick={handleSeedOrganizers} disabled={isOrganizersLoading} variant="destructive" className="w-full sm:w-auto">
           {isOrganizersLoading ? "Seeding..." : "Seed Training Organizers"}
         </Button>
+        <Button onClick={handleSeedStateBureaus} disabled={isBureausLoading} variant="destructive" className="w-full sm:w-auto">
+          {isBureausLoading ? "Seeding..." : "Seed State Bureaus"}
+        </Button>
+        <Button onClick={handleSeedDemoUsers} disabled={isDemoUsersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isDemoUsersLoading ? "Seeding..." : "Seed Demo Users"}
+        </Button>
         <Button onClick={handleSeedHistory} disabled={isHistoryLoading} variant="destructive" className="w-full sm:w-auto">
           {isHistoryLoading ? "Seeding..." : "Seed Training History"}
         </Button>
-        <Button onClick={handleSeedStateBureaus} disabled={isBureausLoading} variant="destructive" className="w-full sm:w-auto">
-          {isBureausLoading ? "Seeding..." : "Seed State Bureaus"}
+        <Button onClick={handleSeedOtherUsers} disabled={isOtherUsersLoading} variant="destructive" className="w-full sm:w-auto">
+          {isOtherUsersLoading ? "Seeding..." : "Seed Representations"}
         </Button>
     </div>
   );

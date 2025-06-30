@@ -82,7 +82,7 @@ This command only needs to be run once, or whenever the `firestore.indexes.json`
 
 Make sure you have the FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, and NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variables set correctly in your environment (e.g., in your .env file)
 
-To run the script for creating Storage folders, you need to install the Firebase Admin SDK:\n
+To run the script for creating Storage folders, you need to install the Firebase Admin SDK:
 
 ```bash
     npm install firebase-admin
@@ -147,12 +147,19 @@ Please consult the documentation for your specific SMTP provider for instruction
 Once your environment is deployed and running:
 
 1.  Navigate to the `/developer` page in your deployed application.
-2.  In the "Database Seeding" section, click the following buttons **in order**:
+2.  In the "Database Seeding" section, click the following buttons **in the specified order** to set up the application with essential data and test users.
+
+    **Core Data (Required for basic functionality):**
     *   **Seed ZFD Groups**: Creates the core groups for continuing education points.
     *   **Seed Training Categories**: Populates the different types of training.
     *   **Seed Training Organizers**: Adds a list of known training organizers.
-    *   **Seed State Chambers**: Populates the contact information for the state chambers.
-3.  The other seed buttons (`Seed Training History`, `Seed Representations`) are for creating test data and should **not** be used in a production environment.
+    *   **Seed State Bureaus**: Populates the contact information for the state bureaus.
+
+    **Test Data (For demonstration purposes):**
+    *   **Seed Demo Users**: Creates the primary demo users and assigns them to state bureaus. **This must be run before seeding history or representations.**
+    *   **Seed Training History**: Populates the training history for the demo users.
+    *   **Seed Representations**: Creates additional test users and populates representation data for the demo users.
+3.  The test data buttons should **not** be used in a production environment.
 
 ### Step 10: Seed Firebase Auth
 
