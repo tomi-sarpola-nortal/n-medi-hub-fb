@@ -20,11 +20,11 @@ import { Badge } from '@/components/ui/badge';
 
 const getClientTranslations = (locale: string) => {
     try {
-        const page = locale === 'de' ? require('../../../../locales/de/representations.json') : require('../../../../locales/en/representations.json');
+        const page = locale === 'de' ? require('../../../locales/de/representations.json') : require('../../../locales/en/representations.json');
         return page;
     } catch (e) {
         console.warn("Translation file not found, falling back to en");
-        return require('../../../../locales/en/representations.json');
+        return require('../../../locales/en/representations.json');
     }
 };
 

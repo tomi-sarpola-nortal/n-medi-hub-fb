@@ -20,26 +20,13 @@ import { format } from 'date-fns';
 const getClientTranslations = (locale: string) => {
     try {
         if (locale === 'de') {
-            return require('../../../locales/de.json');
+            return require('../../locales/de/representations.json');
         }
-        return require('../../../locales/en.json');
+        return require('../../locales/en/representations.json');
     } catch (e) {
         console.warn("Translation file not found, falling back to en");
-        return require('../../../locales/en.json');
+        return require('../../locales/en/representations.json');
     }
-};
-
-const formatPeriod = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    const isSameDay = format(start, 'yyyy-MM-dd') === format(end, 'yyyy-MM-dd');
-    
-    if (isSameDay) {
-        return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'HH:mm')} Uhr`;
-    }
-    
-    return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
 };
 
 const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Representation, t: Record<string, string>, onStatusChange: (id: string, status: 'confirmed' | 'declined') => void }) => {
@@ -55,6 +42,19 @@ const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Represen
         setIsSubmitting('decline');
         await onStatusChange(request.id, 'declined');
         setIsSubmitting(null);
+    };
+
+    const formatPeriod = (startDate: string, endDate: string) => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        const isSameDay = format(start, 'yyyy-MM-dd') === format(end, 'yyyy-MM-dd');
+        
+        if (isSameDay) {
+            return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'HH:mm')} Uhr`;
+        }
+        
+        return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
     };
 
     const period = formatPeriod(request.startDate, request.endDate);
@@ -125,7 +125,7 @@ export default function RepresentationsPage() {
 
     const handleStatusChange = async (representationId: string, status: 'confirmed' | 'declined') => {
         try {
-            await updateRepresentationStatus(representationId, status);
+            await updateRepresentationStatus(representationId, status, locale);
             toast({
                 title: "Success",
                 description: `Representation has been ${status}.`,
@@ -154,6 +154,19 @@ export default function RepresentationsPage() {
         return combined.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
     }, [representations]);
     
+    const formatPeriod = (startDate: string, endDate: string) => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        const isSameDay = format(start, 'yyyy-MM-dd') === format(end, 'yyyy-MM-dd');
+        
+        if (isSameDay) {
+            return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'HH:mm')} Uhr`;
+        }
+        
+        return `${format(start, 'dd.MM.yyyy, HH:mm')} - ${format(end, 'dd.MM.yyyy, HH:mm')}`;
+    };
+
     const pageTitle = t.representations_page_title || "My Representations";
     const pageIsLoading = authLoading || isLoading || Object.keys(t).length === 0;
 
