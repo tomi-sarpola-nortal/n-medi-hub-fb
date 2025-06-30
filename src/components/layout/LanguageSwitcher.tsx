@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -16,10 +15,11 @@ import { Skeleton } from '../ui/skeleton';
 import { useClientTranslations } from '@/hooks/use-client-translations';
 
 // Using inline SVGs for flags to avoid adding new image files.
-const AustriaFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" {...props}>
-        <rect width="9" height="6" fill="#ed2939"/>
-        <rect width="9" height="2" y="2" fill="#fff"/>
+const GermanFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3" {...props}>
+        <rect width="5" height="1" y="0" fill="#000000"/>
+        <rect width="5" height="1" y="1" fill="#DD0000"/>
+        <rect width="5" height="1" y="2" fill="#FFCE00"/>
     </svg>
 );
 
@@ -39,7 +39,7 @@ type LanguageSwitcherProps = ComponentProps<'div'> & {
 
 const languages = [
     { value: 'en', label: 'English', Flag: (props: any) => <UKFlagIcon {...props} /> },
-    { value: 'de', label: 'Deutsch', Flag: (props: any) => <AustriaFlagIcon {...props} /> },
+    { value: 'de', label: 'Deutsch', Flag: (props: any) => <GermanFlagIcon {...props} /> },
 ];
 
 export default function LanguageSwitcher({ initialLocale, className, ...props }: LanguageSwitcherProps) {
