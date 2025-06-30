@@ -169,14 +169,14 @@ export function AppSidebar() {
             <SidebarMenuItem>
                <LanguageSwitcher />
             </SidebarMenuItem>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <Button asChild variant="outline" className="w-full justify-start h-9 px-3 text-sm">
                   <Link href={`/${locale}/developer`}>
                       <Database className="h-5 w-5"/>
                       <span>{t.sidebar_developer_module || "Developer Module"}</span>
                   </Link>
               </Button>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
             <SidebarMenuItem>
                 <Button
                     onClick={handleLogoutClick}

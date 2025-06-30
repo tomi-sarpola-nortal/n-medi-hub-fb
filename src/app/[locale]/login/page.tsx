@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -238,7 +239,7 @@ export default function LoginPage() {
                             </Button>
                         </div>
                     </div>
-                    <div className="mt-4 pt-2 border-t border-gray-200">
+                    {/* <div className="mt-4 pt-2 border-t border-gray-200">
                         <Button 
                             variant="outline" 
                             size="sm" 
@@ -248,7 +249,7 @@ export default function LoginPage() {
                             <Code className="mr-2 h-4 w-4" />
                             Open Developer Module
                         </Button>
-                    </div>
+                    </div> */}
                 </AlertDescription>
             </Alert>
           </div>
