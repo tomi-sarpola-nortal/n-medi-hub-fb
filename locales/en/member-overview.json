@@ -119,5 +119,9 @@
   "create_member_review_info": "Please review the data carefully. Upon creation, the user will receive an email to set their password.",
   "create_member_success_page_title": "Member Created",
   "create_member_success_card_title": "Success!",
-  "create_member_success_button": "Back to Member Overview"
+  "create_member_success_button": "Back to Member Overview",
+  "member_list_table_action_set_active": "Set Active",
+  "member_list_activate_dialog_title": "Are you sure?",
+  "member_list_activate_dialog_desc": "This will set user {memberName} to 'active'. They will regain access to the portal. This action can be reversed.",
+  "member_list_activate_dialog_confirm": "Set Active"
 }

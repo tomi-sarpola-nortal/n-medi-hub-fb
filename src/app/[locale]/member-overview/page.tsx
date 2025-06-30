@@ -46,6 +46,7 @@ export default function MemberOverviewPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [personToDeactivate, setPersonToDeactivate] = useState<AugmentedPerson | null>(null);
+  const [personToActivate, setPersonToActivate] = useState<AugmentedPerson | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [membersToReview, setMembersToReview] = useState<Person[]>([]);
 
@@ -125,6 +126,20 @@ export default function MemberOverviewPage() {
       toast({ title: "Error", description: result.message, variant: "destructive" });
     }
     setPersonToDeactivate(null);
+    setIsSubmitting(false);
+  };
+
+  const handleActivateConfirm = async () => {
+    if (!personToActivate) return;
+    setIsSubmitting(true);
+    const result = await setPersonStatus(personToActivate.id, 'active');
+    if (result.success) {
+      toast({ title: "Success", description: result.message });
+      fetchData();
+    } else {
+      toast({ title: "Error", description: result.message, variant: "destructive" });
+    }
+    setPersonToActivate(null);
     setIsSubmitting(false);
   };
   
@@ -317,11 +332,21 @@ export default function MemberOverviewPage() {
                         <TableCell className="text-right">
                           <DropdownMenu><DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}><span className="sr-only">Open menu</span><MoreHorizontal className="h-4 w-4" /></Button>
-                          </DropdownMenuTrigger><DropdownMenuContent align="end">
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); router.push(`/${locale}/member-overview/${member.id}`); }}>{t('member_list_table_action_view_profile')}</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setPersonToDeactivate(member); }} disabled={member.status !== 'active'} className="text-destructive focus:bg-destructive/10 focus:text-destructive">{t('member_list_table_action_set_inactive')}</DropdownMenuItem>
-                          </DropdownMenuContent></DropdownMenu>
+                            {member.status === 'active' ? (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setPersonToDeactivate(member); }} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                                {t('member_list_table_action_set_inactive')}
+                                </DropdownMenuItem>
+                            ) : member.status === 'inactive' ? (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setPersonToActivate(member); }} className="text-green-600 focus:bg-green-100 focus:text-green-700 dark:text-green-400 dark:focus:bg-green-900/50 dark:focus:text-green-400">
+                                {t('member_list_table_action_set_active')}
+                                </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     )) : (
@@ -356,6 +381,24 @@ export default function MemberOverviewPage() {
               <AlertDialogAction onClick={handleDeactivateConfirm} disabled={isSubmitting} className="bg-destructive hover:bg-destructive/90">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {t('member_list_deactivate_dialog_confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={!!personToActivate} onOpenChange={(open) => !open && setPersonToActivate(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('member_list_activate_dialog_title')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('member_list_activate_dialog_desc', { memberName: personToActivate?.name || 'this user' })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>{t('member_list_deactivate_dialog_cancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleActivateConfirm} disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t('member_list_activate_dialog_confirm')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

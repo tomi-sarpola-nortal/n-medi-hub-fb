@@ -119,5 +119,9 @@
   "create_member_review_info": "Bitte überprüfen Sie die Daten sorgfältig. Nach der Erstellung erhält der Benutzer eine E-Mail, um sein Passwort festzulegen.",
   "create_member_success_page_title": "Mitglied erstellt",
   "create_member_success_card_title": "Erfolg!",
-  "create_member_success_button": "Zurück zur Mitgliederübersicht"
+  "create_member_success_button": "Zurück zur Mitgliederübersicht",
+  "member_list_table_action_set_active": "Auf Aktiv setzen",
+  "member_list_activate_dialog_title": "Sind Sie sicher?",
+  "member_list_activate_dialog_desc": "Dies setzt den Benutzer {memberName} auf 'aktiv'. Er erhält wieder Zugang zum Portal. Diese Aktion kann rückgängig gemacht werden.",
+  "member_list_activate_dialog_confirm": "Auf Aktiv setzen"
 }
