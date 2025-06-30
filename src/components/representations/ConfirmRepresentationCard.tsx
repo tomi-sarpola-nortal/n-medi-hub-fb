@@ -54,11 +54,11 @@ const ConfirmationRequest = ({ request, t, onStatusChange }: { request: Represen
             <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                 <Button onClick={handleConfirm} disabled={!!isSubmitting} className="flex-1 sm:flex-none">
                     {isSubmitting === 'confirm' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t('representations_confirm_button')}
+                    {t('confirm_reps_confirm_button')}
                 </Button>
                 <Button onClick={handleDecline} disabled={!!isSubmitting} variant="outline" className="flex-1 sm:flex-none">
                     {isSubmitting === 'decline' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t('representations_decline_button')}
+                    {t('confirm_reps_decline_button')}
                 </Button>
             </div>
         </div>

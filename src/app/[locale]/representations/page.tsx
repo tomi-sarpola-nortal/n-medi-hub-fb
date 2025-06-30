@@ -35,7 +35,7 @@ const formatPeriod = (startDate: string, endDate: string) => {
 export default function RepresentationsPage() {
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
-    const { t, isLoading: translationsLoading, locale } = useClientTranslations(['representations']);
+    const { t, isLoading: translationsLoading, locale } = useClientTranslations(['representations', 'dashboard']);
 
     const [isLoading, setIsLoading] = useState(true);
     const [representations, setRepresentations] = useState<{
@@ -257,4 +257,3 @@ export default function RepresentationsPage() {
         </AppLayout>
     );
 }
-
