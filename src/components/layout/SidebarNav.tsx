@@ -97,8 +97,16 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="none">
       <SidebarHeader className="flex items-center justify-between p-4">
-        <Link href={`/${user ? locale + '/dashboard' : locale + '/login'}`} className="flex items-center gap-3 overflow-hidden">
-          <Logo iconSize={190} />
+        <Link href={`/${user ? locale + '/dashboard' : locale + '/login'}`} className="block overflow-hidden">
+           <div className="flex flex-col">
+              <Logo iconSize={190} />
+              <p
+                className="font-headline text-xs -mt-1"
+                style={{ color: '#372165' }}
+              >
+                Medical Hub
+              </p>
+            </div>
         </Link>
       </SidebarHeader>
 
