@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import type { Representation, Person, UserRole } from '@/lib/types';
-import { getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
+import { getAllRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -48,16 +48,14 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
   const fetchRepresentations = async () => {
     setIsLoading(true);
     try {
-      const data = await getRepresentationsForUser(member.id);
-      const allReps = [...data.performed, ...data.wasRepresented];
-      // Remove duplicates if any (though logic should prevent this)
-      const uniqueReps = Array.from(new Map(allReps.map(item => [item.id, item])).values());
-      const sortedReps = uniqueReps.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      const allReps = await getAllRepresentationsForUser(member.id);
+      const sortedReps = allReps.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
       setRepresentations(sortedReps);
 
       // Check for old pending requests FOR THIS MEMBER based on start date
-      const oldPending = data.wasRepresented.filter(r => 
+      const oldPending = sortedReps.filter(r => 
           r.status === 'pending' && 
+          r.representedPersonId === member.id &&
           new Date(r.startDate) < fiveDaysAgo
       );
       setHasOldRequests(oldPending.length > 0);
@@ -88,7 +86,7 @@ export default function MemberRepresentationsTab({ member, t }: MemberRepresenta
         const impactedPerson = { id: rep.representedPersonId, name: rep.representedPersonName };
         
         await logGeneralAudit({
-            auditor: { id: auditor.id, name: auditor.name, role: auditor.role as UserRole, chamber: auditor.stateChamberId || 'wien' },
+            auditor: { id: auditor.id, name: auditor.name, role: auditor.role as UserRole, chamber: auditor.stateBureauId || 'wien' },
             impacted: impactedPerson,
             operation: 'update',
             collectionName: 'representations',

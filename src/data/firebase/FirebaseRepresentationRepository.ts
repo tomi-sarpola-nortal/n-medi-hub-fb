@@ -149,40 +149,37 @@ export class FirebaseRepresentationRepository implements IRepresentationReposito
   }
 
   /**
-   * Fetches all representations related to a user.
+   * Fetches all representations where a user is either the representing or the represented person.
    * @param userId The ID of the user.
-   * @returns An object containing arrays for performed, pending confirmation, and received representations.
+   * @returns A de-duplicated array of all representations related to the user.
    */
-  async getForUser(userId: string): Promise<{
-    performed: Representation[],
-    pendingConfirmation: Representation[],
-    wasRepresented: Representation[],
-  }> {
+  async getForUser(userId: string): Promise<Representation[]> {
     this.checkDb();
     const representationsRef = db.collection(REPRESENTATIONS_COLLECTION);
+    
+    const performingQuery = representationsRef.where('representingPersonId', '==', userId);
+    const receivingQuery = representationsRef.where('representedPersonId', '==', userId);
+    
+    const [performingSnapshot, receivingSnapshot] = await Promise.all([
+      performingQuery.get(),
+      receivingQuery.get()
+    ]);
 
-    const querySnapshot = await representationsRef
-      .where('representingPersonId', '==', userId)
-      .get();
+    const representationMap = new Map<string, Representation>();
+    
+    performingSnapshot.docs.forEach(doc => {
+      if (!representationMap.has(doc.id)) {
+        representationMap.set(doc.id, this.snapshotToRepresentation(doc));
+      }
+    });
 
-    const querySnapshot2 = await representationsRef
-      .where('representedPersonId', '==', userId)
-      .get();
+    receivingSnapshot.docs.forEach(doc => {
+      if (!representationMap.has(doc.id)) {
+        representationMap.set(doc.id, this.snapshotToRepresentation(doc));
+      }
+    });
 
-    const allRepresentations: Representation[] = [...querySnapshot.docs, ...querySnapshot2.docs]
-      .map(doc => this.snapshotToRepresentation(doc))
-      // Deduplicate
-      .filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
-
-    const performed = allRepresentations.filter(r => r.representingPersonId === userId);
-    const wasRepresented = allRepresentations.filter(r => r.representedPersonId === userId);
-    const pendingConfirmation = wasRepresented.filter(r => r.status === 'pending');
-
-    return {
-      performed,
-      pendingConfirmation,
-      wasRepresented,
-    };
+    return Array.from(representationMap.values());
   }
 
   /**

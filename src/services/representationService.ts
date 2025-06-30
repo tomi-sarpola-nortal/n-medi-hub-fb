@@ -24,7 +24,7 @@ export async function getConfirmedRepresentationHours(userId: string): Promise<n
 }
 
 /**
- * Fetches all representations related to a user.
+ * Fetches all representations related to a user, split into categories.
  * @param userId The ID of the user.
  * @returns An object containing arrays for performed, pending confirmation, and received representations.
  */
@@ -33,6 +33,21 @@ export async function getRepresentationsForUser(userId: string): Promise<{
   pendingConfirmation: Representation[],
   wasRepresented: Representation[],
 }> {
+  const allReps = await representationRepository.getForUser(userId);
+
+  const performed = allReps.filter(r => r.representingPersonId === userId);
+  const wasRepresented = allReps.filter(r => r.representedPersonId === userId);
+  const pendingConfirmation = wasRepresented.filter(r => r.status === 'pending');
+
+  return { performed, pendingConfirmation, wasRepresented };
+}
+
+/**
+ * Fetches all representations related to a user as a single list.
+ * @param userId The ID of the user.
+ * @returns A de-duplicated array of all representations for the user.
+ */
+export async function getAllRepresentationsForUser(userId: string): Promise<Representation[]> {
   return representationRepository.getForUser(userId);
 }
 
