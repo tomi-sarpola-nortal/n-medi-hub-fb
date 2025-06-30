@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -83,7 +84,7 @@ export default function LanguageSwitcher({ initialLocale, className, ...props }:
     <div className={cn("", className)} {...props}>
       <Select value={currentLocale} onValueChange={handleChange}>
         <SelectTrigger 
-          className="h-8 px-3 text-sm"
+          className="h-9 w-full px-3 text-sm"
           aria-label={t('language_switcher_label')}
         >
             <div className="flex items-center gap-2">

@@ -162,7 +162,7 @@ export function AppSidebar() {
                <LanguageSwitcher />
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <Button asChild variant="outline" className="w-full justify-start h-8 px-3 text-sm">
+              <Button asChild variant="outline" className="w-full justify-start h-9 px-3 text-sm">
                   <Link href={`/${locale}/developer`}>
                       <Database className="h-5 w-5"/>
                       <span>{t.sidebar_developer_module || "Developer Module"}</span>
@@ -173,7 +173,7 @@ export function AppSidebar() {
                 <Button
                     onClick={handleLogoutClick}
                     variant="outline"
-                    className="w-full justify-start h-8 px-3 text-sm"
+                    className="w-full justify-start h-9 px-3 text-sm"
                 >
                     <LogOut className="h-5 w-5"/>
                     <span>{t.sidebar_logout || "Logout"}</span>
