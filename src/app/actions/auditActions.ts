@@ -4,7 +4,7 @@ import { createAuditLog } from '@/services/auditLogService';
 import type { AuditLogCreationData, Person, UserRole } from '@/lib/types';
 
 interface LogParams {
-    auditor: { id: string; name: string; role: UserRole; chamber: string; };
+    auditor: { id: string; name: string; role: UserRole; bureau: string; };
     impacted: { id:string; name: string };
     operation: 'create' | 'read' | 'update' | 'delete';
     collectionName: string;
@@ -18,7 +18,7 @@ export async function logGeneralAudit(params: LogParams): Promise<{ success: boo
       userId: params.auditor.id,
       userName: params.auditor.name,
       userRole: params.auditor.role,
-      userChamber: params.auditor.chamber,
+      userBureau: params.auditor.bureau,
       collectionName: params.collectionName,
       documentId: params.impacted.id,
       fieldName: params.fieldName,

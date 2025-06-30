@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
-import StateChamberInfo from './StateChamberInfo';
+import StateBureauInfo from './StateChamberInfo';
 import { getConfirmedRepresentationHours, getRepresentationsForUser, updateRepresentationStatus } from '@/services/representationService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CircularProgress } from '@/components/ui/circular-progress';
@@ -223,8 +223,8 @@ export default function DentistDashboard({ user, t }: DentistDashboardProps) {
                     </div>
 
                     <div className="lg:col-span-1">
-                        {/* Chamber Info Card */}
-                        <StateChamberInfo chamberId={user.stateChamberId} />
+                        {/* Bureau Info Card */}
+                        <StateBureauInfo bureauId={user.stateBureauId} />
                     </div>
                 </div>
             )}

@@ -53,7 +53,7 @@
   "email_subject_new_registration": "New Member Registration for Review",
   "email_body_new_registration": "Dear {targetName},<br><br>A new member registration for {actorName} is ready for your review. Please log in to the portal.<br><br>Thank you.",
   "email_subject_registration_approved": "Your Registration has been Approved",
-  "email_body_registration_approved": "Dear {targetName},<br><br>Congratulations! Your registration with the Medical Chamber has been approved. You can now access all portal features.<br><br>Thank you.",
+  "email_body_registration_approved": "Dear {targetName},<br><br>Congratulations! Your registration with the Medical Bureau has been approved. You can now access all portal features.<br><br>Thank you.",
   "email_subject_registration_rejected": "Update on Your Registration",
   "email_body_registration_rejected": "Dear {targetName},<br><br>There has been an update regarding your registration application. Please log in to the portal for more details.<br><br>Thank you.",
 

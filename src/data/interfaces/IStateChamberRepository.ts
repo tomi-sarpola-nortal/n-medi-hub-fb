@@ -1,27 +1,27 @@
-import type { StateChamber, StateChamberCreationData } from '@/lib/types';
+import type { StateBureau, StateBureauCreationData } from '@/lib/types';
 
 /**
- * Interface for the StateChamber repository
- * Defines methods for interacting with state chamber data
+ * Interface for the StateBureau repository
+ * Defines methods for interacting with state bureau data
  */
-export interface IStateChamberRepository {
+export interface IStateBureauRepository {
   /**
-   * Creates a new state chamber document in the data store
-   * @param id The document ID for the new chamber (e.g., 'wien')
-   * @param chamberData The data for the new chamber
+   * Creates a new state bureau document in the data store
+   * @param id The document ID for the new bureau (e.g., 'wien')
+   * @param bureauData The data for the new bureau
    */
-  create(id: string, chamberData: StateChamberCreationData): Promise<void>;
+  create(id: string, bureauData: StateBureauCreationData): Promise<void>;
   
   /**
-   * Retrieves a state chamber by its ID
-   * @param id The ID of the state chamber to retrieve
-   * @returns A StateChamber object if found, otherwise null
+   * Retrieves a state bureau by its ID
+   * @param id The ID of the state bureau to retrieve
+   * @returns A StateBureau object if found, otherwise null
    */
-  getById(id: string): Promise<StateChamber | null>;
+  getById(id: string): Promise<StateBureau | null>;
   
   /**
-   * Retrieves all state chambers from the data store
-   * @returns An array of StateChamber objects
+   * Retrieves all state bureaus from the data store
+   * @returns An array of StateBureau objects
    */
-  getAll(): Promise<StateChamber[]>;
+  getAll(): Promise<StateBureau[]>;
 }

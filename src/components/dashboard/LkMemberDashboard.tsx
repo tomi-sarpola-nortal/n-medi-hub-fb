@@ -12,7 +12,7 @@ import { getAllPersons } from '@/services/personService';
 import { getOldPendingRepresentations } from '@/services/representationService';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import StateChamberInfo from './StateChamberInfo';
+import StateBureauInfo from './StateChamberInfo';
 
 interface LkMemberDashboardProps {
     user: Person;
@@ -231,7 +231,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                 </div>
                 
                 <div className="lg:col-span-1">
-                    <StateChamberInfo chamberId={user.stateChamberId} />
+                    <StateBureauInfo bureauId={user.stateBureauId} />
                 </div>
             </div>
         </div>

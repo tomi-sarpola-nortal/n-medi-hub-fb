@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { getStateChamberById } from '@/services/stateChamberService';
+import { getStateBureauById } from '@/services/stateChamberService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
-import type { StateChamber } from '@/lib/types';
+import type { StateBureau } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClientTranslations } from '@/hooks/use-client-translations';
 import { useToast } from '@/hooks/use-toast';
 
-interface StateChamberInfoProps {
-  chamberId?: string;
+interface StateBureauInfoProps {
+  bureauId?: string;
 }
 
 const LoadingSkeleton = () => (
@@ -46,48 +46,48 @@ const LoadingSkeleton = () => (
   </Card>
 );
 
-export default function StateChamberInfo({ chamberId }: StateChamberInfoProps) {
-  const [chamber, setChamber] = useState<StateChamber | null>(null);
+export default function StateBureauInfo({ bureauId }: StateBureauInfoProps) {
+  const [bureau, setBureau] = useState<StateBureau | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useClientTranslations(['dashboard']);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!chamberId) {
+    if (!bureauId) {
       setIsLoading(false);
       return;
     }
 
-    const fetchChamber = async () => {
+    const fetchBureau = async () => {
       setIsLoading(true);
       try {
-        const chamberData = await getStateChamberById(chamberId);
-        setChamber(chamberData);
+        const bureauData = await getStateBureauById(bureauId);
+        setBureau(bureauData);
       } catch (error) {
-        console.error("Failed to fetch state chamber info:", error);
+        console.error("Failed to fetch state bureau info:", error);
         toast({
           title: "Error",
-          description: "Failed to load chamber information. Please try again later.",
+          description: "Failed to load bureau information. Please try again later.",
           variant: "destructive"
         });
-        setChamber(null);
+        setBureau(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchChamber();
-  }, [chamberId, toast]);
+    fetchBureau();
+  }, [bureauId, toast]);
 
   if (isLoading) {
     return <LoadingSkeleton />;
   }
   
-  if (!chamberId || !chamber) {
+  if (!bureauId || !bureau) {
     return (
       <Card className="shadow-lg">
-        <CardHeader><CardTitle>{t('chamber_info_title')}</CardTitle></CardHeader>
-        <CardContent><p>Chamber information not found.</p></CardContent>
+        <CardHeader><CardTitle>{t('bureau_info_title')}</CardTitle></CardHeader>
+        <CardContent><p>State Bureau information not found.</p></CardContent>
       </Card>
     );
   }
@@ -95,25 +95,25 @@ export default function StateChamberInfo({ chamberId }: StateChamberInfoProps) {
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader>
-        <CardTitle className="text-lg font-medium font-headline">{t('chamber_info_title')}</CardTitle>
+        <CardTitle className="text-lg font-medium font-headline">{t('bureau_info_title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
-        <p className="font-semibold">{chamber.name}</p>
+        <p className="font-semibold">{bureau.name}</p>
         <div className="flex items-start gap-3">
           <MapPin className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-          <span className="whitespace-pre-line">{chamber.address}</span>
+          <span className="whitespace-pre-line">{bureau.address}</span>
         </div>
         <div className="flex items-center gap-3">
           <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-          <span className="break-words">{chamber.phone}</span>
+          <span className="break-words">{bureau.phone}</span>
         </div>
         <div className="flex items-center gap-3">
           <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
-          <span className="break-all">{chamber.email}</span>
+          <span className="break-all">{bureau.email}</span>
         </div>
         <div className="flex items-start gap-3">
           <Clock className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-          <span className="whitespace-pre-line">{chamber.officeHours}</span>
+          <span className="whitespace-pre-line">{bureau.officeHours}</span>
         </div>
       </CardContent>
     </Card>

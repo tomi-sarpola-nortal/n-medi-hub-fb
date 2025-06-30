@@ -55,7 +55,7 @@ export interface IPersonBase {
   dentistId?: string;
   avatarUrl?: string;
   status: 'pending' | 'active' | 'inactive' | 'rejected';
-  stateChamberId?: string;
+  stateBureauId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -179,9 +179,9 @@ export interface ZfdGroup {
 export type ZfdGroupCreationData = Omit<ZfdGroup, 'id'>;
 
 // ==========================================
-// Chamber and Organization Types
+// Bureau and Organization Types
 // ==========================================
-export interface StateChamber {
+export interface StateBureau {
   id: string;
   name: string;
   address: string;
@@ -190,7 +190,7 @@ export interface StateChamber {
   officeHours: string;
 }
 
-export type StateChamberCreationData = Omit<StateChamber, 'id'>;
+export type StateBureauCreationData = Omit<StateBureau, 'id'>;
 
 // ==========================================
 // Representation Types
@@ -220,7 +220,7 @@ export interface AuditLog {
   userId: string;
   userName: string;
   userRole: UserRole;
-  userChamber: string;
+  userBureau: string;
   collectionName: string;
   documentId: string;
   fieldName: string | string[];

@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateChambers, seedZfdGroups, seedUsersAndRepresentations, seedDemoUsers } from '@/app/actions/seedActions';
+import { seedTrainingCategories, seedTrainingOrganizers, seedTrainingHistory, seedStateBureaus, seedZfdGroups, seedUsersAndRepresentations, seedDemoUsers } from '@/app/actions/seedActions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -11,7 +11,7 @@ export default function SeedButton() {
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
   const [isOrganizersLoading, setIsOrganizersLoading] = useState(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
-  const [isChambersLoading, setIsChambersLoading] = useState(false);
+  const [isBureausLoading, setIsBureausLoading] = useState(false);
   const [isZfdGroupsLoading, setIsZfdGroupsLoading] = useState(false);
   const [isOtherUsersLoading, setIsOtherUsersLoading] = useState(false);
   const [isDemoUsersLoading, setIsDemoUsersLoading] = useState(false);
@@ -74,12 +74,12 @@ export default function SeedButton() {
     setIsHistoryLoading(false);
   };
 
-  const handleSeedStateChambers = async () => {
-    setIsChambersLoading(true);
+  const handleSeedStateBureaus = async () => {
+    setIsBureausLoading(true);
     try {
-      const result = await seedStateChambers();
+      const result = await seedStateBureaus();
       toast({
-        title: "Seeding Report (State Chambers)",
+        title: "Seeding Report (State Bureaus)",
         description: result.message,
       });
     } catch (error) {
@@ -90,7 +90,7 @@ export default function SeedButton() {
         variant: "destructive",
       });
     }
-    setIsChambersLoading(false);
+    setIsBureausLoading(false);
   };
   
   const handleSeedZfdGroups = async () => {
@@ -170,11 +170,9 @@ export default function SeedButton() {
         <Button onClick={handleSeedHistory} disabled={isHistoryLoading} variant="destructive" className="w-full sm:w-auto">
           {isHistoryLoading ? "Seeding..." : "Seed Training History"}
         </Button>
-        <Button onClick={handleSeedStateChambers} disabled={isChambersLoading} variant="destructive" className="w-full sm:w-auto">
-          {isChambersLoading ? "Seeding..." : "Seed State Chambers"}
+        <Button onClick={handleSeedStateBureaus} disabled={isBureausLoading} variant="destructive" className="w-full sm:w-auto">
+          {isBureausLoading ? "Seeding..." : "Seed State Bureaus"}
         </Button>
     </div>
   );
 }
-
-    

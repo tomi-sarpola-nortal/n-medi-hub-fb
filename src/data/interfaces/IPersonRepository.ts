@@ -16,6 +16,6 @@ export interface IPersonRepository {
   }): Promise<{ data: Person[]; total: number }>;
   getByRole(role: UserRole): Promise<Person[]>;
   getPersonsToReview(): Promise<Person[]>;
-  review(personId: string, decision: 'approve' | 'deny' | 'reject', justification: string | undefined, auditor: { id: string; name: string; role: UserRole; chamber: string; }, locale: string): Promise<void>;
+  review(personId: string, decision: 'approve' | 'deny' | 'reject', justification: string | undefined, auditor: { id: string; name: string; role: UserRole; bureau: string; }, locale: string): Promise<void>;
 }
     

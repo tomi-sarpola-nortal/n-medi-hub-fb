@@ -11,7 +11,7 @@
   "login_support_link": "Contact our support",
   "login_register_title": "Not yet registered with the Medical Bureau?",
   "login_register_description": "If you are new to practicing in the region and do not yet have an entry with the Medical Bureau, you can apply for an entry here.",
-  "login_register_button_text": "APPLY FOR CHAMBER REGISTRATION",
+  "login_register_button_text": "APPLY FOR BUREAU REGISTRATION",
   "login_error_title": "Login Failed",
   "login_error_description": "The email or password you entered is incorrect. Please try again.",
   "login_error_pending_approval": "Your account is pending approval. You will receive an email once it has been reviewed.",

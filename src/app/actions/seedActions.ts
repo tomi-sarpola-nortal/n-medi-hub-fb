@@ -4,9 +4,9 @@
 import { findPersonByEmail, updatePerson, createPerson, getPersonById } from '@/services/personService';
 import { createTrainingCategory, findTrainingCategoryByAbbreviation } from '@/services/trainingCategoryService';
 import { addTrainingHistoryForUser, getTrainingHistoryForUser } from '@/services/trainingHistoryService';
-import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateChamberCreationData, ZfdGroupCreationData, UserRole } from '@/lib/types';
+import type { PersonCreationData, RepresentationCreationData, TrainingCategoryCreationData, TrainingOrganizerCreationData, TrainingHistoryCreationData, StateBureauCreationData, ZfdGroupCreationData, UserRole } from '@/lib/types';
 import { createTrainingOrganizer, findTrainingOrganizerByName } from '@/services/trainingOrganizerService';
-import { createStateChamber, getStateChamberById } from '@/services/stateChamberService';
+import { createStateBureau, getStateBureauById } from '@/services/stateChamberService';
 import { createZfdGroup } from '@/services/zfdGroupService';
 import { createRepresentation } from '@/services/representationService';
 import { adminAuth } from '@/lib/firebaseAdminConfig';
@@ -44,23 +44,23 @@ const organizersToSeed: TrainingOrganizerCreationData[] = [
   { name: 'Thieme', isActive: true },
 ];
 
-const chambersToSeed: { id: string, data: StateChamberCreationData }[] = [
-    { id: 'bw', data: { name: 'Ärztekammer Baden-Württemberg', address: 'Jahnstraße 5, 70597 Stuttgart', phone: '+49 711 76981-0', email: 'info@laek-bw.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 12:00 Uhr' } },
-    { id: 'by', data: { name: 'Bayerische Landesärztekammer', address: 'Mühlbaurstraße 16, 81677 München', phone: '+49 89 4147-0', email: 'info@blaek.de', officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
-    { id: 'be', data: { name: 'Ärztekammer Berlin', address: 'Friedrichstraße 16, 10969 Berlin', phone: '+49 30 400456-0', email: 'kammer@aekb.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
-    { id: 'bb', data: { name: 'Landesärztekammer Brandenburg', address: 'Dreifertstraße 12, 03044 Cottbus', phone: '+49 355 78010-0', email: 'info@laekb.de', officeHours: 'Mo-Do: 8:30 - 15:30 Uhr\nFr: 8:30 - 12:00 Uhr' } },
-    { id: 'hb', data: { name: 'Ärztekammer Bremen', address: 'Schwachhauser Heerstraße 30, 28209 Bremen', phone: '+49 421 3404-200', email: 'info@aekhb.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 13:00 Uhr' } },
-    { id: 'hh', data: { name: 'Ärztekammer Hamburg', address: 'Weidestraße 122 B, 22083 Hamburg', phone: '+49 40 227197-0', email: 'info@aekhh.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 14:00 Uhr' } },
-    { id: 'he', data: { name: 'Landesärztekammer Hessen', address: 'Im Vogelsgesang 3, 60488 Frankfurt am Main', phone: '+49 69 97672-0', email: 'info@laekh.de', officeHours: 'Mo-Fr: 8:00 - 16:30 Uhr' } },
-    { id: 'mv', data: { name: 'Ärztekammer Mecklenburg-Vorpommern', address: 'August-Bebel-Straße 9a, 18055 Rostock', phone: '+49 381 49280-0', email: 'info@aek-mv.de', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
-    { id: 'ni', data: { name: 'Ärztekammer Niedersachsen', address: 'Berliner Allee 20, 30175 Hannover', phone: '+49 511 380-02', email: 'info@aekn.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
-    { id: 'nw', data: { name: 'Ärztekammer Nordrhein', address: 'Tersteegenstraße 9, 40474 Düsseldorf', phone: '+49 211 4302-0', email: 'aerztekammer.nordrhein@aekno.de', officeHours: 'Mo-Fr: 8:00 - 16:00 Uhr' } },
-    { id: 'rp', data: { name: 'Landesärztekammer Rheinland-Pfalz', address: 'Deutschhausplatz 3, 55116 Mainz', phone: '+49 6131 28822-0', email: 'info@laek-rlp.de', officeHours: 'Mo-Do: 8:30 - 16:30 Uhr\nFr: 8:30 - 12:30 Uhr' } },
-    { id: 'sl', data: { name: 'Ärztekammer des Saarlandes', address: 'Faktoreistraße 4, 66111 Saarbrücken', phone: '+49 681 4003-0', email: 'info@aeksaar.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
-    { id: 'sn', data: { name: 'Sächsische Landesärztekammer', address: 'Schützenhöhe 16, 01099 Dresden', phone: '+49 351 8267-0', email: 'dresden@slaek.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
-    { id: 'st', data: { name: 'Ärztekammer Sachsen-Anhalt', address: 'Doctor-Eisenbart-Ring 2, 39120 Magdeburg', phone: '+49 391 6054-6', email: 'info@aeksa.de', officeHours: 'Mo-Fr: 8:30 - 15:30 Uhr' } },
-    { id: 'sh', data: { name: 'Ärztekammer Schleswig-Holstein', address: 'Bismarckallee 8-12, 23795 Bad Segeberg', phone: '+49 4551 803-0', email: 'info@aeksh.de', officeHours: 'Mo-Fr: 9:00 - 16:00 Uhr' } },
-    { id: 'th', data: { name: 'Landesärztekammer Thüringen', address: 'Im Semmicht 33, 07751 Jena-Maua', phone: '+49 3641 614-0', email: 'info@laek-thueringen.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+const bureausToSeed: { id: string, data: StateBureauCreationData }[] = [
+    { id: 'bw', data: { name: 'Ärztebüro Baden-Württemberg', address: 'Jahnstraße 5, 70597 Stuttgart', phone: '+49 711 76981-0', email: 'info@laek-bw.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 12:00 Uhr' } },
+    { id: 'by', data: { name: 'Bayerisches Landesärztebüro', address: 'Mühlbaurstraße 16, 81677 München', phone: '+49 89 4147-0', email: 'info@blaek.de', officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'be', data: { name: 'Ärztebüro Berlin', address: 'Friedrichstraße 16, 10969 Berlin', phone: '+49 30 400456-0', email: 'kammer@aekb.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'bb', data: { name: 'Landesärztebüro Brandenburg', address: 'Dreifertstraße 12, 03044 Cottbus', phone: '+49 355 78010-0', email: 'info@laekb.de', officeHours: 'Mo-Do: 8:30 - 15:30 Uhr\nFr: 8:30 - 12:00 Uhr' } },
+    { id: 'hb', data: { name: 'Ärztebüro Bremen', address: 'Schwachhauser Heerstraße 30, 28209 Bremen', phone: '+49 421 3404-200', email: 'info@aekhb.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 13:00 Uhr' } },
+    { id: 'hh', data: { name: 'Ärztebüro Hamburg', address: 'Weidestraße 122 B, 22083 Hamburg', phone: '+49 40 227197-0', email: 'info@aekhh.de', officeHours: 'Mo-Do: 9:00 - 16:00 Uhr\nFr: 9:00 - 14:00 Uhr' } },
+    { id: 'he', data: { name: 'Landesärztebüro Hessen', address: 'Im Vogelsgesang 3, 60488 Frankfurt am Main', phone: '+49 69 97672-0', email: 'info@laekh.de', officeHours: 'Mo-Fr: 8:00 - 16:30 Uhr' } },
+    { id: 'mv', data: { name: 'Ärztebüro Mecklenburg-Vorpommern', address: 'August-Bebel-Straße 9a, 18055 Rostock', phone: '+49 381 49280-0', email: 'info@aek-mv.de', officeHours: 'Mo-Do: 8:00 - 16:00 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'ni', data: { name: 'Ärztebüro Niedersachsen', address: 'Berliner Allee 20, 30175 Hannover', phone: '+49 511 380-02', email: 'info@aekn.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'nw', data: { name: 'Ärztebüro Nordrhein', address: 'Tersteegenstraße 9, 40474 Düsseldorf', phone: '+49 211 4302-0', email: 'aerztekammer.nordrhein@aekno.de', officeHours: 'Mo-Fr: 8:00 - 16:00 Uhr' } },
+    { id: 'rp', data: { name: 'Landesärztebüro Rheinland-Pfalz', address: 'Deutschhausplatz 3, 55116 Mainz', phone: '+49 6131 28822-0', email: 'info@laek-rlp.de', officeHours: 'Mo-Do: 8:30 - 16:30 Uhr\nFr: 8:30 - 12:30 Uhr' } },
+    { id: 'sl', data: { name: 'Ärztebüro des Saarlandes', address: 'Faktoreistraße 4, 66111 Saarbrücken', phone: '+49 681 4003-0', email: 'info@aeksaar.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
+    { id: 'sn', data: { name: 'Sächsisches Landesärztebüro', address: 'Schützenhöhe 16, 01099 Dresden', phone: '+49 351 8267-0', email: 'dresden@slaek.de', officeHours: 'Mo-Fr: 9:00 - 15:00 Uhr' } },
+    { id: 'st', data: { name: 'Ärztebüro Sachsen-Anhalt', address: 'Doctor-Eisenbart-Ring 2, 39120 Magdeburg', phone: '+49 391 6054-6', email: 'info@aeksa.de', officeHours: 'Mo-Fr: 8:30 - 15:30 Uhr' } },
+    { id: 'sh', data: { name: 'Ärztebüro Schleswig-Holstein', address: 'Bismarckallee 8-12, 23795 Bad Segeberg', phone: '+49 4551 803-0', email: 'info@aeksh.de', officeHours: 'Mo-Fr: 9:00 - 16:00 Uhr' } },
+    { id: 'th', data: { name: 'Landesärztebüro Thüringen', address: 'Im Semmicht 33, 07751 Jena-Maua', phone: '+49 3641 614-0', email: 'info@laek-thueringen.de', officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 13:00 Uhr' } },
 ];
 
 
@@ -117,29 +117,29 @@ export async function seedTrainingOrganizers(): Promise<{ success: boolean; mess
 }
 
 
-export async function seedStateChambers(): Promise<{ success: boolean; message: string }> {
+export async function seedStateBureaus(): Promise<{ success: boolean; message: string }> {
     try {
         let createdCount = 0;
         let skippedCount = 0;
 
-        for (const chamber of chambersToSeed) {
-            const existing = await getStateChamberById(chamber.id);
+        for (const bureau of bureausToSeed) {
+            const existing = await getStateBureauById(bureau.id);
             if (existing) {
                 skippedCount++;
             } else {
-                await createStateChamber(chamber.id, chamber.data);
+                await createStateBureau(bureau.id, bureau.data);
                 createdCount++;
             }
         }
         
         return { 
         success: true, 
-        message: `Seeding complete. Created: ${createdCount} new state chambers. Skipped: ${skippedCount} existing chambers.` 
+        message: `Seeding complete. Created: ${createdCount} new state bureaus. Skipped: ${skippedCount} existing bureaus.` 
         };
     } catch (error) {
-        console.error('Error seeding state chambers:', error);
+        console.error('Error seeding state bureaus:', error);
         const errorMessage = error instanceof Error ? error.message : String(error);
-        return { success: false, message: `Error seeding chambers: ${errorMessage}` };
+        return { success: false, message: `Error seeding bureaus: ${errorMessage}` };
     }
 }
 
@@ -252,13 +252,13 @@ export async function setSabineMuellerToPending(): Promise<{ success: boolean; m
   }
 }
 
-const usersToSeedForReps: { email: string; name: string; dentistId?: string; role: UserRole }[] = [
-    { email: 'mark.weaver@example.com', name: 'Dr. Mark Weaver', dentistId: '78954', role: 'dentist' },
-    { email: 'julia.smith@example.com', name: 'Dr. Julia Smith', dentistId: '65412', role: 'dentist' },
-    { email: 'thomas.miller@example.com', name: 'Dr. Thomas Miller', dentistId: '34567', role: 'dentist' },
-    { email: 'sarah.baker@example.com', name: 'Dr. Sarah Baker', dentistId: '23456', role: 'dentist' },
-    { email: 'lucas.hoffman@example.com', name: 'Dr. Lucas Hoffman', dentistId: '78954', role: 'dentist' },
-    { email: 'anna.taylor@example.com', name: 'Dr. Anna Taylor', dentistId: '65412', role: 'dentist' },
+const usersToSeedForReps: { email: string; name: string; dentistId?: string; role: UserRole; stateBureauId: string; }[] = [
+    { email: 'mark.weaver@example.com', name: 'Dr. Mark Weaver', dentistId: '78954', role: 'dentist', stateBureauId: 'hh' },
+    { email: 'julia.smith@example.com', name: 'Dr. Julia Smith', dentistId: '65412', role: 'dentist', stateBureauId: 'hh' },
+    { email: 'thomas.miller@example.com', name: 'Dr. Thomas Miller', dentistId: '34567', role: 'dentist', stateBureauId: 'hh' },
+    { email: 'sarah.baker@example.com', name: 'Dr. Sarah Baker', dentistId: '23456', role: 'dentist', stateBureauId: 'hh' },
+    { email: 'lucas.hoffman@example.com', name: 'Dr. Lucas Hoffman', dentistId: '78954', role: 'dentist', stateBureauId: 'hh' },
+    { email: 'anna.taylor@example.com', name: 'Dr. Anna Taylor', dentistId: '65412', role: 'dentist', stateBureauId: 'hh' },
 ];
 
 export async function seedUsersAndRepresentations(): Promise<{ success: boolean; message: string }> {
@@ -285,7 +285,7 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
             if (!person) {
                 const newPersonData: PersonCreationData = {
                     name: userData.name, email: userData.email, dentistId: userData.dentistId,
-                    role: userData.role, status: 'active', region: 'Wien', stateChamberId: 'wien',
+                    role: userData.role, status: 'active', region: 'Wien', stateBureauId: userData.stateBureauId,
                     otpEnabled: false, notificationSettings: { inApp: true, email: false },
                     avatarUrl: `https://avatar.vercel.sh/${userData.email}.png?size=100`,
                 };
@@ -367,9 +367,9 @@ export async function seedUsersAndRepresentations(): Promise<{ success: boolean;
 export async function seedDemoUsers(): Promise<{ success: boolean; message: string }> {
   try {
     const demoUsers = [
-      { email: process.env.DENTIST_EMAIL, firstName: 'Sarah', lastName: 'Miller', role: 'dentist' as UserRole, dentistId: '12345', title: 'Dr.' },
-      { email: process.env.DENTIST2_EMAIL, firstName: 'Asif', lastName: 'Adidas', role: 'dentist' as UserRole, dentistId: '54321', title: 'Dr.' },
-      { email: process.env.LK_MEMBER_EMAIL, firstName: 'Max', lastName: 'Sample', role: 'lk_member' as UserRole, dentistId: '54326', title: 'Dr.' },
+      { email: process.env.DENTIST_EMAIL, firstName: 'Sarah', lastName: 'Miller', role: 'dentist' as UserRole, dentistId: '12345', title: 'Dr.', stateBureauId: 'by' },
+      { email: process.env.DENTIST2_EMAIL, firstName: 'Asif', lastName: 'Adidas', role: 'dentist' as UserRole, dentistId: '54321', title: 'Dr.', stateBureauId: 'nw' },
+      { email: process.env.LK_MEMBER_EMAIL, firstName: 'Max', lastName: 'Sample', role: 'lk_member' as UserRole, dentistId: '54326', title: 'Dr.', stateBureauId: 'be' },
     ];
 
     let createdCount = 0;
@@ -399,7 +399,7 @@ export async function seedDemoUsers(): Promise<{ success: boolean; message: stri
           role: demoUser.role,
           status: 'active',
           region: 'Wien',
-          stateChamberId: 'wien',
+          stateBureauId: demoUser.stateBureauId,
           dentistId: demoUser.dentistId,
           otpEnabled: false,
           notificationSettings: { inApp: true, email: false },

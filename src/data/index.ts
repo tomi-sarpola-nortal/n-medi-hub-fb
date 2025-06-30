@@ -4,7 +4,7 @@ import { FirebaseTrainingCategoryRepository } from './firebase/FirebaseTrainingC
 import { FirebaseTrainingOrganizerRepository } from './firebase/FirebaseTrainingOrganizerRepository';
 import { FirebaseTrainingHistoryRepository } from './firebase/FirebaseTrainingHistoryRepository';
 import { FirebasePersonRepository } from './firebase/FirebasePersonRepository';
-import { FirebaseStateChamberRepository } from './firebase/FirebaseStateChamberRepository';
+import { FirebaseStateBureauRepository } from './firebase/FirebaseStateChamberRepository';
 
 import { IRepresentationRepository } from './interfaces/IRepresentationRepository';
 import { IDocumentTemplateRepository } from './interfaces/IDocumentTemplateRepository';
@@ -12,7 +12,7 @@ import { ITrainingCategoryRepository } from './interfaces/ITrainingCategoryRepos
 import { ITrainingOrganizerRepository } from './interfaces/ITrainingOrganizerRepository';
 import { ITrainingHistoryRepository } from './interfaces/ITrainingHistoryRepository';
 import { IPersonRepository } from './interfaces/IPersonRepository';
-import { IStateChamberRepository } from './interfaces/IStateChamberRepository';
+import { IStateBureauRepository } from './interfaces/IStateChamberRepository';
 
 // Create and export repository instances
 export const representationRepository: IRepresentationRepository = new FirebaseRepresentationRepository();
@@ -21,4 +21,4 @@ export const trainingCategoryRepository: ITrainingCategoryRepository = new Fireb
 export const trainingOrganizerRepository: ITrainingOrganizerRepository = new FirebaseTrainingOrganizerRepository();
 export const trainingHistoryRepository: ITrainingHistoryRepository = new FirebaseTrainingHistoryRepository();
 export const personRepository: IPersonRepository = new FirebasePersonRepository();
-export const stateChamberRepository: IStateChamberRepository = new FirebaseStateChamberRepository();
+export const stateBureauRepository: IStateBureauRepository = new FirebaseStateBureauRepository();

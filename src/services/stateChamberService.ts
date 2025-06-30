@@ -1,50 +1,50 @@
 'use server';
 
-import { stateChamberRepository } from '@/data';
-import type { StateChamber, StateChamberCreationData } from '@/lib/types';
+import { stateBureauRepository } from '@/data';
+import type { StateBureau, StateBureauCreationData } from '@/lib/types';
 import { withErrorHandling } from '@/app/actions/errorHandler';
 import { ValidationError } from '@/lib/errors';
 
 /**
- * Creates a new state chamber document in Firestore. The ID is provided explicitly.
- * @param id The document ID for the new chamber (e.g., 'wien').
- * @param chamberData The data for the new chamber.
+ * Creates a new state bureau document in Firestore. The ID is provided explicitly.
+ * @param id The document ID for the new bureau (e.g., 'wien').
+ * @param bureauData The data for the new bureau.
  */
-export const createStateChamber = withErrorHandling(
-  async (id: string, chamberData: StateChamberCreationData): Promise<void> => {
+export const createStateBureau = withErrorHandling(
+  async (id: string, bureauData: StateBureauCreationData): Promise<void> => {
     if (!id) {
-      throw new ValidationError("Chamber ID is required");
+      throw new ValidationError("Bureau ID is required");
     }
     
-    if (!chamberData.name) {
-      throw new ValidationError("Chamber name is required");
+    if (!bureauData.name) {
+      throw new ValidationError("Bureau name is required");
     }
     
-    return stateChamberRepository.create(id, chamberData);
+    return stateBureauRepository.create(id, bureauData);
   }
 );
 
 /**
- * Finds a state chamber by its ID.
+ * Finds a state bureau by its ID.
  * @param id The ID to search for.
- * @returns A StateChamber object if found, otherwise null.
+ * @returns A StateBureau object if found, otherwise null.
  */
-export const getStateChamberById = withErrorHandling(
-  async (id: string): Promise<StateChamber | null> => {
+export const getStateBureauById = withErrorHandling(
+  async (id: string): Promise<StateBureau | null> => {
     if (!id) {
-      throw new ValidationError("Chamber ID is required");
+      throw new ValidationError("Bureau ID is required");
     }
     
-    return stateChamberRepository.getById(id);
+    return stateBureauRepository.getById(id);
   }
 );
 
 /**
- * Retrieves all state chambers from Firestore.
- * @returns An array of StateChamber objects.
+ * Retrieves all state bureaus from Firestore.
+ * @returns An array of StateBureau objects.
  */
-export const getAllStateChambers = withErrorHandling(
-  async (): Promise<StateChamber[]> => {
-    return stateChamberRepository.getAll();
+export const getAllStateBureaus = withErrorHandling(
+  async (): Promise<StateBureau[]> => {
+    return stateBureauRepository.getAll();
   }
 );

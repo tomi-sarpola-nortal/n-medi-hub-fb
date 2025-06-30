@@ -63,7 +63,7 @@ export class FirebasePersonRepository implements IPersonRepository {
       status: data.status,
       otpEnabled: data.otpEnabled,
       otpSecret: data.otpSecret,
-      stateChamberId: data.stateChamberId || 'wien',
+      stateBureauId: data.stateBureauId || 'wien',
       
       // Add missing fields to make it a complete user representation
       approved: data.approved,
@@ -369,7 +369,7 @@ export class FirebasePersonRepository implements IPersonRepository {
     personId: string, 
     decision: 'approve' | 'deny' | 'reject', 
     justification: string | undefined,
-    auditor: { id: string; name: string; role: UserRole; chamber: string; },
+    auditor: { id: string; name: string; role: UserRole; bureau: string; },
     locale: string = 'en'
   ): Promise<void> {
     try {
@@ -386,7 +386,7 @@ export class FirebasePersonRepository implements IPersonRepository {
         userId: auditor.id,
         userName: auditor.name,
         userRole: auditor.role,
-        userChamber: auditor.chamber,
+        userBureau: auditor.bureau,
         collectionName: 'persons',
         documentId: personId,
         fieldName: isNewRegistration ? 'status' : 'pendingData',
