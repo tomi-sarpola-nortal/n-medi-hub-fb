@@ -1,6 +1,8 @@
 {
   "projects": {
-    "dev": "n-medi-portal-dev-v7"
+    "dev": "n-medi-portal-dev-v7",
+    "default": "n-medi-portal-dev-v7",
+    "prod": "n-medi-portal-prd-v7"
   },
   "targets": {},
   "etags": {}
