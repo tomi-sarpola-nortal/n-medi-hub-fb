@@ -117,9 +117,9 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                             {registrationsToReview.map((member, index) => (
                                                 <React.Fragment key={member.id}>
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-                                                        <div>
-                                                            <p className="font-semibold text-base">{member.name}</p>
-                                                            <div className="flex items-center gap-2 mt-1">
+                                                        <div className="flex-grow min-w-0">
+                                                            <p className="font-semibold text-base truncate">{member.name}</p>
+                                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                                 <p className="text-sm text-muted-foreground">
                                                                     {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                                                 </p>
@@ -128,7 +128,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                 </Badge>
                                                             </div>
                                                         </div>
-                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0 flex-shrink-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
                                                                 <FilePen className="mr-2 h-4 w-4" />
                                                                 {t('member_overview_review_registration_button')}
@@ -158,9 +158,9 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                             {changesToReview.map((member, index) => (
                                                 <React.Fragment key={member.id}>
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-                                                        <div>
-                                                            <p className="font-semibold text-base">{member.name}</p>
-                                                            <div className="flex items-center gap-2 mt-1">
+                                                        <div className="flex-grow min-w-0">
+                                                            <p className="font-semibold text-base truncate">{member.name}</p>
+                                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                                 <p className="text-sm text-muted-foreground">
                                                                     {member.updatedAt ? format(new Date(member.updatedAt), 'dd.MM.yyyy') : '-'}
                                                                 </p>
@@ -169,7 +169,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                 </Badge>
                                                             </div>
                                                         </div>
-                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0 flex-shrink-0">
                                                             <Link href={`/${locale}/member-overview/${member.id}/review`}>
                                                                 <FilePen className="mr-2 h-4 w-4" />
                                                                 {t('member_overview_review_changes_button')}
@@ -201,9 +201,9 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                             {overdueRepsByPerson.map((item, index) => (
                                                 <React.Fragment key={item.personId}>
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-                                                        <div>
-                                                            <p className="font-semibold">{item.personName}</p>
-                                                             <div className="flex items-center gap-2 mt-1">
+                                                        <div className="flex-grow min-w-0">
+                                                            <p className="font-semibold truncate">{item.personName}</p>
+                                                             <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                                 <p className="text-sm text-muted-foreground">
                                                                     {t("dashboard_overdue_reps_for_person", { count: item.count })}
                                                                 </p>
@@ -212,7 +212,7 @@ export default function LkMemberDashboard({ user, t, locale }: LkMemberDashboard
                                                                 </Badge>
                                                             </div>
                                                         </div>
-                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                                                        <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0 flex-shrink-0">
                                                             <Link href={`/${locale}/member-overview/${item.personId}?tab=vertretungen`}>
                                                                 <Users2 className="mr-2 h-4 w-4" />
                                                                 {t('dashboard_old_reps_button')}
