@@ -158,7 +158,7 @@ Once your environment is deployed and running:
     **Test Data (For demonstration purposes):**
     *   **Seed Demo Users**: Creates the primary demo users and assigns them to state bureaus. **This must be run before seeding history or representations.**
     *   **Seed Training History**: Populates the training history for the demo users.
-    *   **Seed Representations**: Creates additional test users and populates representation data for the demo users.
+    *   **Seed Other Users & Reps**: Creates additional test users and populates representation data for the demo users.
 3.  The test data buttons should **not** be used in a production environment.
 
 ### Step 10: Seed Firebase Auth

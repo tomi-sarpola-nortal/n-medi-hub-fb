@@ -171,7 +171,7 @@ export default function SeedButton() {
           {isHistoryLoading ? "Seeding..." : "Seed Training History"}
         </Button>
         <Button onClick={handleSeedOtherUsers} disabled={isOtherUsersLoading} variant="destructive" className="w-full sm:w-auto">
-          {isOtherUsersLoading ? "Seeding..." : "Seed Representations"}
+          {isOtherUsersLoading ? "Seeding..." : "Seed Other Users & Reps"}
         </Button>
     </div>
   );
