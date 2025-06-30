@@ -32,16 +32,14 @@ const categoriesToSeed: TrainingCategoryCreationData[] = [
 ];
 
 const organizersToSeed: TrainingOrganizerCreationData[] = [
-  { name: 'Universitätsklinik Wien', isActive: true },
-  { name: 'ÖZÄK', isActive: true },
-  { name: 'Medizinische Universität Graz', isActive: true },
-  { name: 'Österreichische Gesellschaft für KFO', isActive: true },
-  { name: 'DentEd Online', isActive: true },
-  { name: 'Ärztebüro Wien', isActive: true },
-  { name: 'Medizinische Universität Wien', isActive: true },
-  { name: 'Medical Tribune', isActive: true },
-  { name: 'Quintessenz Verlag', isActive: true },
-  { name: 'Thieme', isActive: true },
+  { name: 'Charité - Universitätsmedizin Berlin', isActive: true },
+  { name: 'Klinikum der Universität München (LMU)', isActive: true },
+  { name: 'Universitätsklinikum Heidelberg', isActive: true },
+  { name: 'Deutsche Gesellschaft für Zahn-, Mund- und Kieferheilkunde (DGZMK)', isActive: true },
+  { name: 'Bundeszahnärztekammer (BZÄK)', isActive: true },
+  { name: 'Springer Medizin', isActive: true },
+  { name: 'Deutscher Ärzte-Verlag', isActive: true },
+  { name: 'Akademie für zahnärztliche Fortbildung Karlsruhe', isActive: true },
 ];
 
 const bureausToSeed: { id: string, data: StateBureauCreationData }[] = [
@@ -172,25 +170,25 @@ export async function seedZfdGroups(): Promise<{ success: boolean; message: stri
 const historyToSeedForAsif: TrainingHistoryCreationData[] = [
   // This data is crafted to match the ZFD totals in the screenshot (97 points)
   // and the order of visible items.
-  { date: "2025-05-22", title: "Modern Procedures in Implantology", category: "IMPL", points: 15, organizer: "University Clinic Vienna", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-15", title: "Digital Workflows in Medical Practice", category: "ZMK", points: 5, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-05-03", title: "Advances in Periodontology", category: "PARO", points: 5, organizer: "Medical University Graz", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-20", title: "Current Trends in Orthodontics", category: "KFO", points: 10, organizer: "Regional Society for KFO", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-04-10", title: "Webinar: New Materials in Prosthetics", category: "Literatur", points: 10, organizer: "DentEd Online", zfdGroupId: 'literatur' },
-  { date: "2025-03-28", title: "Practice Management and Communication", category: "Frei", points: 8, organizer: "Medical Bureau Vienna", zfdGroupId: 'frei' },
+  { date: "2025-05-22", title: "Modern Procedures in Implantology", category: "IMPL", points: 15, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-15", title: "Digital Workflows in Medical Practice", category: "ZMK", points: 5, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-05-03", title: "Advances in Periodontology", category: "PARO", points: 5, organizer: "Klinikum der Universität München (LMU)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-20", title: "Current Trends in Orthodontics", category: "KFO", points: 10, organizer: "Deutsche Gesellschaft für Zahn-, Mund- und Kieferheilkunde (DGZMK)", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-04-10", title: "Webinar: New Materials in Prosthetics", category: "Literatur", points: 10, organizer: "Springer Medizin", zfdGroupId: 'literatur' },
+  { date: "2025-03-28", title: "Practice Management and Communication", category: "Frei", points: 8, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
   { date: "2025-03-05", title: "Annual Subscription 'Medical Magazine'", category: "Literatur", points: 10, organizer: "Medical Tribune", zfdGroupId: 'literatur' },
-  { date: "2025-02-25", title: "Implant Prosthetics for Advanced Practitioners", category: "IMPL", points: 10, organizer: "University Clinic Vienna", zfdGroupId: 'berufsbezogen' },
-  { date: "2025-02-01", title: "Workshop: Legal Foundations", category: "Frei", points: 4, organizer: "ÖZÄK", zfdGroupId: 'frei' },
+  { date: "2025-02-25", title: "Implant Prosthetics for Advanced Practitioners", category: "IMPL", points: 10, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
+  { date: "2025-02-01", title: "Workshop: Legal Foundations", category: "Frei", points: 4, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'frei' },
   { date: "2025-01-15", title: "Annual Subscription 'Quintessence Medicine'", category: "Literatur", points: 10, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
   { date: "2024-12-10", title: "Annual Subscription 'ZWR'", category: "Literatur", points: 10, organizer: "Thieme", zfdGroupId: 'literatur' },
 ];
 
 const historyToSeedForSarah: TrainingHistoryCreationData[] = [
-    { date: "2025-06-10", title: "Emergency Management in the Dental Office", category: "ZMK", points: 10, organizer: "ÖZÄK", zfdGroupId: 'berufsbezogen' },
-    { date: "2025-05-20", title: "Pediatric Dentistry Update", category: "ZMK", points: 8, organizer: "Medical University Graz", zfdGroupId: 'berufsbezogen' },
-    { date: "2025-04-18", title: "Advanced Endodontics Workshop", category: "ZMK", points: 12, organizer: "University Clinic Vienna", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-06-10", title: "Emergency Management in the Dental Office", category: "ZMK", points: 10, organizer: "Bundeszahnärztekammer (BZÄK)", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-05-20", title: "Pediatric Dentistry Update", category: "ZMK", points: 8, organizer: "Universitätsklinikum Heidelberg", zfdGroupId: 'berufsbezogen' },
+    { date: "2025-04-18", title: "Advanced Endodontics Workshop", category: "ZMK", points: 12, organizer: "Charité - Universitätsmedizin Berlin", zfdGroupId: 'berufsbezogen' },
     { date: "2025-03-15", title: "Journal Club: Periodontology Research", category: "Literatur", points: 5, organizer: "Quintessenz Verlag", zfdGroupId: 'literatur' },
-    { date: "2025-02-20", title: "Ethical Considerations in Dentistry", category: "Frei", points: 5, organizer: "Medical Bureau Vienna", zfdGroupId: 'frei' },
+    { date: "2025-02-20", title: "Ethical Considerations in Dentistry", category: "Frei", points: 5, organizer: "Ärztebüro Berlin", zfdGroupId: 'frei' },
 ];
 
 export async function seedTrainingHistory(): Promise<{ success: boolean; message: string }> {
