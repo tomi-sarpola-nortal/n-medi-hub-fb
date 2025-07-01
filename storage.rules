@@ -1,12 +1,31 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+
+    // Allow public write access only for the temporary registration folder.
+    // This is necessary for new users to upload documents before their account is created.
+    match /registrations/{sessionId}/{allPaths=**} {
+      allow write: if true;
+      allow read: if request.auth != null;
+    }
+    
+    // For user-specific files, only the authenticated user can read/write their own files.
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Document templates can be read by any authenticated user.
+    // Only lk_member can upload/delete document templates.
+    match /document_templates/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/persons/$(request.auth.uid)).data.role == 'lk_member';
+    }
+    
+    // Logos are publically readable
+    match /logos/{allPaths=**} {
+        allow read: if true;
+        allow write: if request.auth != null && get(/databases/$(database)/documents/persons/$(request.auth.uid)).data.role == 'lk_member';
     }
   }
 }

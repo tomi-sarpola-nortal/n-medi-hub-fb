@@ -16,6 +16,10 @@ This guide provides step-by-step instructions for deploying this application to 
 ### Step 1: Prerequisites
 
 1.  **Install Node.js**: Ensure you have a recent version of Node.js installed.
+    ```bash
+    npm install
+    npm install firebase
+    ```
 2.  **Install Firebase CLI**: Open your terminal and install the Firebase Command Line Interface globally.
     ```bash
     npm install -g firebase-tools
@@ -30,6 +34,23 @@ This guide provides step-by-step instructions for deploying this application to 
 
 1.  **Create Firebase Project**: Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
 2.  **Upgrade to Blaze Plan**: To use Firebase Extensions (like the email trigger), you must upgrade your project to the "Blaze (Pay-as-you-go)" plan. You can do this from the settings in the lower-left corner of your Firebase project dashboard.
+
+The application connects to Firebase using environment variables.
+
+1.  **Copy the Template**: In your project's root directory, make a copy of `.env.example` and rename it to `.env`.
+2.  **Get Client-Side Keys**:
+    *   In your Firebase project, go to **Project Settings** (gear icon) > **General**.
+    *   Scroll down to "Your apps" and click the `</>` icon to create or view your Web App.
+    *   Under "Firebase SDK snippet", select **Config**.
+    *   Copy the values from this config object into the corresponding `NEXT_PUBLIC_*` variables in your `.env` file.
+3.  **Get Server-Side (Admin) Keys**:
+    *   In Project Settings, go to the **Service Accounts** tab.
+    *   Click **Generate new private key** and confirm. A JSON file will be downloaded.
+    *   Open the JSON file and copy the following values into your `.env` file:
+        *   `project_id` -> `FIREBASE_PROJECT_ID`
+        *   `client_email` -> `FIREBASE_CLIENT_EMAIL`
+        *   `private_key` -> `FIREBASE_PRIVATE_KEY`
+    *   **Important**: The `private_key` contains newline characters (`\n`). You must wrap the entire key in double quotes (`"`) to ensure it's parsed correctly.
 
 ### Step 3: Local Project Setup
 
@@ -98,24 +119,6 @@ You can create the folder structure (`users`, `document_templates`, `logos`) in 
 ```bash
     node firebase.storage.setupFolders.js
 ```
-
-
-The application connects to Firebase using environment variables.
-
-1.  **Copy the Template**: In your project's root directory, make a copy of `.env.example` and rename it to `.env`.
-2.  **Get Client-Side Keys**:
-    *   In your Firebase project, go to **Project Settings** (gear icon) > **General**.
-    *   Scroll down to "Your apps" and click the `</>` icon to create or view your Web App.
-    *   Under "Firebase SDK snippet", select **Config**.
-    *   Copy the values from this config object into the corresponding `NEXT_PUBLIC_*` variables in your `.env` file.
-3.  **Get Server-Side (Admin) Keys**:
-    *   In Project Settings, go to the **Service Accounts** tab.
-    *   Click **Generate new private key** and confirm. A JSON file will be downloaded.
-    *   Open the JSON file and copy the following values into your `.env` file:
-        *   `project_id` -> `FIREBASE_PROJECT_ID`
-        *   `client_email` -> `FIREBASE_CLIENT_EMAIL`
-        *   `private_key` -> `FIREBASE_PRIVATE_KEY`
-    *   **Important**: The `private_key` contains newline characters (`\n`). You must wrap the entire key in double quotes (`"`) to ensure it's parsed correctly.
 
 ### Step 8: Deploy Email Extension
 
