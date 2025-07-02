@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -90,7 +91,6 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
     }
   };
   
-  // Reset form when dialog is closed
   const handleOpenChange = (open: boolean) => {
       if (!open) {
           form.reset();
