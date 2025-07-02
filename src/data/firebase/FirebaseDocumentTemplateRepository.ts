@@ -54,10 +54,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       // 1. Upload file to Storage using Admin SDK
       const fileUpload = adminStorage!.file(storagePath);
       await fileUpload.save(fileBuffer, {
-        metadata: {
-          contentType: file.type,
-        },
-        public: true, // Make the file publicly readable
+        public: true, // Make the file publicly readable. Firebase will infer content type.
       });
 
       // Get the public URL.
