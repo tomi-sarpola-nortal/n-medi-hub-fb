@@ -102,7 +102,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_personal_data_title || "Personal Data"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_personal_data_desc || "Update your personal details and contact information."}</p>
-              <PersonalDataForm user={user} t={t} isDisabled={isFormDisabled} />
+              <PersonalDataForm user={user} t={t} isDisabled={isFormDisabled} locale={locale} />
             </AccordionContent>
           </AccordionItem>
           
@@ -110,7 +110,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_prof_qual_title || "Professional Qualifications"}</AccordionTrigger>
             <AccordionContent>
               <p className="text-sm text-muted-foreground mb-4">{t.settings_prof_qual_desc || "Manage your professional titles, specializations, and qualifications."}</p>
-              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isFormDisabled} />
+              <ProfessionalQualificationsForm user={user} t={t} isDisabled={isFormDisabled} locale={locale} />
             </AccordionContent>
           </AccordionItem>
           
@@ -118,7 +118,7 @@ export default function SettingsPage() {
             <AccordionTrigger className="font-headline text-lg">{t.settings_practice_info_title || "Practice Information"}</AccordionTrigger>
             <AccordionContent>
                 <p className="text-sm text-muted-foreground mb-4">{t.settings_practice_info_desc || "Update the details for your primary practice or clinic."}</p>
-                <PracticeInformationForm user={user} t={t} isDisabled={isFormDisabled} />
+                <PracticeInformationForm user={user} t={t} isDisabled={isFormDisabled} locale={locale} />
             </AccordionContent>
           </AccordionItem>
           

@@ -39,9 +39,10 @@ interface PracticeInformationFormProps {
   user: Person;
   t: Record<string, string>;
   isDisabled?: boolean;
+  locale: string;
 }
 
-export default function PracticeInformationForm({ user, t, isDisabled = false }: PracticeInformationFormProps) {
+export default function PracticeInformationForm({ user, t, isDisabled = false, locale }: PracticeInformationFormProps) {
   const { toast } = useToast();
   const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +66,7 @@ export default function PracticeInformationForm({ user, t, isDisabled = false }:
     if (!authUser) return;
     setIsLoading(true);
     try {
-      const result = await requestDataChange(user.id, data, authUser);
+      const result = await requestDataChange(user.id, data, authUser, locale);
 
       if (result.success) {
         setUser(prev => prev ? ({ ...prev, pendingData: { ...prev.pendingData, ...data }, hasPendingChanges: true }) : null);

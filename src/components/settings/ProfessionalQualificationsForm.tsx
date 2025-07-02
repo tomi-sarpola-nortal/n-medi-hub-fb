@@ -53,9 +53,10 @@ interface ProfessionalQualificationsFormProps {
   user: Person;
   t: Record<string, string>;
   isDisabled?: boolean;
+  locale: string;
 }
 
-export default function ProfessionalQualificationsForm({ user, t, isDisabled = false }: ProfessionalQualificationsFormProps) {
+export default function ProfessionalQualificationsForm({ user, t, isDisabled = false, locale }: ProfessionalQualificationsFormProps) {
   const { toast } = useToast();
   const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -161,8 +162,6 @@ export default function ProfessionalQualificationsForm({ user, t, isDisabled = f
   };
   
   const isFormDisabled = isDisabled || !!user.pendingData;
-  const locale = t.locale || 'en';
-
 
   return (
      <Form {...form}>

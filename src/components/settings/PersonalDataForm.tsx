@@ -53,9 +53,10 @@ interface PersonalDataFormProps {
   user: Person;
   t: Record<string, string>;
   isDisabled?: boolean;
+  locale: string;
 }
 
-export default function PersonalDataForm({ user, t, isDisabled = false }: PersonalDataFormProps) {
+export default function PersonalDataForm({ user, t, isDisabled = false, locale }: PersonalDataFormProps) {
   const { toast } = useToast();
   const { user: authUser, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -141,7 +142,6 @@ export default function PersonalDataForm({ user, t, isDisabled = false }: Person
   };
 
   const isFormDisabled = isDisabled || !!user.pendingData;
-  const locale = t.locale || 'en';
 
   return (
     <Form {...form}>
