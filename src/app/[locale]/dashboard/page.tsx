@@ -14,7 +14,7 @@ import LkMemberDashboard from '@/components/dashboard/LkMemberDashboard';
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const { t, isLoading: translationsLoading, locale } = useClientTranslations(['dashboard', 'layout', 'representations']);
+  const { t, isLoading: translationsLoading, locale } = useClientTranslations(['dashboard', 'layout', 'representations', 'member-overview']);
 
   useEffect(() => {
     if (!loading) {
