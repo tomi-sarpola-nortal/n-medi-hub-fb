@@ -1,10 +1,8 @@
-import { storage } from '@/lib/firebaseConfig';
-import { adminDb as db } from '@/lib/firebaseAdminConfig';
+import { adminDb as db, adminStorage } from '@/lib/firebaseAdminConfig';
 import {
   FieldValue,
   type Timestamp,
 } from 'firebase-admin/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import type { DocumentTemplate, DocumentTemplateCreationData } from '@/lib/types';
 import { IDocumentTemplateRepository } from '../interfaces/IDocumentTemplateRepository';
@@ -21,8 +19,8 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
     if (!db) {
       throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration.");
     }
-    if (!storage) {
-      throw new ConfigurationError("Firebase Storage is not initialized. Please check your Firebase configuration.");
+    if (!adminStorage) {
+      throw new ConfigurationError("Firebase Admin Storage is not initialized. Check bucket name in .env");
     }
   }
 
@@ -33,7 +31,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
   }
 
   /**
-   * Uploads a document template and its metadata.
+   * Uploads a document template and its metadata using the Admin SDK.
    * @param metadata - The document metadata (title, type, publisher).
    * @param file - The file to upload.
    * @returns The ID of the newly created document.
@@ -45,27 +43,23 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
     try {
       this.checkServices();
 
-      // Sanitize publisher name to create a valid path segment.
-      // Replaces non-alphanumeric characters with underscores and converts to lowercase.
       const publisherPath = metadata.publisher.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
       const uniqueFileName = `${uuidv4()}-${file.name}`;
       const storagePath = `${DOC_TEMPLATES_COLLECTION}/${publisherPath}/${uniqueFileName}`;
-      const storageRef = ref(storage, storagePath);
       
-      // 1. Upload file to Storage
-      let snapshot;
-      try {
-        snapshot = await uploadBytes(storageRef, file);
-      } catch (error) {
-        throw new FileOperationError(`Failed to upload file ${file.name} to Storage`, error as Error);
-      }
-      
-      let downloadURL;
-      try {
-        downloadURL = await getDownloadURL(snapshot.ref);
-      } catch (error) {
-        throw new FileOperationError(`Failed to get download URL for file ${file.name}`, error as Error);
-      }
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+      // 1. Upload file to Storage using Admin SDK
+      const fileUpload = adminStorage!.file(storagePath);
+      await fileUpload.save(fileBuffer, {
+        metadata: {
+          contentType: file.type,
+        },
+        public: true, // Make the file publicly readable
+      });
+
+      // Get the public URL.
+      const downloadURL = fileUpload.publicUrl();
 
       // 2. Create document in Firestore
       const docData: DocumentTemplateCreationData = {
@@ -82,6 +76,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
 
       return docRef.id;
     } catch (error) {
+      console.error("Error in add document template:", error);
       if (error instanceof FileOperationError || error instanceof ConfigurationError) {
         throw error;
       }
@@ -120,30 +115,36 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
   }
 
   /**
-   * Deletes a document template from Firestore and its file from Storage.
+   * Deletes a document template from Firestore and its file from Storage using Admin SDK.
    * @param templateId - The ID of the Firestore document to delete.
    * @param fileUrl - The full download URL of the file to delete from Storage.
    */
   async delete(templateId: string, fileUrl: string): Promise<void> {
     try {
       this.checkServices();
-
-      // 1. Delete file from Storage
+      
+      // 1. Delete file from Storage using Admin SDK
       if (fileUrl) {
-        const fileRef = ref(storage, fileUrl);
-        try {
-          await deleteObject(fileRef);
+         try {
+            // Extract the path from the URL. e.g., "document_templates/some_publisher/file.pdf"
+            const bucketName = adminStorage!.name;
+            const prefix = `https://storage.googleapis.com/${bucketName}/`;
+            if (fileUrl.startsWith(prefix)) {
+                const filePath = decodeURIComponent(fileUrl.substring(prefix.length));
+                await adminStorage!.file(filePath).delete();
+            } else {
+                console.warn(`File URL ${fileUrl} does not match expected format for bucket ${bucketName}. Skipping deletion.`);
+            }
         } catch (error: any) {
-          // Log error but don't block Firestore deletion if file is already gone
-          console.error(`Failed to delete file from Storage (${fileUrl}):`, error);
-          if (error.code === 'storage/object-not-found') {
-            console.warn('File was not found in Storage, proceeding to delete Firestore document.');
-          } else {
-            throw new FileOperationError(`Failed to delete file from Storage: ${fileUrl}`, error);
-          }
+            // Log error but don't block Firestore deletion if file is already gone
+            if (error.code === 404) { // GCS not found error code
+                console.warn(`File was not found in Storage, proceeding to delete Firestore document: ${fileUrl}`);
+            } else {
+                throw new FileOperationError(`Failed to delete file from Storage: ${fileUrl}`, error);
+            }
         }
       }
-
+      
       // 2. Delete document from Firestore
       const docRef = db.collection(DOC_TEMPLATES_COLLECTION).doc(templateId);
       await docRef.delete();
