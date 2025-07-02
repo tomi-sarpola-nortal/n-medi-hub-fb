@@ -47,7 +47,7 @@ const WordFileIcon = () => (
 export default function DocumentsPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { t, isLoading: translationsLoading, locale } = useClientTranslations(['documents']);
+  const { t, isLoading: translationsLoading, locale } = useClientTranslations(['documents', 'register']);
   const { toast } = useToast();
 
   const [documents, setDocuments] = useState<DocumentTemplate[]>([]);
