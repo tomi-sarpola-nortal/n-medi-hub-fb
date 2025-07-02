@@ -1,20 +1,36 @@
+
 'use server';
 
 import { documentTemplateRepository } from '@/data';
-import type { DocumentTemplate, DocumentTemplateCreationData } from '@/lib/types';
+import type { DocumentTemplate } from '@/lib/types';
+import { withErrorHandling } from '@/app/actions/errorHandler';
+import { ValidationError } from '@/lib/errors';
 
 /**
- * Uploads a document template and its metadata.
- * @param metadata - The document metadata (title, type, publisher).
- * @param file - The file to upload.
- * @returns The ID of the newly created document.
+ * Uploads a document template and its metadata using FormData.
+ * This is a server action designed to be called from a client form.
+ * @param formData - The FormData object containing file and metadata.
+ * @returns An object indicating success or failure.
  */
-export async function addDocumentTemplate(
-  metadata: Omit<DocumentTemplateCreationData, 'fileName' | 'fileUrl' | 'fileFormat'>,
-  file: File
-): Promise<string> {
-  return documentTemplateRepository.add(metadata, file);
-}
+export const addDocumentTemplate = withErrorHandling(
+  async (
+    formData: FormData
+  ): Promise<{ success: boolean; message: string; templateId: string }> => {
+    const file = formData.get('file') as File | null;
+    const title = formData.get('title') as string | null;
+    const type = formData.get('type') as 'vorlage' | 'leitlinie' | 'empfehlung' | null;
+    const publisher = formData.get('publisher') as string | null;
+
+    if (!file || !title || !type || !publisher) {
+      throw new ValidationError('Missing required form data for document upload.');
+    }
+    
+    const metadata = { title, type, publisher };
+    const templateId = await documentTemplateRepository.add(metadata, file);
+
+    return { success: true, message: 'Document uploaded successfully.', templateId };
+  }
+);
 
 /**
  * Fetches all document templates from Firestore.

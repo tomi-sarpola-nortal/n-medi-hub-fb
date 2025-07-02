@@ -69,21 +69,32 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      const { file, ...metadata } = data;
-      await addDocumentTemplate(metadata, file[0]);
-      toast({
-        title: t('documents_upload_success_title'),
-        description: t('documents_upload_success_desc', { title: data.title }),
-      });
-      onUploadSuccess();
-      form.reset();
-      setSelectedFileName(null);
-      onOpenChange(false);
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('type', data.type);
+      formData.append('publisher', data.publisher);
+      formData.append('file', data.file[0]);
+
+      const result = await addDocumentTemplate(formData);
+      
+      if (result.success) {
+        toast({
+          title: t('documents_upload_success_title'),
+          description: t('documents_upload_success_desc', { title: data.title }),
+        });
+        onUploadSuccess();
+        form.reset();
+        setSelectedFileName(null);
+        onOpenChange(false);
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       console.error("Upload failed:", error);
+      const errorMessage = error instanceof Error ? error.message : t('documents_upload_error_desc');
       toast({
         title: t('documents_upload_error_title'),
-        description: t('documents_upload_error_desc'),
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
