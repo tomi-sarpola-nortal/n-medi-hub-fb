@@ -3,32 +3,25 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-
-    // Allow ANYONE to write to the temporary registration folder.
-    // This is required for the multi-step sign-up process where a user
-    // account does not exist until the final step. The path is protected
-    // by a UUID to prevent path guessing.
-    match /registrations/{sessionId}/{allPaths=**} {
-      allow write: if true;
-    }
-
-    // Allow any authenticated user to read from the shared document templates folder.
-    match /document_templates/{allPaths=**} {
-      allow read: if request.auth != null;
-    }
-
-    // Allow public read for logos
+    // PUBLIC: Logos and other public assets are publicly readable.
     match /logos/{allPaths=**} {
       allow read;
     }
+    
+    // AUTHENTICATED: Document templates are readable by any authenticated user.
+    match /document_templates/{allPaths=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // UNAUTHENTICATED: Allow file uploads only to a temporary folder during the initial registration process.
+    match /registrations/{sessionId}/{allPaths=**} {
+      allow write: if request.auth == null;
+    }
 
-    // Allow an authenticated user to read and write to their OWN folder.
-    // The {userId} wildcard must match the UID of the authenticated user.
-    // This rule covers all sub-folders within a user's directory, including
-    // permanent folders (like 'qualifications') and temporary folders for updates
-    // (like 'qualifications_pending').
+    // USER-SPECIFIC: Users can read and write to any file within their own user folder.
+    // This allows them to read their permanent documents and write to pending folders when updating their profile.
     match /users/{userId}/{allPaths=**} {
-      allow read, write: if request.auth.uid == userId;
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
