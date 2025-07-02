@@ -44,7 +44,9 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       this.checkServices();
 
       const publisherPath = metadata.publisher.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-      const uniqueFileName = `${uuidv4()}-${file.name}`;
+      // Sanitize filename to prevent issues with special characters in storage path
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const uniqueFileName = `${uuidv4()}-${safeFileName}`;
       const storagePath = `${DOC_TEMPLATES_COLLECTION}/${publisherPath}/${uniqueFileName}`;
       
       const fileBuffer = Buffer.from(await file.arrayBuffer());
@@ -64,7 +66,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       // 2. Create document in Firestore
       const docData: DocumentTemplateCreationData = {
         ...metadata,
-        fileName: file.name,
+        fileName: file.name, // Store the original filename for display
         fileUrl: downloadURL,
         fileFormat: this.getFileFormat(file.name),
       };

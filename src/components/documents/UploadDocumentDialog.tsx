@@ -23,6 +23,7 @@ interface UploadDocumentDialogProps {
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const ACCEPTED_FILE_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+const ACCEPTED_EXTENSIONS = ['.pdf', '.doc', '.docx'];
 
 const FormSchema = z.object({
   title: z.string().min(1, { message: "Title is required." }),
@@ -35,7 +36,12 @@ const FormSchema = z.object({
     .refine((files) => files && files.length > 0, 'File is required.')
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 15MB.`)
     .refine(
-      (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+      (files) => {
+        if (!files?.[0]) return false;
+        const file = files[0];
+        const fileExtension = `.${file.name.split('.').pop()?.toLowerCase()}`;
+        return ACCEPTED_FILE_TYPES.includes(file.type) || ACCEPTED_EXTENSIONS.includes(fileExtension);
+      },
       "Only .pdf, .doc, and .docx formats are supported."
     ),
 });
@@ -104,7 +110,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
   
   const handleOpenChange = (open: boolean) => {
       if (!open) {
-          form.reset();
+          form.reset({ title: '', publisher: '', type: undefined, file: undefined });
           setSelectedFileName(null);
       }
       onOpenChange(open);
