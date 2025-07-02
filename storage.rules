@@ -3,25 +3,26 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // PUBLIC: Logos and other public assets are publicly readable.
-    match /logos/{allPaths=**} {
-      allow read;
-    }
-    
-    // AUTHENTICATED: Document templates are readable by any authenticated user.
-    match /document_templates/{allPaths=**} {
-      allow read: if request.auth != null;
-    }
-    
-    // UNAUTHENTICATED: Allow file uploads only to a temporary folder during the initial registration process.
+
+    // Allow unauthenticated users to upload to a temporary registration folder
     match /registrations/{sessionId}/{allPaths=**} {
-      allow write: if request.auth == null;
+      allow write: if true;
     }
 
-    // USER-SPECIFIC: Users can read and write to any file within their own user folder.
-    // This allows them to read their permanent documents and write to pending folders when updating their profile.
+    // Allow authenticated users to manage their own folder
     match /users/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow public read access for logos
+    match /logos/{allPaths=**} {
+        allow read;
+    }
+    
+    // Allow public read access for all users, but only authenticated users (bureau members) can write.
+    match /document_templates/{allPaths=**} {
+        allow read;
+        allow write: if request.auth != null;
     }
   }
 }
