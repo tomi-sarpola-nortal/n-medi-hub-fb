@@ -51,7 +51,7 @@ export default function UploadDocumentDialog({ isOpen, onOpenChange, onUploadSuc
     resolver: zodResolver(FormSchema),
     defaultValues: {
       title: '',
-      publisher: 'ÖZÄK',
+      publisher: '',
     },
   });
 
