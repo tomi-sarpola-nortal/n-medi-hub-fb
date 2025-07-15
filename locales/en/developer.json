@@ -1,0 +1,13 @@
+
+{
+  "developer_module_page_title": "Developer Module",
+  "developer_module_page_description": "This page contains tools and actions for development and testing purposes.",
+  "developer_module_project_history_title": "Project History",
+  "developer_module_project_history_desc": "View a summary of implemented features and project history.",
+  "developer_module_show_project_history_button": "Show Project History",
+  "developer_module_show_prompt_history_button": "Show Prompt History",
+  "developer_module_db_indexing_title": "Database Indexing",
+  "developer_module_db_indexing_desc": "The following composite indexes are required for optimal query performance. This file is located at the root of the project.",
+  "developer_module_db_indexing_instruction": "If you haven't set a default Firebase project, run `firebase use --add` first. Then, to create these indexes in your Firebase project, run the following command from your terminal:"
+}
+

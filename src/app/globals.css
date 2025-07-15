@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* #FFFFFF White */
+    --foreground: 0 0% 11%; /* #1C1C1C Dark Grey */
+    --card: 0 0% 100%; /* #FFFFFF White */
+    --card-foreground: 0 0% 11%; /* #1C1C1C Dark Grey */
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 0 0% 11%; /* Dark Grey */
+    --primary: 140 100% 35%; /* #00B140 Nortal Green */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --secondary-foreground: 0 0% 11%; /* Dark Grey */
+    --muted: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --muted-foreground: 0 0% 45%; /* Mid Grey */
+    --accent: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --accent-foreground: 140 100% 35%; /* Nortal Green */
+    --destructive: 0 84% 60%; /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+    --border: 0 0% 90%; /* Light Grey Border */
+    --input: 0 0% 90%; /* Light Grey Input */
+    --ring: 140 100% 35%; /* Nortal Green */
+    --chart-1: 140 100% 35%; /* Nortal Green */
+    --chart-2: 0 0% 11%; /* Dark Grey */
+    --chart-3: 0 0% 0%; /* Black */
+    --chart-4: 0 0% 96%; /* Light Grey */
+    --chart-5: 0 0% 45%; /* Mid Grey */
+    --radius: 0.5rem;
+
+    /* Status Badge Colors */
+    --status-success-background: 140 80% 96%;
+    --status-success-foreground: 140 100% 35%;
+    --status-warning-background: 45 100% 96%;
+    --status-warning-foreground: 45 80% 25%;
+    --status-destructive-background: 0 100% 97%;
+    --status-destructive-foreground: 0 70% 40%;
+
+    /* Document Type Badge Colors */
+    --badge-vorlage-background: 140 100% 96%; /* Very Light Green */
+    --badge-vorlage-foreground: 140 100% 35%; /* Nortal Green */
+    --badge-leitlinie-background: 0 0% 96%; /* Light Grey */
+    --badge-leitlinie-foreground: 0 0% 11%; /* Dark Grey */
+    --badge-empfehlung-background: 0 0% 96%; /* Light Grey */
+    --badge-empfehlung-foreground: 0 0% 0%; /* Black */
+    
+    /* ZFD Progress Colors */
+    --zfd-color-1: 140 100% 35%; /* Nortal Green */
+    --zfd-color-2: 140 70% 45%; /* Medium Green */
+    --zfd-color-3: 140 50% 55%; /* Light Green */
+
+    /* New Color for Progress */
+    --dark-blue: 140 100% 35%; /* Nortal Green */
+
+    /* Sidebar specific colors */
+    --sidebar-background: 0 0% 100%; /* White */
+    --sidebar-foreground: 0 0% 11%; /* Dark Grey */
+    --sidebar-border: 0 0% 96%; /* Light Grey */
+    --sidebar-accent: 0 0% 96%; /* Light Grey */
+    --sidebar-accent-foreground: 140 100% 35%; /* Nortal Green */
+    
+    /* These are used by the sidebar component's variants */
+    --sidebar-item-active-background: hsl(var(--sidebar-accent));
+    --sidebar-item-active-foreground: hsl(var(--primary));
+    --sidebar-item-active-border: hsl(var(--primary));
+    --sidebar-item-hover-background: hsl(var(--sidebar-accent));
+    --sidebar-item-hover-foreground: hsl(var(--primary));
+  }
+
+  .dark {
+    --background: 0 0% 11%; /* #1C1C1C Dark Grey */
+    --foreground: 0 0% 96%; /* #F4F4F4 Light Grey */
+    --card: 0 0% 15%; /* Slightly lighter dark grey */
+    --card-foreground: 0 0% 96%; /* Light Grey */
+    --popover: 0 0% 15%; /* Slightly lighter dark grey */
+    --popover-foreground: 0 0% 96%; /* Light Grey */
+    --primary: 140 100% 35%; /* #00B140 Nortal Green */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 15%; /* Darker version of card bg */
+    --secondary-foreground: 0 0% 96%; /* Light Grey */
+    --muted: 0 0% 15%; /* Darker version of card bg */
+    --muted-foreground: 0 0% 65%; /* Lighter grey */
+    --accent: 0 0% 15%; /* Darker version of card bg */
+    --accent-foreground: 140 100% 35%; /* Nortal Green */
+    --destructive: 0 100% 66%; /* Brighter Red */
+    --destructive-foreground: 0 0% 96%; /* Light Grey */
+    --border: 0 0% 20%; /* Darker border */
+    --input: 0 0% 15%; /* Slightly lighter dark grey */
+    --ring: 140 100% 35%; /* Nortal Green */
+
+    /* Status Badge Colors */
+    --status-success-background: 140 83% 20%;
+    --status-success-foreground: 140 83% 85%;
+    --status-warning-background: 48 83% 25%;
+    --status-warning-foreground: 48 96% 77%;
+    --status-destructive-background: 0 70% 25%;
+    --status-destructive-foreground: 0 100% 80%;
+    
+    /* Document Type Badge Colors */
+    --badge-vorlage-background: 140 60% 25%;
+    --badge-vorlage-foreground: 140 80% 85%;
+    --badge-leitlinie-background: 0 0% 25%;
+    --badge-leitlinie-foreground: 0 0% 85%;
+    --badge-empfehlung-background: 0 0% 25%;
+    --badge-empfehlung-foreground: 0 0% 85%;
+
+    /* ZFD Progress Colors */
+    --zfd-color-1: 140 100% 35%;
+    --zfd-color-2: 140 70% 45%;
+    --zfd-color-3: 140 50% 55%;
+
+    /* New Color for Progress */
+    --dark-blue: 140 100% 35%; /* Nortal Green */
+
+    --sidebar-background: 0 0% 11%; 
+    --sidebar-foreground: 0 0% 96%; 
+    --sidebar-border: 0 0% 20%;
+    --sidebar-accent: 0 0% 15%; 
+    --sidebar-accent-foreground: 140 100% 35%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

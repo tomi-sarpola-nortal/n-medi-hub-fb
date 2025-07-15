@@ -1,0 +1,24 @@
+
+{
+  "login_page_main_title": "Medical Hub",
+  "login_logo_text_portal": "Portal",
+  "login_form_title": "Anmeldung ins Portal",
+  "login_label_email": "E-Mail oder Arzt-ID",
+  "login_placeholder_email": "max.mustermann@example.com",
+  "login_label_password": "Passwort",
+  "login_button_text": "ANMELDEN",
+  "login_forgot_password_link": "Passwort vergessen?",
+  "login_support_text_prefix": "Probleme bei der Anmeldung?",
+  "login_support_link": "Kontaktieren Sie unseren Support",
+  "login_register_title": "Noch nicht beim Medizinischen Büro gemeldet?",
+  "login_register_description": "Wenn Sie neu in der Region tätig sind und noch keinen Eintrag beim Medizinischen Büro haben, können Sie sich hier für einen Eintrag anmelden.",
+  "login_register_button_text": "ALS BÜROMITGLIED REGISTRIEREN",
+  "login_error_title": "Anmeldung fehlgeschlagen",
+  "login_error_description": "Die eingegebene E-Mail-Adresse oder das Passwort ist ungültig. Bitte versuchen Sie es erneut.",
+  "login_error_pending_approval": "Ihr Konto wartet auf die Genehmigung. Sie erhalten eine E-Mail, sobald es überprüft wurde.",
+  "login_error_inactive": "Ihr Konto ist derzeit inaktiv. Bitte kontaktieren Sie den Support für Unterstützung.",
+  "forgot_password_dialog_title": "Passwort zurücksetzen",
+  "forgot_password_dialog_desc": "Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link, um Ihr Passwort zurückzusetzen.",
+  "forgot_password_button_send": "Link zum Zurücksetzen senden",
+  "forgot_password_success_toast": "Wenn ein Konto für diese E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet."
+}

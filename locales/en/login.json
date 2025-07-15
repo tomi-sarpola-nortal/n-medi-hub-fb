@@ -1,0 +1,24 @@
+
+{
+  "login_page_main_title": "Medical Hub",
+  "login_logo_text_portal": "Portal",
+  "login_form_title": "Login to Portal",
+  "login_label_email": "Email or Doctor ID",
+  "login_placeholder_email": "john.doe@example.com",
+  "login_label_password": "Password",
+  "login_button_text": "LOGIN",
+  "login_forgot_password_link": "Forgot password?",
+  "login_support_text_prefix": "Problems with login?",
+  "login_support_link": "Contact our support",
+  "login_register_title": "Not yet registered with the Medical Bureau?",
+  "login_register_description": "If you are new to practicing in the region and do not yet have an entry with the Medical Bureau, you can apply for an entry here.",
+  "login_register_button_text": "REGISTER AS BUREAU MEMBER",
+  "login_error_title": "Login Failed",
+  "login_error_description": "The email or password you entered is incorrect. Please try again.",
+  "login_error_pending_approval": "Your account is pending approval. You will receive an email once it has been reviewed.",
+  "login_error_inactive": "Your account is currently inactive. Please contact support for assistance.",
+  "forgot_password_dialog_title": "Reset your password",
+  "forgot_password_dialog_desc": "Enter your email address and we will send you a link to reset your password.",
+  "forgot_password_button_send": "Send Reset Link",
+  "forgot_password_success_toast": "If an account exists for this email, a link to reset your password has been sent."
+}

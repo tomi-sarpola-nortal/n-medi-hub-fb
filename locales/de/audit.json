@@ -1,0 +1,15 @@
+
+{
+  "audit_tools_page_title": "Audit-Werkzeuge",
+  "audit_tools_page_description": "Überprüfen Sie die Änderungshistorie und die Audit-Logs für das System.",
+  "audit_log_table_title": "Audit-Log",
+  "audit_log_table_description": "Ein Protokoll aller wichtigen Aktionen, die im System durchgeführt wurden.",
+  "audit_log_header_timestamp": "Zeitstempel",
+  "audit_log_header_user": "Benutzer",
+  "audit_log_header_operation": "Operation",
+  "audit_log_header_collection": "Sammlung",
+  "audit_log_header_field": "Feld(er)",
+  "audit_log_header_impacted_person": "Betroffene Person",
+  "audit_log_header_details": "Details",
+  "audit_log_no_results": "Keine Audit-Logs gefunden."
+}
