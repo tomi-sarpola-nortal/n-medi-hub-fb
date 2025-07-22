@@ -17,6 +17,7 @@ import AuthLayout from '@/components/auth/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useClientTranslations } from '@/hooks/use-client-translations';
+import Link from 'next/link';
 
 const LoginFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -239,6 +240,16 @@ export default function LoginPage() {
                             </Button>
                         </div>
                     </div>
+                     <div className="mt-4 pt-2 border-t border-green-200 dark:border-green-700/80">
+                         <Button
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2 w-full text-xs h-7 bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-green-900/20 border-green-200 dark:border-green-700/80 text-green-800 dark:text-green-200 font-medium" 
+                            asChild
+                         >
+                            <Link href={`/${currentLocale}/hello`}>Open Hello-page</Link>
+                         </Button>
+                    </div>
                 </AlertDescription>
             </Alert>
           </div>
@@ -277,3 +288,5 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
+
+    
