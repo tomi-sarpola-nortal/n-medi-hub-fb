@@ -170,21 +170,23 @@ export default function LoginPage() {
 
             <Card className="shadow-lg w-full max-w-md mx-auto lg:mx-0">
               <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <PlusCircle className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-headline text-lg font-semibold">
-                      {t('login_register_title')}
-                    </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {t('login_register_description')}
-                    </p>
-                    <Button variant="outline" className="mt-4 w-full sm:w-auto border-primary text-primary hover:bg-primary/10" asChild>
+                <div className="flex flex-col items-start space-y-4">
+                    <div className="flex items-start space-x-4">
+                        <PlusCircle className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+                        <div>
+                            <h3 className="font-headline text-lg font-semibold">
+                            {t('login_register_title')}
+                            </h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                            {t('login_register_description')}
+                            </p>
+                        </div>
+                    </div>
+                    <Button variant="outline" className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 self-stretch sm:self-start" asChild>
                       <a href={`/${currentLocale}/register/step1`}> 
                         {t('login_register_button_text')}
                       </a>
                     </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -288,5 +290,7 @@ export default function LoginPage() {
     </AuthLayout>
   );
 }
+
+    
 
     
