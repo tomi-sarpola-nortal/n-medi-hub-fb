@@ -190,34 +190,34 @@ export default function LoginPage() {
           </div>
           
           <div className="w-full max-w-md mx-auto lg:mx-0">
-            <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Demo Mode</AlertTitle>
-                <AlertDescription>
+            <Alert className="bg-green-50 border-green-300 dark:bg-green-950 dark:border-green-800">
+                <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <AlertTitle className="text-green-800 dark:text-green-200">Demo Mode</AlertTitle>
+                <AlertDescription className="text-green-700 dark:text-green-300">
                     <p className="mb-2">You can use the following credentials to explore the application:</p>
                     <div className="space-y-2">
                         <div>
                             <p className="font-semibold">Doctor Role:</p>
                             <div className="pl-2 mt-1 space-y-1">
                                 <div>
-                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">adasd@asdas.com</code></p>
-                                    <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                                    <p className="text-xs">Email: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">adasd@asdas.com</code></p>
+                                    <p className="text-xs">Password: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7 bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-800 font-medium" 
+                                        className="mt-1 text-xs h-7 bg-white dark:bg-green-900/50 hover:bg-gray-100 dark:hover:bg-green-900/80 border-green-200 dark:border-green-700/80 text-green-800 dark:text-green-200 font-medium" 
                                         onClick={() => fillLoginForm('adasd@asdas.com', '-dkwfFv8WDGL=tR')}
                                     >
                                         Use these credentials
                                     </Button>
                                 </div>
                                 <div className="pt-1">
-                                    <p className="text-xs">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">sarah.miller@example.com</code></p>
-                                    <p className="text-xs">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">TestTest24</code></p>
+                                    <p className="text-xs">Email: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">sarah.miller@example.com</code></p>
+                                    <p className="text-xs">Password: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">TestTest24</code></p>
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
-                                        className="mt-1 text-xs h-7 bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-800 font-medium" 
+                                        className="mt-1 text-xs h-7 bg-white dark:bg-green-900/50 hover:bg-gray-100 dark:hover:bg-green-900/80 border-green-200 dark:border-green-700/80 text-green-800 dark:text-green-200 font-medium" 
                                         onClick={() => fillLoginForm('sarah.miller@example.com', 'TestTest24')}
                                     >
                                         Use these credentials
@@ -227,29 +227,18 @@ export default function LoginPage() {
                         </div>
                         <div>
                             <p className="font-semibold">Bureau Member Role:</p>
-                            <p className="text-xs ml-2">Email: <code className="font-mono bg-muted px-1 py-0.5 rounded">max.sample@example.com</code></p>
-                            <p className="text-xs ml-2">Password: <code className="font-mono bg-muted px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
+                            <p className="text-xs ml-2">Email: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">max.sample@example.com</code></p>
+                            <p className="text-xs ml-2">Password: <code className="font-mono bg-green-100 dark:bg-green-900/80 px-1 py-0.5 rounded">-dkwfFv8WDGL=tR</code></p>
                             <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="mt-1 ml-2 text-xs h-7 bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-800 font-medium" 
+                                className="mt-1 ml-2 text-xs h-7 bg-white dark:bg-green-900/50 hover:bg-gray-100 dark:hover:bg-green-900/80 border-green-200 dark:border-green-700/80 text-green-800 dark:text-green-200 font-medium" 
                                 onClick={() => fillLoginForm('max.sample@example.com', '-dkwfFv8WDGL=tR')}
                             >
                                 Use these credentials
                             </Button>
                         </div>
                     </div>
-                    {/* <div className="mt-4 pt-2 border-t border-gray-200">
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="w-full text-xs h-7 bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-800 font-medium flex items-center justify-center"
-                            onClick={() => router.push(`/${currentLocale}/developer`)}
-                        >
-                            <Code className="mr-2 h-4 w-4" />
-                            Open Developer Module
-                        </Button>
-                    </div> */}
                 </AlertDescription>
             </Alert>
           </div>
