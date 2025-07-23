@@ -1,4 +1,3 @@
-
 import { adminDb as db } from '@/lib/firebaseAdminConfig';
 import {
   FieldValue,
@@ -22,8 +21,14 @@ import {
 const PERSONS_COLLECTION = 'persons';
 
 export class FirebasePersonRepository implements IPersonRepository {
+  private db: any;
+
+  constructor(dbInstance: any) {
+    this.db = dbInstance;
+  }
+
   private checkDb() {
-    if (!db) {
+    if (!this.db) {
       throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration in the .env file.");
     }
   }
@@ -136,7 +141,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   ): Promise<void> {
     try {
       this.checkDb();
-      const personDocRef = db.collection(PERSONS_COLLECTION).doc(uid);
+      const personDocRef = this.db.collection(PERSONS_COLLECTION).doc(uid);
       
       const dataToSet = Object.fromEntries(
         Object.entries(personData).filter(([_, v]) => v !== undefined && v !== null)
@@ -189,7 +194,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async getById(id: string): Promise<Person | null> {
     try {
       this.checkDb();
-      const docRef = db.collection(PERSONS_COLLECTION).doc(id);
+      const docRef = this.db.collection(PERSONS_COLLECTION).doc(id);
       const docSnap = await docRef.get();
       if (!docSnap.exists) {
         return null;
@@ -212,7 +217,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   ): Promise<void> {
     try {
       this.checkDb();
-      const docRef = db.collection(PERSONS_COLLECTION).doc(id);
+      const docRef = this.db.collection(PERSONS_COLLECTION).doc(id);
       
       const dataToUpdate = Object.fromEntries(
         Object.entries(updates).filter(([_, v]) => v !== undefined)
@@ -236,7 +241,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async findByEmail(email: string): Promise<Person | null> {
     try {
       this.checkDb();
-      const q = db.collection(PERSONS_COLLECTION).where('email', '==', email);
+      const q = this.db.collection(PERSONS_COLLECTION).where('email', '==', email);
       const querySnapshot = await q.get();
       if (querySnapshot.empty) {
         return null;
@@ -256,7 +261,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async findByDentistId(dentistId: string): Promise<Person | null> {
     try {
       this.checkDb();
-      const q = db.collection(PERSONS_COLLECTION).where('dentistId', '==', dentistId);
+      const q = this.db.collection(PERSONS_COLLECTION).where('dentistId', '==', dentistId);
       const querySnapshot = await q.get();
       if (querySnapshot.empty) {
         return null;
@@ -275,7 +280,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async getAll(): Promise<Person[]> {
     try {
       this.checkDb();
-      const querySnapshot = await db.collection(PERSONS_COLLECTION).get();
+      const querySnapshot = await this.db.collection(PERSONS_COLLECTION).get();
       return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
     } catch (error) {
       console.error("Error getting all persons:", error);
@@ -299,7 +304,7 @@ export class FirebasePersonRepository implements IPersonRepository {
       const { page, pageSize, orderBy, filters } = options;
       
       // Start with a base query
-      let query: any = db.collection(PERSONS_COLLECTION);
+      let query: any = this.db.collection(PERSONS_COLLECTION);
       
       // Apply filters if provided
       if (filters) {
@@ -348,7 +353,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async getByRole(role: UserRole): Promise<Person[]> {
     try {
       this.checkDb();
-      const q = db.collection(PERSONS_COLLECTION).where('role', '==', role);
+      const q = this.db.collection(PERSONS_COLLECTION).where('role', '==', role);
       const querySnapshot = await q.get();
       return querySnapshot.docs.map(doc => this.snapshotToPerson(doc));
     } catch (error) {
@@ -473,7 +478,7 @@ export class FirebasePersonRepository implements IPersonRepository {
   async getPersonsToReview(): Promise<Person[]> {
     try {
       this.checkDb();
-      const personsCollection = db.collection(PERSONS_COLLECTION);
+      const personsCollection = this.db.collection(PERSONS_COLLECTION);
       
       const pendingQuery = personsCollection.where('status', '==', 'pending');
       const changesQuery = personsCollection.where('hasPendingChanges', '==', true);

@@ -15,11 +15,19 @@ import {
 const DOC_TEMPLATES_COLLECTION = 'document_templates';
 
 export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepository {
+  private db: any;
+  private storage: any; // Add storage property
+
+  constructor(dbInstance: any, storageInstance: any) { // Accept db and storage instances
+    this.db = dbInstance;
+    this.storage = storageInstance; // Assign storage instance
+  }
+
   private checkServices() {
-    if (!db) {
+    if (!this.db) {
       throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration.");
     }
-    if (!adminStorage) {
+    if (!this.storage) { // Check the instance property
       throw new ConfigurationError("Firebase Admin Storage is not initialized. Check bucket name in .env");
     }
   }
@@ -52,7 +60,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       const fileBuffer = Buffer.from(await file.arrayBuffer());
 
       // 1. Upload file to Storage using Admin SDK
-      const fileUpload = adminStorage!.file(storagePath);
+      const fileUpload = this.storage!.file(storagePath);
       await fileUpload.save(fileBuffer, {
         public: true, // Make the file publicly readable. Firebase will infer content type.
       });
@@ -68,7 +76,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
         fileFormat: this.getFileFormat(file.name),
       };
       
-      const docRef = await db.collection(DOC_TEMPLATES_COLLECTION).add({
+      const docRef = await this.db.collection(DOC_TEMPLATES_COLLECTION).add({
         ...docData,
         lastChange: FieldValue.serverTimestamp(),
       });
@@ -90,7 +98,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
   async getAll(): Promise<DocumentTemplate[]> {
     try {
       this.checkServices();
-      const templatesCollection = db.collection(DOC_TEMPLATES_COLLECTION);
+      const templatesCollection = this.db.collection(DOC_TEMPLATES_COLLECTION);
       const q = templatesCollection.orderBy('lastChange', 'desc');
       const snapshot = await q.get();
 
@@ -126,18 +134,18 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       if (fileUrl) {
          try {
             // Extract the path from the URL. e.g., "document_templates/some_publisher/file.pdf"
-            const bucketName = adminStorage!.name;
+            const bucketName = this.storage!.name;
             const prefix = `https://storage.googleapis.com/${bucketName}/`;
             if (fileUrl.startsWith(prefix)) {
                 const filePath = decodeURIComponent(fileUrl.substring(prefix.length));
-                await adminStorage!.file(filePath).delete();
+                await this.storage!.file(filePath).delete();
             } else {
                 console.warn(`File URL ${fileUrl} does not match expected format for bucket ${bucketName}. Skipping deletion.`);
             }
         } catch (error: any) {
             // Log error but don't block Firestore deletion if file is already gone
             if (error.code === 404) { // GCS not found error code
-                console.warn(`File was not found in Storage, proceeding to delete Firestore document: ${fileUrl}`);
+                console.warn(`File was not found in Storage, proceeding to delete Firestore document: ${fileId}`);
             } else {
                 throw new FileOperationError(`Failed to delete file from Storage: ${fileUrl}`, error);
             }
@@ -145,7 +153,7 @@ export class FirebaseDocumentTemplateRepository implements IDocumentTemplateRepo
       }
       
       // 2. Delete document from Firestore
-      const docRef = db.collection(DOC_TEMPLATES_COLLECTION).doc(templateId);
+      const docRef = this.db.collection(DOC_TEMPLATES_COLLECTION).doc(templateId);
       await docRef.delete();
     } catch (error) {
       if (error instanceof FileOperationError || error instanceof ConfigurationError) {

@@ -14,12 +14,18 @@ import {
 const STATE_BUREAUS_COLLECTION = 'state_bureaus';
 
 export class FirebaseStateBureauRepository implements IStateBureauRepository {
+  private db: any;
+
+  constructor(dbInstance: any) { // Accept db instance
+    this.db = dbInstance;
+  }
+
   /**
    * Checks if the database is initialized
    * @throws ConfigurationError if Firestore is not initialized
    */
   private checkDb() {
-    if (!db) {
+    if (!this.db) {
       throw new ConfigurationError("Firestore is not initialized. Please check your Firebase configuration.");
     }
   }
@@ -54,7 +60,7 @@ export class FirebaseStateBureauRepository implements IStateBureauRepository {
   async create(id: string, bureauData: StateBureauCreationData): Promise<void> {
     try {
       this.checkDb();
-      const bureauDocRef = db.collection(STATE_BUREAUS_COLLECTION).doc(id);
+      const bureauDocRef = this.db.collection(STATE_BUREAUS_COLLECTION).doc(id);
       await bureauDocRef.set(bureauData);
     } catch (error) {
       console.error(`Error creating state bureau with ID ${id}:`, error);
@@ -71,7 +77,7 @@ export class FirebaseStateBureauRepository implements IStateBureauRepository {
   async getById(id: string): Promise<StateBureau | null> {
     try {
       this.checkDb();
-      const docRef = db.collection(STATE_BUREAUS_COLLECTION).doc(id);
+      const docRef = this.db.collection(STATE_BUREAUS_COLLECTION).doc(id);
       const docSnap = await docRef.get();
       if (!docSnap.exists) {
         return null;
@@ -91,7 +97,7 @@ export class FirebaseStateBureauRepository implements IStateBureauRepository {
   async getAll(): Promise<StateBureau[]> {
     try {
       this.checkDb();
-      const querySnapshot = await db.collection(STATE_BUREAUS_COLLECTION).get();
+      const querySnapshot = await this.db.collection(STATE_BUREAUS_COLLECTION).get();
       return querySnapshot.docs.map(doc => this.snapshotToStateBureau(doc));
     } catch (error) {
       console.error("Error getting all state bureaus:", error);

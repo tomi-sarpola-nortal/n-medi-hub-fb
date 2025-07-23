@@ -1,3 +1,4 @@
+
 import { FirebaseRepresentationRepository } from './firebase/FirebaseRepresentationRepository';
 import { FirebaseDocumentTemplateRepository } from './firebase/FirebaseDocumentTemplateRepository';
 import { FirebaseTrainingCategoryRepository } from './firebase/FirebaseTrainingCategoryRepository';
@@ -5,6 +6,7 @@ import { FirebaseTrainingOrganizerRepository } from './firebase/FirebaseTraining
 import { FirebaseTrainingHistoryRepository } from './firebase/FirebaseTrainingHistoryRepository';
 import { FirebasePersonRepository } from './firebase/FirebasePersonRepository';
 import { FirebaseStateBureauRepository } from './firebase/FirebaseStateChamberRepository';
+import { adminDb, adminStorage } from '@/lib/firebaseAdminConfig';
 
 import { IRepresentationRepository } from './interfaces/IRepresentationRepository';
 import { IDocumentTemplateRepository } from './interfaces/IDocumentTemplateRepository';
@@ -14,11 +16,11 @@ import { ITrainingHistoryRepository } from './interfaces/ITrainingHistoryReposit
 import { IPersonRepository } from './interfaces/IPersonRepository';
 import { IStateBureauRepository } from './interfaces/IStateChamberRepository';
 
-// Create and export repository instances
+// Create and export repository instances, passing the adminDb and adminStorage instances
 export const representationRepository: IRepresentationRepository = new FirebaseRepresentationRepository();
-export const documentTemplateRepository: IDocumentTemplateRepository = new FirebaseDocumentTemplateRepository();
+export const documentTemplateRepository: IDocumentTemplateRepository = new FirebaseDocumentTemplateRepository(adminDb, adminStorage);
 export const trainingCategoryRepository: ITrainingCategoryRepository = new FirebaseTrainingCategoryRepository();
 export const trainingOrganizerRepository: ITrainingOrganizerRepository = new FirebaseTrainingOrganizerRepository();
 export const trainingHistoryRepository: ITrainingHistoryRepository = new FirebaseTrainingHistoryRepository();
-export const personRepository: IPersonRepository = new FirebasePersonRepository();
-export const stateBureauRepository: IStateBureauRepository = new FirebaseStateBureauRepository();
+export const personRepository: IPersonRepository = new FirebasePersonRepository(adminDb);
+export const stateBureauRepository: IStateBureauRepository = new FirebaseStateBureauRepository(adminDb);
