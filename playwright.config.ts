@@ -7,7 +7,7 @@ export const DENTIST_AUTH_FILE = path.join(__dirname, 'playwright/.auth/dentist.
 export const LK_MEMBER_AUTH_FILE = path.join(__dirname, 'playwright/.auth/lk-member.json');
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e_test',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -19,17 +19,18 @@ export default defineConfig({
   },
   
   // A global setup file to run before all tests to handle authentication
-  globalSetup: require.resolve('./tests/global-setup'),
+  globalSetup: require.resolve('./tests/e2e_test/global-setup'),
 
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testMatch: /.*.spec.ts$/,
     },
     // Project for tests that need a logged-in Dentist
     {
       name: 'Dentist',
-      testMatch: /.*\.dentist\.spec\.ts/,
+      testMatch: /.*.dentist.spec.ts$/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: DENTIST_AUTH_FILE,
@@ -39,7 +40,7 @@ export default defineConfig({
     // Project for tests that need a logged-in LK Member
     {
       name: 'LK Member',
-      testMatch: /.*\.lk-member\.spec\.ts/,
+      testMatch: /.*.lk-member.spec.ts$/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: LK_MEMBER_AUTH_FILE,
@@ -49,7 +50,7 @@ export default defineConfig({
     // Setup project to handle authentication
     {
       name: 'setup',
-      testMatch: /global-setup\.ts/,
+      testMatch: /global-setup.ts$/,
     },
   ],
 });

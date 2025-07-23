@@ -34,7 +34,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/lib/` - Utilities, configurations, and shared libraries
 - `src/types/` - TypeScript type definitions
 - `locales/` - Translation files for German and English
-- `tests/` - Playwright E2E tests with authentication setup
+- `tests/` - Contains project tests, organized into subdirectories:
+    - `tests/unit_test/`: General unit tests.
+    - `tests/data_tests/`: Unit tests for the data layer (e.g., Firebase repositories).
+    - `tests/e2e_test/`: End-to-end tests using Playwright.
+    - `tests/reports/`: Directory for test reports.
 
 ### Architecture Patterns
 

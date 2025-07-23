@@ -197,9 +197,7 @@ describe('FirebaseDocumentTemplateRepository', () => {
         }
       ];
       
-      mockGet.mockResolvedValueOnce({
-        docs: mockDocs
-      });
+      mockGet.mockResolvedValueOnce({ docs: mockDocs });
 
       // Act
       const result = await repository.getAll();

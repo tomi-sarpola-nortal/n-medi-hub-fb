@@ -66,10 +66,12 @@ describe('FirebaseStateChamberRepository', () => {
       // Arrange
       const mockChamber = {
         name: 'Vienna Medical Bureau',
-        address: 'Kohlmarkt 11/6\n1010 Wien',
+        address: 'Kohlmarkt 11/6
+1010 Wien',
         phone: '+43 1 513 37 31',
         email: 'office@wr.aerztekammer.at',
-        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr'
+        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr
+Fr: 8:00 - 14:00 Uhr'
       };
       
       mockGet.mockResolvedValueOnce({
@@ -103,10 +105,12 @@ describe('FirebaseStateChamberRepository', () => {
       // Arrange
       const chamberData = {
         name: 'Vienna Medical Bureau',
-        address: 'Kohlmarkt 11/6\n1010 Wien',
+        address: 'Kohlmarkt 11/6
+1010 Wien',
         phone: '+43 1 513 37 31',
         email: 'office@wr.aerztekammer.at',
-        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr'
+        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr
+Fr: 8:00 - 14:00 Uhr'
       };
 
       mockSet.mockResolvedValueOnce({});
@@ -124,10 +128,12 @@ describe('FirebaseStateChamberRepository', () => {
       // Arrange
       const chamberData = {
         name: 'Vienna Medical Bureau',
-        address: 'Kohlmarkt 11/6\n1010 Wien',
+        address: 'Kohlmarkt 11/6
+1010 Wien',
         phone: '+43 1 513 37 31',
         email: 'office@wr.aerztekammer.at',
-        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr'
+        officeHours: 'Mo-Do: 8:00 - 16:30 Uhr
+Fr: 8:00 - 14:00 Uhr'
       };
 
       mockSet.mockRejectedValueOnce(new Error('Firestore error'));
@@ -158,28 +164,29 @@ describe('FirebaseStateChamberRepository', () => {
           id: 'wien',
           data: () => ({
             name: 'Vienna Medical Bureau',
-            address: 'Kohlmarkt 11/6\n1010 Wien',
+            address: 'Kohlmarkt 11/6
+1010 Wien',
             phone: '+43 1 513 37 31',
             email: 'office@wr.aerztekammer.at',
-            officeHours: 'Mo-Do: 8:00 - 16:30 Uhr\nFr: 8:00 - 14:00 Uhr'
+            officeHours: 'Mo-Do: 8:00 - 16:30 Uhr
+Fr: 8:00 - 14:00 Uhr'
           })
         },
         {
           id: 'noe',
           data: () => ({
             name: 'Lower Austria Medical Bureau',
-            address: 'Kremser Gasse 20\n3100 St. Pölten',
+            address: 'Kremser Gasse 20
+3100 St. Pölten',
             phone: '+43 2742 35 35 70',
             email: 'office@noe.aerztekammer.at',
-            officeHours: 'Mo-Do: 8:00 - 17:00 Uhr\nFr: 8:00 - 12:00 Uhr'
+            officeHours: 'Mo-Do: 8:00 - 17:00 Uhr
+Fr: 8:00 - 12:00 Uhr'
           })
         }
       ];
       
-      mockGet.mockResolvedValueOnce({
-        empty: false,
-        docs: mockChambers
-      });
+      mockGet.mockResolvedValueOnce({ empty: false, docs: mockChambers });
 
       // Act
       const result = await repository.getAll();
