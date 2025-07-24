@@ -1,7 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
-## REQ-A1.2: New dentist Log in
-After the Dentist has been created by the LK employee, the dentist gets an E-Mail (or letter) with dentist ID & OTP (or link to portal, whatever is simpler). From here, same flow as for Zahndat migrated dentists
+## REQ-B1.3: Dentist change notification
+Dentist notified via E-Mail if change wasn´t accepted and the comment. Can then change again in System.
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

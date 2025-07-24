@@ -1,6 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
 ## REQ-A2.2: Provide Dentist ID & OTP
+For getting the OTP & Dentist ID to the dentist, either through e-mail or via letter, the same features as in Dentist Migration are used
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

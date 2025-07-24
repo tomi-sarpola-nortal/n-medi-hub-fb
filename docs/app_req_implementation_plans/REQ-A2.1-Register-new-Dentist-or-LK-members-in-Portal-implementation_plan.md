@@ -1,7 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
-## REQ-A1.2: New dentist Log in
-After the Dentist has been created by the LK employee, the dentist gets an E-Mail (or letter) with dentist ID & OTP (or link to portal, whatever is simpler). From here, same flow as for Zahndat migrated dentists
+## REQ-A2.1: Register new Dentist or LK members in Portal
+The employee of the Landeskammer will answer the E-Mail of the Dentist. Once the employee has all the information, can fill out the fields of the dentist in the portal. The Dentist ID is created.
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

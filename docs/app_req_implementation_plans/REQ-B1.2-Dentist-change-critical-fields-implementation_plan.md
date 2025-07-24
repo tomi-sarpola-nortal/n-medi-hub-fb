@@ -1,7 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
-## REQ-A1.2: New dentist Log in
-After the Dentist has been created by the LK employee, the dentist gets an E-Mail (or letter) with dentist ID & OTP (or link to portal, whatever is simpler). From here, same flow as for Zahndat migrated dentists
+## REQ-B1.2: Dentist change critical fields
+Dentist selects Critical fields (TBD which) to be changed. After confirming, alert next to field that Chamber will confirm change.
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

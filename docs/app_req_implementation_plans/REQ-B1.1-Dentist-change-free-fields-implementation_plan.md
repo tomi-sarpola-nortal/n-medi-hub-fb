@@ -1,7 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
-## REQ-A1.2: New dentist Log in
-After the Dentist has been created by the LK employee, the dentist gets an E-Mail (or letter) with dentist ID & OTP (or link to portal, whatever is simpler). From here, same flow as for Zahndat migrated dentists
+## REQ-B1.1: Dentist change free fields
+Dentist can access profile and change fields. Fields such as opening hours, etc. TBD which fields
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

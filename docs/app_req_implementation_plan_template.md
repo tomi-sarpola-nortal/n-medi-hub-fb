@@ -1,6 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
 ## REQ-XXX: [Requirement Name]
+[Requirement Details]
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**

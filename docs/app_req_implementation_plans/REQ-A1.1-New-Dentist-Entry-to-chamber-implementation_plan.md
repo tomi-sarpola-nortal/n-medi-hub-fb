@@ -1,7 +1,7 @@
 # Implementation Plan Templates for Dentist Portal
 
-## REQ-A1.2: New dentist Log in
-After the Dentist has been created by the LK employee, the dentist gets an E-Mail (or letter) with dentist ID & OTP (or link to portal, whatever is simpler). From here, same flow as for Zahndat migrated dentists
+## REQ-A1.1: New Dentist Entry to chamber
+Dentists can see the E-Mail of ÖZÄK on the login view of the portal. They write an E-Mail to ÖZÄK where they include the necessary Information. They can also do the same thing by going physically to a ÖZÄK office and do the process manually.
 
 ### Task 1: Repository & Data Layer Setup
 **Prompt for AI:**
